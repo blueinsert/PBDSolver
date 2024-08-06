@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace bluebean.UGFramework.Physics
+namespace bluebean.Physics.PBD
 {
     [CustomEditor(typeof(BunnyTetMeshImpl))]
     public class TetMeshInspector : Editor
@@ -20,11 +20,11 @@ namespace bluebean.UGFramework.Physics
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
-            if (GUILayout.Button("³õÊ¼»¯"))
+            if (GUILayout.Button("ï¿½ï¿½Ê¼ï¿½ï¿½"))
             {
                 m_tetMesh.Init();
             }
-            if (GUILayout.Button("Í¬²½Mesh"))
+            if (GUILayout.Button("Í¬ï¿½ï¿½Mesh"))
             {
                 m_tetMesh.Sync2Mesh4Editor();
             }
