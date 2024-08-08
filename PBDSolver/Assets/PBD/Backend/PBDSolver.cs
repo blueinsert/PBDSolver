@@ -13,6 +13,14 @@ namespace bluebean.Physics.PBD
 {
     public class PBDSolver : MonoBehaviour, ISolver
     {
+        public ColliderWorld ColliderWorld
+        {
+            get
+            {
+                return m_colliderWorld;
+            }
+        }
+
         public int m_targetFrameRate = 60;
         public float m_dtSubStep = 0.0333f;
         public float m_dtStep = 0.0333f;
@@ -33,6 +41,8 @@ namespace bluebean.Physics.PBD
         private Dictionary<int, PDBActor> m_actorDic = new Dictionary<int, PDBActor>();
 
         private Dictionary<int, ConstrainGroup> m_constrains = new Dictionary<int, ConstrainGroup>();
+
+        private ColliderWorld m_colliderWorld = new ColliderWorld();
 
         #region 粒子数据
 
@@ -89,6 +99,14 @@ namespace bluebean.Physics.PBD
             m_dtStep = 1.0f / m_targetFrameRate;
             m_damping_subStep = Mathf.Pow(m_damping, 1.0f / m_subStep);
             m_dtSubStep = m_dtStep / m_subStep;
+            Intialize();
+           
+        }
+
+        private void Intialize()
+        {
+            m_colliderWorld = new ColliderWorld();
+            m_colliderWorld.Initialzie();
             InitConstrains();
         }
 
@@ -237,6 +255,7 @@ namespace bluebean.Physics.PBD
 
         void OnPreStep()
         {
+            m_colliderWorld.OnPreStep();
             for (int i = 0; i < m_actors.Count; i++)
             {
                 m_actors[i].OnPreStep();
