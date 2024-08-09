@@ -64,13 +64,14 @@
     <Compile Include="Assets\PBD\Frontend\ColliderBase.cs" />
     <Compile Include="Assets\PBD\Backend\DataStruct\Native\NativeAffineTransformList.cs" />
     <Compile Include="Assets\PBD\Backend\DataStruct\Native\NativeAabbList.cs" />
+    <Compile Include="Assets\PBD\Backend\Job\Collide\BuildSimplexAabbsJob.cs" />
     <Compile Include="Assets\PBD\Backend\DataStruct\Burst\BurstIntegration.cs" />
     <Compile Include="Assets\PBD\Backend\Constrains\StretchConstrainGroup.cs" />
     <Compile Include="Assets\PBD\Backend\DataStruct\CellSpan.cs" />
     <Compile Include="Assets\PBD\Backend\DataStruct\Native\NativeInt2List.cs" />
     <Compile Include="Assets\PBD\Backend\PBDUtil.cs" />
-    <Compile Include="Assets\PBD\Backend\DataStruct\SDF\ASDF.cs" />
     <Compile Include="Assets\PBD\Backend\Job\Constrains\StretchConstrainSolveJob.cs" />
+    <Compile Include="Assets\PBD\Backend\DataStruct\SDF\ASDF.cs" />
     <Compile Include="Assets\PBD\Frontend\PbdMeshCollider.cs" />
     <Compile Include="Assets\PBD\Backend\Utils\ParticleDragger.cs" />
     <Compile Include="Assets\PBD\Backend\Constrains\VolumeConstrainGroup.cs" />
@@ -133,6 +134,8 @@
     <Compile Include="Assets\PBD\Backend\DataStruct\Burst\BurstContact.cs" />
     <Compile Include="Assets\PBD\Backend\PBDSolver.cs" />
     <Compile Include="Assets\PBD\Backend\DataStruct\Burst\BurstAabb.cs" />
+    <Compile Include="Assets\PBD\Backend\Job\Collide\GenerateContactsJob.cs" />
+    <Compile Include="Assets\PBD\Backend\Job\Collide\UpdateMovingCollidersJob.cs" />
     <Compile Include="Assets\PBD\Backend\Actor\SoftBodyActor.cs" />
     <Compile Include="Assets\PBD\Backend\Job\Collide\IdentifyMovingCollidersJob.cs" />
     <Compile Include="Assets\PBD\Backend\BurstMath.cs" />

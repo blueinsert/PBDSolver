@@ -5,6 +5,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Collections;
+using Unity.Collections.LowLevel.Unsafe;
+using Unity.Jobs;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -19,14 +21,16 @@ namespace bluebean.Physics.PBD
 
     public class ColliderWorld
     {
-        struct MovingCollider
+        ISolver Solver
         {
-            public BurstCellSpan oldSpan;
-            public BurstCellSpan newSpan;
-            public int entity;
+            get
+            {
+                return m_solver;
+            }
         }
 
         #region 内部变量
+        ISolver m_solver;
 
         #region 碰撞体数据
         [NonSerialized] public List<ColliderHandle> m_colliderHandles;
@@ -51,7 +55,7 @@ namespace bluebean.Physics.PBD
 
         #endregion
 
-        public void Initialzie()
+        public void Initialzie(ISolver solver)
         {
             m_colliderHandles = new List<ColliderHandle>();
             m_colliderShapes = new NativeColliderShapeList();
@@ -91,11 +95,83 @@ namespace bluebean.Physics.PBD
         /// <summary>
         /// 更新网格划分
         /// </summary>
-        public void UpdateCollidersMultiGrid()
+        public void UpdateCollidersMultiGrid(float deltaTime)
         {
+            //将移动的碰撞体加入队列
+            var identifyMoving = new IdentifyMovingCollidersJob
+            {
+                movingColliders = this.movingColliders.AsParallelWriter(),
+                shapes = this.m_colliderShapes.AsNativeArray<BurstColliderShape>(cellSpans.count),
+                //rigidbodies = world.rigidbodies.AsNativeArray<BurstRigidbody>(),
+                //collisionMaterials = world.collisionMaterials.AsNativeArray<BurstCollisionMaterial>(),
+                bounds = this.m_colliderAabbs.AsNativeArray<BurstAabb>(cellSpans.count),
+                cellIndices = this.cellSpans.AsNativeArray<BurstCellSpan>(),
+                colliderCount = colliderCount,
+                dt = deltaTime
+            };
+            JobHandle movingHandle = identifyMoving.Schedule(cellSpans.count, 128);
 
+            var updateMoving = new UpdateMovingColliders
+            {
+                movingColliders = movingColliders,
+                grid = grid,
+                colliderCount = colliderCount
+            };
+            updateMoving.Schedule(movingHandle).Complete();
         }
 
+        public JobHandle GenerateContacts(float deltaTime, JobHandle inputDeps)
+        {
+            var world = ObiColliderWorld.GetInstance();
+
+            var generateColliderContactsJob = new GenerateContactsJob
+            {
+                colliderGrid = grid,
+                gridLevels = grid.populatedLevels.GetKeyArray(Allocator.TempJob),
+
+                positions = Solver.ParticlePositions,
+                orientations = solver.orientations,
+                velocities = solver.velocities,
+                invMasses = solver.invMasses,
+                radii = solver.principalRadii,
+                filters = solver.filters,
+
+                simplices = solver.simplices,
+                simplexCounts = solver.simplexCounts,
+                simplexBounds = solver.simplexBounds,
+
+                transforms = world.colliderTransforms.AsNativeArray<BurstAffineTransform>(),
+                shapes = world.colliderShapes.AsNativeArray<BurstColliderShape>(),
+                rigidbodies = world.rigidbodies.AsNativeArray<BurstRigidbody>(),
+                collisionMaterials = world.collisionMaterials.AsNativeArray<BurstCollisionMaterial>(),
+                bounds = world.colliderAabbs.AsNativeArray<BurstAabb>(),
+
+                distanceFieldHeaders = world.distanceFieldContainer.headers.AsNativeArray<DistanceFieldHeader>(),
+                distanceFieldNodes = world.distanceFieldContainer.dfNodes.AsNativeArray<BurstDFNode>(),
+
+                triangleMeshHeaders = world.triangleMeshContainer.headers.AsNativeArray<TriangleMeshHeader>(),
+                bihNodes = world.triangleMeshContainer.bihNodes.AsNativeArray<BIHNode>(),
+                triangles = world.triangleMeshContainer.triangles.AsNativeArray<Triangle>(),
+                vertices = world.triangleMeshContainer.vertices.AsNativeArray<float3>(),
+
+                edgeMeshHeaders = world.edgeMeshContainer.headers.AsNativeArray<EdgeMeshHeader>(),
+                edgeBihNodes = world.edgeMeshContainer.bihNodes.AsNativeArray<BIHNode>(),
+                edges = world.edgeMeshContainer.edges.AsNativeArray<Edge>(),
+                edgeVertices = world.edgeMeshContainer.vertices.AsNativeArray<float2>(),
+
+                heightFieldHeaders = world.heightFieldContainer.headers.AsNativeArray<HeightFieldHeader>(),
+                heightFieldSamples = world.heightFieldContainer.samples.AsNativeArray<float>(),
+
+                contactsQueue = colliderContactQueue.AsParallelWriter(),
+                solverToWorld = solver.solverToWorld,
+                worldToSolver = solver.worldToSolver,
+                deltaTime = deltaTime,
+                parameters = solver.abstraction.parameters
+            };
+
+            return generateColliderContactsJob.Schedule(solver.simplexCounts.simplexCount, 16, inputDeps);
+
+        }
 
         public void OnPreSubStep(float dt, Vector3 g)
         {

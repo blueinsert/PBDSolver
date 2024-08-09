@@ -24,6 +24,9 @@ namespace bluebean.Physics.PBD
         [ReadOnly] public NativeArray<BurstColliderShape> shapes;
         //[ReadOnly] public NativeArray<BurstRigidbody> rigidbodies;
         //[ReadOnly] public NativeArray<BurstCollisionMaterial> collisionMaterials;
+        /// <summary>
+        /// 碰撞体Aabb世界坐标
+        /// </summary>
         public NativeArray<BurstAabb> bounds;
 
         public NativeArray<BurstCellSpan> cellIndices;
@@ -54,11 +57,11 @@ namespace bluebean.Physics.PBD
                                                       new int4(GridHash.Quantize(velocityBounds.max.xyz, cellSize), level));
 
             // if the collider is 2D, project it to the z = 0 cells.
-            if (shapes[i].is2D != 0)
-            {
-                newSpan.min[2] = 0;
-                newSpan.max[2] = 0;
-            }
+            //if (shapes[i].is2D != 0)
+            //{
+            //    newSpan.min[2] = 0;
+            //    newSpan.max[2] = 0;
+            //}
 
             // if the collider is at the tail (removed), we will only remove it from its current cellspan.
             // if the new cellspan and the current one are different, we must remove it from its current cellspan and add it to its new one.

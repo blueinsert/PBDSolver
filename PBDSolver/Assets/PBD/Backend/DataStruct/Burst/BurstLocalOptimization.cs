@@ -36,6 +36,18 @@ namespace bluebean.Physics.PBD.DataStruct
             }
         }
 
+        public static SurfacePoint NoOptimize<T>(ref T function,
+                                              NativeArray<float4> positions,
+                                              NativeArray<float4> radii,
+                                               int simplexIndex ) where T : struct, IDistanceFunction
+        {
+            var pointInFunction = new SurfacePoint();
+            var convexPoint = positions[simplexIndex];
+            var convexThickness = radii[simplexIndex];
+            function.Evaluate(convexPoint, convexThickness, quaternion.identity, ref pointInFunction);
+            return pointInFunction;
+        }
+
         public static SurfacePoint Optimize<T>(ref T function,
                                                NativeArray<float4> positions,
                                                NativeArray<quaternion> orientations,
