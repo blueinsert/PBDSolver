@@ -183,6 +183,7 @@ namespace bluebean.Physics.PBD
                     {
                         //colliderToSolver = colliderToSolver,
                         //solverToWorld = solverToWorld,
+                        colliderToWorld = colliderToWorld,
                         shape = shape,
                         header = triangleMeshHeaders[shape.dataIndex],
                         bihNodes = bihNodes,
@@ -193,7 +194,7 @@ namespace bluebean.Physics.PBD
                     };
 
                     triangleMeshShape.Contacts(colliderIndex, positions, velocities, radii, in simplexBoundsCS,
-                    simplexIndex, contactsQueue);
+                        simplexIndex, contactsQueue);
 
                     break;
                     //case ColliderShape.ShapeType.Sphere:

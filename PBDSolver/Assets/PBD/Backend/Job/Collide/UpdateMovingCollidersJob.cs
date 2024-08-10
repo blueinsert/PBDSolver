@@ -13,7 +13,7 @@ namespace bluebean.Physics.PBD
     /// 根据MovingCollider更新MultiGrid
     /// </summary>
     [BurstCompile]
-    public struct UpdateMovingColliders : IJob
+    public struct UpdateMovingCollidersJob : IJob
     {
         public NativeQueue<MovingCollider> movingColliders;
         public NativeMultilevelGrid<int> grid;

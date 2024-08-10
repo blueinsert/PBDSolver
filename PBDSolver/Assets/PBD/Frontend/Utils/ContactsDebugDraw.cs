@@ -46,21 +46,23 @@ public class ContactsDebugDraw : MonoBehaviour
 
             //if (contact.distance > 0.001f) continue;
 
-            Gizmos.color = (contact.distance <= 0) ? Color.red : Color.green;
+            
 
             //Gizmos.color = new Color(((i * 100) % 255) / 255.0f, ((i * 50) % 255) / 255.0f, ((i * 20) % 255) / 255.0f);
 
-            int simplexStart = contact.bodyA;
-            var radius = solver.ParticleRadius[simplexStart].x;
-            var point = solver.GetParticlePosition(simplexStart);
+            int simplexIndex = contact.bodyA;
+            var radius = solver.ParticleRadius[simplexIndex].x;
+            var particlePoint = solver.GetParticlePosition(simplexIndex);
 
+            var distance = contact.distance;
+            var collidePoint = contact.pointB;
             Vector3 normal = contact.normal;
 
-            //Gizmos.DrawSphere(point + normal.normalized * frame.contacts[i].distance, 0.01f);
-
-            Gizmos.DrawSphere(point + normal * radius, 0.01f);
-
-            Gizmos.DrawRay(point + normal * radius, normal.normalized * contact.distance);
+            Gizmos.color = Color.blue;
+            Gizmos.DrawSphere(particlePoint, 0.01f);
+            Gizmos.color = (distance <= 0) ? Color.red : Color.green;
+            Gizmos.DrawSphere(collidePoint, 0.01f);
+            Gizmos.DrawRay(collidePoint, normal.normalized * distance);
         }
     }
 

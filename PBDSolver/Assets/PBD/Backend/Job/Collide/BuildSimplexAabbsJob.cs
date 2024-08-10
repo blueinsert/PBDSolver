@@ -31,7 +31,6 @@ namespace bluebean.Physics.PBD.DataStruct
 
         public void Execute(int i)
         {
-            int simplexStart = i;// simplexCounts.GetSimplexStartAndSize(i, out int simplexSize);
 
             var bounds = new BurstAabb(float.MaxValue, float.MinValue);
 

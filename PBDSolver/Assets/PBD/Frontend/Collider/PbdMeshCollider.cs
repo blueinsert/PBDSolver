@@ -33,8 +33,9 @@ namespace bluebean.Physics.PBD
             }
             var index = m_colliderHandle.index;
             var shape = colliderWorld.m_colliderShapes[index];
-            shape.type = ColliderShape.ShapeType.TriangleMesh;
+            shape.type = ColliderShapeType.TriangleMesh;
             shape.dataIndex = m_shapeHandle.index;
+            colliderWorld.m_colliderShapes[index] = shape;
 
             var aabb = colliderWorld.m_colliderAabbs[index];
             aabb.FromBounds(m_unityMeshCollider.bounds, 0);

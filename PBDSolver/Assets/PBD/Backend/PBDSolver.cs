@@ -143,6 +143,10 @@ namespace bluebean.Physics.PBD
             m_positionDeltaList.Dispose();
             m_gradientList.Dispose();
             m_positionConstraintCountList.Dispose();
+            m_radiusList.Dispose();
+            m_aabbList.Dispose();
+
+            m_colliderWorld.Destroy();
         }
 
         private void InitConstrains()
@@ -242,7 +246,8 @@ namespace bluebean.Physics.PBD
                     this.m_positionDeltaList[index] = Vector4.zero;
                     this.m_gradientList[index] = Vector4.zero;
                     this.m_positionConstraintCountList[index] = 0;
-                    this.m_radiusList[index] = new Vector4(1, 1, 1, 1);
+                    float radius = 0.1f;
+                    this.m_radiusList[index] = new Vector4(radius, radius, radius, radius);
                     this.m_aabbList[index] = new Aabb();
                     //if(i == 25)
                     //{
@@ -282,7 +287,7 @@ namespace bluebean.Physics.PBD
 
         void OnPreStep()
         {
-            m_colliderWorld.OnPreStep();
+            m_colliderWorld.UpdateWorld(m_dtStep);
             for (int i = 0; i < m_actors.Count; i++)
             {
                 m_actors[i].OnPreStep();
@@ -317,6 +322,9 @@ namespace bluebean.Physics.PBD
                 OnCollision(this, collisionArgs);
 
             }
+
+            if (colliderContacts.IsCreated)
+                colliderContacts.Dispose();
         }
 
         void Solve()
@@ -433,7 +441,7 @@ namespace bluebean.Physics.PBD
             return pos;
         }
 
-        protected JobHandle UpdateSimplexBounds(JobHandle inputDeps, float deltaTime)
+        protected JobHandle UpdateSimplexBounds(float deltaTime)
         {
             var buildAabbs = new BuildSimplexAabbsJob
             {
@@ -441,17 +449,11 @@ namespace bluebean.Physics.PBD
                 positions = this.ParticlePositions,
                 velocities = this.ParticleVels,
                 collisionMargin = 0,
-                continuousCollisionDetection = 0,
+                continuousCollisionDetection = 1,
                 dt = deltaTime,
+                simplexBounds = this.ParticleAabb,
             };
-            return buildAabbs.Schedule(this.ParticlePositions.Count(), 32, inputDeps);
-        }
-
-        protected JobHandle GenerateContacts(JobHandle inputDeps, float deltaTime)
-        {
-            inputDeps = UpdateSimplexBounds(inputDeps, deltaTime);
-            inputDeps = m_colliderWorld.GenerateContacts(deltaTime, inputDeps);
-            return inputDeps;
+            return buildAabbs.Schedule(this.ParticlePositions.Count(), 32);
         }
 
         public void GetCollisionContacts(Contact[] contacts, int count)
@@ -461,8 +463,10 @@ namespace bluebean.Physics.PBD
 
         private void CollisionDetection(float deltaTime)
         {
-            var jobHandle = GenerateContacts(new JobHandle(), deltaTime);
-            jobHandle.Complete();
+            var updateSimplexBoundsHandle = UpdateSimplexBounds(deltaTime);
+           
+            var gemterateCpmtactsHandle = m_colliderWorld.GenerateContacts(deltaTime, updateSimplexBoundsHandle);
+            gemterateCpmtactsHandle.Complete();
 
             colliderContacts = new NativeArray<BurstContact>(m_colliderWorld.colliderContactQueue.Count, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
 
@@ -471,9 +475,11 @@ namespace bluebean.Physics.PBD
                 InputQueue = m_colliderWorld.colliderContactQueue,
                 OutputArray = colliderContacts
             };
-            jobHandle = dequeueColliderContacts.Schedule(jobHandle);
-
-            jobHandle.Complete();
+            dequeueColliderContacts.Schedule().Complete();
+            if (colliderContacts.Length > 0)
+            {
+                Debug.Log($"contacts count: {colliderContacts.Length}");
+            }
         }
     }
 }

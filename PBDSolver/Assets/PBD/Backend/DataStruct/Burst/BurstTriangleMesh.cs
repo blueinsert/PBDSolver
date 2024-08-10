@@ -29,13 +29,16 @@ namespace bluebean.Physics.PBD.DataStruct
         /// <param name="projectedPoint"></param>
         public void Evaluate(float4 point, float4 radii, quaternion orientation, ref SurfacePoint projectedPoint)
         {
+            //从世界坐标系转碰撞体本地坐标系
+            point = colliderToWorld.InverseTransformPoint(point);
             //point = colliderToSolver.InverseTransformPointUnscaled(point);
 
             float4 nearestPoint = BurstMath.NearestPointOnTri(tri, point, out float4 bary);
             float4 normal = math.normalizesafe(point - nearestPoint);
 
-            projectedPoint.point = nearestPoint + normal * shape.contactOffset;// colliderToSolver.TransformPointUnscaled(nearestPoint + normal * shape.contactOffset);
-            projectedPoint.normal = normal;// colliderToSolver.TransformDirection(normal);
+            //转回世界坐标系
+            projectedPoint.point = colliderToWorld.TransformPoint(nearestPoint + normal * shape.contactOffset);// colliderToSolver.TransformPointUnscaled(nearestPoint + normal * shape.contactOffset);
+            projectedPoint.normal = colliderToWorld.TransformDirection(normal);// colliderToSolver.TransformDirection(normal);
         }
 
         public void Contacts(int colliderIndex,
@@ -142,6 +145,7 @@ namespace bluebean.Physics.PBD.DataStruct
                                 pointA = new float4(1,0,0,0),
                                 pointB = colliderPoint.point,
                                 normal = colliderPoint.normal,
+                                distance = dAB,
                             });
                         }
                     }

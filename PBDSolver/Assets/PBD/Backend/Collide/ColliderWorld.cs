@@ -39,12 +39,15 @@ namespace bluebean.Physics.PBD
         [NonSerialized] public NativeAabbList m_colliderAabbs;                   // list of collider bounds.
         [NonSerialized] public NativeAffineTransformList m_colliderTransforms;   // list of collider transforms.
         [NonSerialized] public TriangleMeshContainer m_triangleMeshContainer;
-        private int colliderCount = 0;
+        private int m_colliderCount = 0;
         #endregion
 
         #region 碰撞体网格划分，空间优化
         private NativeQueue<MovingCollider> movingColliders;
         private NativeMultilevelGrid<int> grid;
+        /// <summary>
+        /// 每个碰撞体在网格坐标上跨域的范围
+        /// </summary>
         public NativeCellSpanList cellSpans;
         #endregion
 
@@ -54,12 +57,33 @@ namespace bluebean.Physics.PBD
 
         public void Initialzie(ISolver solver)
         {
+            m_solver = solver;
+
             m_colliderHandles = new List<ColliderHandle>();
             m_colliderShapes = new NativeColliderShapeList();
             m_colliderAabbs = new NativeAabbList();
             m_colliderTransforms = new NativeAffineTransformList();
+            cellSpans = new NativeCellSpanList();
             m_triangleMeshContainer = new TriangleMeshContainer();
-            colliderCount = 0;
+            m_colliderCount = 0;
+
+            movingColliders = new NativeQueue<MovingCollider>(Allocator.Persistent);
+            grid = new NativeMultilevelGrid<int>(1000, Allocator.Persistent);
+            colliderContactQueue = new NativeQueue<BurstContact>(Allocator.Persistent);
+        }
+
+        public void Destroy()
+        {
+            m_colliderHandles.Clear(); m_colliderHandles = null;
+            m_colliderShapes.Dispose(); m_colliderShapes = null;
+            m_colliderAabbs.Dispose(); m_colliderAabbs = null;
+            m_colliderTransforms.Dispose(); m_colliderTransforms = null;
+            cellSpans.Dispose(); cellSpans = null;
+            m_triangleMeshContainer.Dispose(); m_triangleMeshContainer = null;
+            m_colliderCount = 0;
+            movingColliders.Dispose();
+            grid.Dispose();
+            colliderContactQueue.Dispose();
         }
 
         public ColliderHandle CreateCollider()
@@ -70,6 +94,9 @@ namespace bluebean.Physics.PBD
             m_colliderShapes.Add(new ColliderShape() {  });
             m_colliderAabbs.Add(new Aabb());
             m_colliderTransforms.Add(new AffineTransform());
+
+            cellSpans.Add(new CellSpan());
+            m_colliderCount++;
 
             return handle;
         }
@@ -94,7 +121,9 @@ namespace bluebean.Physics.PBD
         /// </summary>
         public void UpdateCollidersMultiGrid(float deltaTime)
         {
-            //将移动的碰撞体加入队列
+            if (m_colliderCount <= 0)
+                return;
+            //获取移动的碰撞体和其范围
             var identifyMoving = new IdentifyMovingCollidersJob
             {
                 movingColliders = this.movingColliders.AsParallelWriter(),
@@ -103,16 +132,16 @@ namespace bluebean.Physics.PBD
                 //collisionMaterials = world.collisionMaterials.AsNativeArray<BurstCollisionMaterial>(),
                 bounds = this.m_colliderAabbs.AsNativeArray<BurstAabb>(cellSpans.count),
                 cellIndices = this.cellSpans.AsNativeArray<BurstCellSpan>(),
-                colliderCount = colliderCount,
+                colliderCount = m_colliderCount,
                 dt = deltaTime
             };
-            JobHandle movingHandle = identifyMoving.Schedule(cellSpans.count, 128);
-
-            var updateMoving = new UpdateMovingColliders
+            JobHandle movingHandle = identifyMoving.Schedule(m_colliderCount, 128);
+            //更新multiGrid
+            var updateMoving = new UpdateMovingCollidersJob
             {
                 movingColliders = movingColliders,
                 grid = grid,
-                colliderCount = colliderCount
+                colliderCount = m_colliderCount
             };
             updateMoving.Schedule(movingHandle).Complete();
         }
@@ -169,24 +198,10 @@ namespace bluebean.Physics.PBD
 
         }
 
-        public void OnPreSubStep(float dt, Vector3 g)
-        {
-
-        }
-
-        public void OnPostSubStep(float dt, float velDamp)
-        {
-
-        }
-
-        public void OnPreStep() {
+        public void UpdateWorld(float deltaTime) {
             UpdateColliders();
+            UpdateCollidersMultiGrid(deltaTime);
         }
-
-        public void OnPostStep()
-        {
-        }
-
-        
+ 
     }
 }
