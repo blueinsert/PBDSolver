@@ -4,6 +4,7 @@ using bluebean.Physics.PBD.DataStruct.Native;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
@@ -47,11 +48,7 @@ namespace bluebean.Physics.PBD
         public NativeCellSpanList cellSpans;
         #endregion
 
-        public NativeArray<int> simplices;
-        public NativeArray<BurstAabb> simplexBounds;
-        public NativeArray<float4> principalRadii;
-
-        public NativeArray<BurstContact> colliderContacts;
+        public NativeQueue<BurstContact> colliderContactQueue;
 
         #endregion
 
@@ -122,7 +119,6 @@ namespace bluebean.Physics.PBD
 
         public JobHandle GenerateContacts(float deltaTime, JobHandle inputDeps)
         {
-            var world = ObiColliderWorld.GetInstance();
 
             var generateColliderContactsJob = new GenerateContactsJob
             {
@@ -130,46 +126,46 @@ namespace bluebean.Physics.PBD
                 gridLevels = grid.populatedLevels.GetKeyArray(Allocator.TempJob),
 
                 positions = Solver.ParticlePositions,
-                orientations = solver.orientations,
-                velocities = solver.velocities,
-                invMasses = solver.invMasses,
-                radii = solver.principalRadii,
-                filters = solver.filters,
+                //orientations = solver.orientations,
+                velocities = Solver.ParticleVels,
+                invMasses = Solver.InvMasses,
+                radii = Solver.ParticleRadius,
+                //filters = solver.filters,
 
-                simplices = solver.simplices,
-                simplexCounts = solver.simplexCounts,
-                simplexBounds = solver.simplexBounds,
+                //simplices = solver.simplices,
+                //simplexCounts = solver.simplexCounts,
+                simplexBounds = Solver.ParticleAabb,
 
-                transforms = world.colliderTransforms.AsNativeArray<BurstAffineTransform>(),
-                shapes = world.colliderShapes.AsNativeArray<BurstColliderShape>(),
-                rigidbodies = world.rigidbodies.AsNativeArray<BurstRigidbody>(),
-                collisionMaterials = world.collisionMaterials.AsNativeArray<BurstCollisionMaterial>(),
-                bounds = world.colliderAabbs.AsNativeArray<BurstAabb>(),
+                transforms = this.m_colliderTransforms.AsNativeArray<BurstAffineTransform>(),
+                shapes = this.m_colliderShapes.AsNativeArray<BurstColliderShape>(),
+                //rigidbodies = world.rigidbodies.AsNativeArray<BurstRigidbody>(),
+                //collisionMaterials = world.collisionMaterials.AsNativeArray<BurstCollisionMaterial>(),
+                bounds = this.m_colliderAabbs.AsNativeArray<BurstAabb>(),
 
-                distanceFieldHeaders = world.distanceFieldContainer.headers.AsNativeArray<DistanceFieldHeader>(),
-                distanceFieldNodes = world.distanceFieldContainer.dfNodes.AsNativeArray<BurstDFNode>(),
+                //distanceFieldHeaders = world.distanceFieldContainer.headers.AsNativeArray<DistanceFieldHeader>(),
+                //distanceFieldNodes = world.distanceFieldContainer.dfNodes.AsNativeArray<BurstDFNode>(),
 
-                triangleMeshHeaders = world.triangleMeshContainer.headers.AsNativeArray<TriangleMeshHeader>(),
-                bihNodes = world.triangleMeshContainer.bihNodes.AsNativeArray<BIHNode>(),
-                triangles = world.triangleMeshContainer.triangles.AsNativeArray<Triangle>(),
-                vertices = world.triangleMeshContainer.vertices.AsNativeArray<float3>(),
+                triangleMeshHeaders = this.m_triangleMeshContainer.headers.AsNativeArray<TriangleMeshHeader>(),
+                bihNodes = this.m_triangleMeshContainer.bihNodes.AsNativeArray<BIHNode>(),
+                triangles = this.m_triangleMeshContainer.triangles.AsNativeArray<Triangle>(),
+                vertices = this.m_triangleMeshContainer.vertices.AsNativeArray<float3>(),
 
-                edgeMeshHeaders = world.edgeMeshContainer.headers.AsNativeArray<EdgeMeshHeader>(),
-                edgeBihNodes = world.edgeMeshContainer.bihNodes.AsNativeArray<BIHNode>(),
-                edges = world.edgeMeshContainer.edges.AsNativeArray<Edge>(),
-                edgeVertices = world.edgeMeshContainer.vertices.AsNativeArray<float2>(),
+                //edgeMeshHeaders = world.edgeMeshContainer.headers.AsNativeArray<EdgeMeshHeader>(),
+                //edgeBihNodes = world.edgeMeshContainer.bihNodes.AsNativeArray<BIHNode>(),
+                //edges = world.edgeMeshContainer.edges.AsNativeArray<Edge>(),
+                //edgeVertices = world.edgeMeshContainer.vertices.AsNativeArray<float2>(),
 
-                heightFieldHeaders = world.heightFieldContainer.headers.AsNativeArray<HeightFieldHeader>(),
-                heightFieldSamples = world.heightFieldContainer.samples.AsNativeArray<float>(),
+                //heightFieldHeaders = world.heightFieldContainer.headers.AsNativeArray<HeightFieldHeader>(),
+                //heightFieldSamples = world.heightFieldContainer.samples.AsNativeArray<float>(),
 
-                contactsQueue = colliderContactQueue.AsParallelWriter(),
-                solverToWorld = solver.solverToWorld,
-                worldToSolver = solver.worldToSolver,
+                contactsQueue = this.colliderContactQueue.AsParallelWriter(),
+                //solverToWorld = solver.solverToWorld,
+                //worldToSolver = solver.worldToSolver,
                 deltaTime = deltaTime,
-                parameters = solver.abstraction.parameters
+                //parameters = solver.abstraction.parameters
             };
 
-            return generateColliderContactsJob.Schedule(solver.simplexCounts.simplexCount, 16, inputDeps);
+            return generateColliderContactsJob.Schedule(Solver.ParticlePositions.Count(), 16, inputDeps);
 
         }
 
@@ -190,5 +186,7 @@ namespace bluebean.Physics.PBD
         public void OnPostStep()
         {
         }
+
+        
     }
 }

@@ -18,7 +18,7 @@ namespace bluebean.Physics.PBD.DataStruct
         [ReadOnly] public NativeArray<float4> velocities;
 
         // simplex arrays:
-        [ReadOnly] public NativeArray<int> simplices;
+        //[ReadOnly] public NativeArray<int> simplices;
         //[ReadOnly] public SimplexCounts simplexCounts;
 
         //[ReadOnly] public NativeArray<int> particleMaterialIndices;
@@ -36,7 +36,7 @@ namespace bluebean.Physics.PBD.DataStruct
             var bounds = new BurstAabb(float.MaxValue, float.MinValue);
 
             {
-                int p = simplices[simplexStart];
+                int p = i;
 
                 // Find this particle's stick distance:
                 //int m = particleMaterialIndices[p];

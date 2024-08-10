@@ -3,11 +3,13 @@ using bluebean.Physics.PBD.DataStruct.Native;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Jobs;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Profiling;
+using UnityEngine.UIElements;
 
 namespace bluebean.Physics.PBD
 {
@@ -48,7 +50,8 @@ namespace bluebean.Physics.PBD
 
         public NativeVector4List PositionList { get { return m_positionList; } }
         public NativeVector4List VelList { get { return m_velList; } }
-        public NativeVector4List ExternalForceList { 
+        public NativeVector4List ExternalForceList
+        {
             get { return m_externalForceList; }
             set { m_externalForceList = value; }
         }
@@ -56,9 +59,11 @@ namespace bluebean.Physics.PBD
 
         // all particle positions [NonSerialized] private
         private NativeVector4List m_positionList = new NativeVector4List();
+        private NativeVector4List m_radiusList = new NativeVector4List();
         private NativeVector4List m_prevPositionList = new NativeVector4List();
         private NativeVector4List m_velList = new NativeVector4List();
         private NativeVector4List m_propertyList = new NativeVector4List();
+        private NativeAabbList m_aabbList = new NativeAabbList();
         private NativeVector4List m_externalForceList = new NativeVector4List();
         private NativeIntList m_freeList = new NativeIntList();
         private NativeFloatList m_invMassList = new NativeFloatList();
@@ -70,6 +75,8 @@ namespace bluebean.Physics.PBD
         private NativeArray<float4> m_prevParticlePositions;
         private NativeArray<float4> m_particleVels;
         private NativeArray<float4> m_particleProperties;
+        private NativeArray<float4> m_particleRadius;
+        private NativeArray<BurstAabb> m_particleAabbs;
         private NativeArray<float4> m_externalForces;
         private NativeArray<float> m_invMasses;
         private NativeArray<float4> m_positionDeltas;
@@ -90,8 +97,22 @@ namespace bluebean.Physics.PBD
         public float StretchConstrainCompliance => m_edgeCompliance;
 
         public float VolumeConstrainCompliance => m_volumeCompliance;
+
+        public NativeArray<float4> ParticleRadius => m_particleRadius;
+
+        public NativeArray<BurstAabb> ParticleAabb => m_particleAabbs;
         #endregion
 
+        public NativeArray<BurstContact> colliderContacts;
+
+        public class CollisionEventArgs : System.EventArgs
+        {
+            public ObiList<Contact> contacts = new ObiList<Contact>();  /**< collision contacts.*/
+        }
+
+        public delegate void CollisionCallback(PBDSolver solver, CollisionEventArgs contacts);
+        private CollisionEventArgs collisionArgs = new CollisionEventArgs();
+        public event CollisionCallback OnCollision;
 
         public void Awake()
         {
@@ -100,13 +121,13 @@ namespace bluebean.Physics.PBD
             m_damping_subStep = Mathf.Pow(m_damping, 1.0f / m_subStep);
             m_dtSubStep = m_dtStep / m_subStep;
             Intialize();
-           
+
         }
 
         private void Intialize()
         {
             m_colliderWorld = new ColliderWorld();
-            m_colliderWorld.Initialzie();
+            m_colliderWorld.Initialzie(this);
             InitConstrains();
         }
 
@@ -141,6 +162,8 @@ namespace bluebean.Physics.PBD
             m_positionConstraintCounts = m_positionConstraintCountList.AsNativeArray<int>();
             m_particleProperties = m_propertyList.AsNativeArray<float4>();
             m_prevParticlePositions = m_prevPositionList.AsNativeArray<float4>();
+            m_particleRadius = m_radiusList.AsNativeArray<float4>();
+            m_particleAabbs = m_aabbList.AsNativeArray<BurstAabb>();
         }
 
         private void EnsureParticleArraysCapacity(int count)
@@ -157,6 +180,8 @@ namespace bluebean.Physics.PBD
                 m_positionConstraintCountList.ResizeInitialized(count);
                 m_propertyList.ResizeInitialized(count);
                 m_prevPositionList.ResizeInitialized(count);
+                m_aabbList.ResizeInitialized(count);
+                m_radiusList.ResizeInitialized(count);
 
                 OnParticleCountChange();
             }
@@ -206,7 +231,7 @@ namespace bluebean.Physics.PBD
                 AllocateParticles(actor.m_particleIndicesInSolver);
 
                 //load init position
-                for(int i = 0; i < actor.GetParticleCount(); i++)
+                for (int i = 0; i < actor.GetParticleCount(); i++)
                 {
                     var index = actor.m_particleIndicesInSolver[i];
                     var pos = actor.GetParticleInitPosition(i);
@@ -217,14 +242,16 @@ namespace bluebean.Physics.PBD
                     this.m_positionDeltaList[index] = Vector4.zero;
                     this.m_gradientList[index] = Vector4.zero;
                     this.m_positionConstraintCountList[index] = 0;
-                    if(i == 25)
-                    {
-                        this.m_propertyList[index] = new Vector4(1, 0, 0, 0);
-                    }
-                    else
-                    {
-                        this.m_propertyList[index] = Vector4.zero;
-                    }
+                    this.m_radiusList[index] = new Vector4(1, 1, 1, 1);
+                    this.m_aabbList[index] = new Aabb();
+                    //if(i == 25)
+                    //{
+                    //    this.m_propertyList[index] = new Vector4(1, 0, 0, 0);
+                    //}
+                    //else
+                    //{
+                    //    this.m_propertyList[index] = Vector4.zero;
+                    //}
                 }
                 Debug.Log("AddActor Finish");
             }
@@ -260,7 +287,10 @@ namespace bluebean.Physics.PBD
             {
                 m_actors[i].OnPreStep();
             }
+
+            CollisionDetection(m_dtStep);
         }
+
 
         private void ClearForce()
         {
@@ -275,6 +305,18 @@ namespace bluebean.Physics.PBD
             }
 
             ClearForce();
+
+            if (OnCollision != null)
+            {
+                var contactCount = this.colliderContacts.Length;
+                collisionArgs.contacts.SetCount(contactCount);
+
+                if (contactCount > 0)
+                    GetCollisionContacts(collisionArgs.contacts.Data, contactCount);
+
+                OnCollision(this, collisionArgs);
+
+            }
         }
 
         void Solve()
@@ -283,7 +325,7 @@ namespace bluebean.Physics.PBD
             PredictPositionsJob predictPositionsJob = new PredictPositionsJob()
             {
                 m_deltaTime = m_dtSubStep,
-                m_gravity = new float4(m_g.x,m_g.y,m_g.z,0),
+                m_gravity = new float4(m_g.x, m_g.y, m_g.z, 0),
                 m_positions = ParticlePositions,
                 m_prevPositions = this.PrevParticlePositions,
                 m_externalForces = ExternalForces,
@@ -294,7 +336,7 @@ namespace bluebean.Physics.PBD
             handle = predictPositionsJob.Schedule(ParticlePositions.Count(), 4, handle);
 
             var start = (int)ConstrainType.Start + 1;
-            var end =  (int)ConstrainType.Max;
+            var end = (int)ConstrainType.Max;
             for (int i = start; i < end; i++)
             {
                 var constrain = m_constrains[i];
@@ -389,6 +431,49 @@ namespace bluebean.Physics.PBD
         {
             var pos = m_positionList[particleIndex];
             return pos;
+        }
+
+        protected JobHandle UpdateSimplexBounds(JobHandle inputDeps, float deltaTime)
+        {
+            var buildAabbs = new BuildSimplexAabbsJob
+            {
+                radii = this.ParticleRadius,
+                positions = this.ParticlePositions,
+                velocities = this.ParticleVels,
+                collisionMargin = 0,
+                continuousCollisionDetection = 0,
+                dt = deltaTime,
+            };
+            return buildAabbs.Schedule(this.ParticlePositions.Count(), 32, inputDeps);
+        }
+
+        protected JobHandle GenerateContacts(JobHandle inputDeps, float deltaTime)
+        {
+            inputDeps = UpdateSimplexBounds(inputDeps, deltaTime);
+            inputDeps = m_colliderWorld.GenerateContacts(deltaTime, inputDeps);
+            return inputDeps;
+        }
+
+        public void GetCollisionContacts(Contact[] contacts, int count)
+        {
+            NativeArray<Contact>.Copy(colliderContacts.Reinterpret<Contact>(), 0, contacts, 0, count);
+        }
+
+        private void CollisionDetection(float deltaTime)
+        {
+            var jobHandle = GenerateContacts(new JobHandle(), deltaTime);
+            jobHandle.Complete();
+
+            colliderContacts = new NativeArray<BurstContact>(m_colliderWorld.colliderContactQueue.Count, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
+
+            DequeueIntoArrayJob<BurstContact> dequeueColliderContacts = new DequeueIntoArrayJob<BurstContact>()
+            {
+                InputQueue = m_colliderWorld.colliderContactQueue,
+                OutputArray = colliderContacts
+            };
+            jobHandle = dequeueColliderContacts.Schedule(jobHandle);
+
+            jobHandle.Complete();
         }
     }
 }

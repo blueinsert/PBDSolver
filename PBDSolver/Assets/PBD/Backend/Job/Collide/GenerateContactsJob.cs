@@ -29,7 +29,7 @@ namespace bluebean.Physics.PBD
         //[ReadOnly] public NativeArray<int> filters;
 
         // simplex arrays:
-        [ReadOnly] public NativeArray<int> simplices;
+        //[ReadOnly] public NativeArray<int> simplices;
         //[ReadOnly] public SimplexCounts simplexCounts;
         [ReadOnly] public NativeArray<BurstAabb> simplexBounds;
 
@@ -192,7 +192,7 @@ namespace bluebean.Physics.PBD
                         dt = deltaTime
                     };
 
-                    triangleMeshShape.Contacts(colliderIndex, positions, velocities, radii, simplices, in simplexBoundsCS,
+                    triangleMeshShape.Contacts(colliderIndex, positions, velocities, radii, in simplexBoundsCS,
                     simplexIndex, contactsQueue);
 
                     break;

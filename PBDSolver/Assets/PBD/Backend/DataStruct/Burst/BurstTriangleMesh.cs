@@ -47,7 +47,7 @@ namespace bluebean.Physics.PBD.DataStruct
                               NativeArray<float4> velocities,
                               NativeArray<float4> radii,
 
-                              NativeArray<int> simplices,
+                              //NativeArray<int> simplices,
                               in BurstAabb simplexBounds,
                               int simplexIndex,
                               //int simplexStart,
@@ -59,7 +59,7 @@ namespace bluebean.Physics.PBD.DataStruct
         {
 
             BIHTraverse(colliderIndex, simplexIndex,
-                        positions, velocities, radii, simplices, in simplexBounds, 0, contacts, optimizationIterations, optimizationTolerance);
+                        positions, velocities, radii, in simplexBounds, 0, contacts, optimizationIterations, optimizationTolerance);
             
         }
 
@@ -73,7 +73,7 @@ namespace bluebean.Physics.PBD.DataStruct
                                  //NativeArray<quaternion> orientations,
                                  NativeArray<float4> velocities,
                                  NativeArray<float4> radii,
-                                 NativeArray<int> simplices,
+                                 //NativeArray<int> simplices,
                                  in BurstAabb simplexBounds,
                                  int nodeIndex,
                                  NativeQueue<BurstContact>.ParallelWriter contacts,
@@ -87,13 +87,13 @@ namespace bluebean.Physics.PBD.DataStruct
                 // visit min node:
                 if (simplexBounds.min[node.axis] <= node.leftSplitPlane)
                     BIHTraverse(colliderIndex, simplexIndex,
-                                positions, velocities, radii, simplices, in simplexBounds,
+                                positions, velocities, radii, in simplexBounds,
                                 node.firstChild, contacts, optimizationIterations, optimizationTolerance);
 
                 // visit max node:
                 if (simplexBounds.max[node.axis] >= node.rightSplitPlane)
                     BIHTraverse(colliderIndex, simplexIndex,
-                                positions, velocities, radii, simplices, in simplexBounds,
+                                positions, velocities, radii, in simplexBounds,
                                 node.firstChild + 1, contacts, optimizationIterations, optimizationTolerance);
             }
             else
