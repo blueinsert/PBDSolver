@@ -74,6 +74,7 @@
     <Compile Include="Assets\PBD\Backend\DataStruct\SDF\ASDF.cs" />
     <Compile Include="Assets\PBD\Frontend\Utils\ParticleDragger.cs" />
     <Compile Include="Assets\PBD\Frontend\Utils\ContactsDebugDraw.cs" />
+    <Compile Include="Assets\PBD\Frontend\Utils\FPS.cs" />
     <Compile Include="Assets\PBD\Backend\Constrains\VolumeConstrainGroup.cs" />
     <Compile Include="Assets\PBD\Backend\DataStruct\IDistanceFunction.cs" />
     <Compile Include="Assets\PBD\Backend\Job\Constrains\VolumeConstrainApplyJob.cs" />
@@ -90,6 +91,7 @@
     <Compile Include="Assets\PBD\Backend\DataStruct\Native\NativeCellSpanList.cs" />
     <Compile Include="Assets\PBD\Backend\DataStruct\VectorInt2.cs" />
     <Compile Include="Assets\PBD\Backend\DataStruct\BVH\IBounded.cs" />
+    <Compile Include="Assets\PBD\Backend\Job\Collide\ApplyCollisionConstraintsBatchJob.cs" />
     <Compile Include="Assets\PBD\Backend\DataStruct\Burst\BurstLocalOptimization.cs" />
     <Compile Include="Assets\PBD\Backend\Collide\ColliderWorld.cs" />
     <Compile Include="Assets\PBD\Backend\Job\Constrains\VolumeConstrainSolveJob.cs" />
@@ -113,6 +115,7 @@
     <Compile Include="Assets\PBD\Backend\GeometryUtil.cs" />
     <Compile Include="Assets\PBD\Backend\DataStruct\Native\NativeInt4List.cs" />
     <Compile Include="Assets\PBD\Backend\Job\PredictPositionsJob.cs" />
+    <Compile Include="Assets\PBD\Backend\Constrains\CollideConstrainGroup.cs" />
     <Compile Include="Assets\PBD\Backend\DataStruct\Native\NativeColliderShapeList.cs" />
     <Compile Include="Assets\PBD\Backend\Job\PositionDeltaApplyJob.cs" />
     <Compile Include="Assets\PBD\Backend\DataStruct\ColliderShapeType.cs" />
@@ -139,6 +142,7 @@
     <Compile Include="Assets\PBD\Backend\DataStruct\Burst\BurstContact.cs" />
     <Compile Include="Assets\PBD\Backend\PBDSolver.cs" />
     <Compile Include="Assets\PBD\Backend\DataStruct\Burst\BurstAabb.cs" />
+    <Compile Include="Assets\PBD\Backend\Job\Collide\CollisionConstraintsJob.cs" />
     <Compile Include="Assets\PBD\Backend\Job\Collide\GenerateContactsJob.cs" />
     <Compile Include="Assets\PBD\Backend\Job\Collide\UpdateMovingCollidersJob.cs" />
     <Compile Include="Assets\PBD\Backend\Actor\SoftBodyActor.cs" />

@@ -9,6 +9,7 @@ namespace bluebean.Physics.PBD
 {
     public interface ISolver
     {
+        ColliderWorld ColliderWorld { get; }
         float StretchConstrainCompliance { get; }
         float VolumeConstrainCompliance { get; }
         NativeArray<float4> ParticleRadius { get; }
@@ -22,6 +23,7 @@ namespace bluebean.Physics.PBD
         NativeArray<float4> PositionDeltas { get; }
         NativeArray<float4> Gradients { get; }
         NativeArray<int> PositionConstraintCounts { get; }
+        NativeArray<BurstContact> ColliderContacts { get; }
 
         void AddActor(PDBActor actor);
 

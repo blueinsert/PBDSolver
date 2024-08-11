@@ -101,6 +101,8 @@ namespace bluebean.Physics.PBD
         public NativeArray<float4> ParticleRadius => m_particleRadius;
 
         public NativeArray<BurstAabb> ParticleAabb => m_particleAabbs;
+
+        public NativeArray<BurstContact> ColliderContacts => colliderContacts;
         #endregion
 
         public NativeArray<BurstContact> colliderContacts;

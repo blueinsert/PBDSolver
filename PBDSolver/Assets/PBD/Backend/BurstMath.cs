@@ -7,6 +7,8 @@ namespace bluebean.Physics.PBD
 {
     public static class BurstMath
     {
+        public const float epsilon = 0.0000001f;
+
         /// <summary>
         /// 计算四面体体积
         /// </summary>
