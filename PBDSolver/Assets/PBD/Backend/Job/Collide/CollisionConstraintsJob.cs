@@ -68,6 +68,7 @@ namespace bluebean.Physics.PBD
                 float4 simplexPosition = positions[simplexIndex];
                 float4 simplexPrevPosition = prevPositions[simplexIndex];
                 float simplexRadius = radii[simplexIndex].x;
+                float invMass = invMasses[simplexIndex];
 
                 //for (int j = 0; j < simplexSize; ++j)
                 //{
@@ -83,6 +84,8 @@ namespace bluebean.Physics.PBD
 
                 float4 posB = contact.pointB;
 
+                //contact.CalculateContactMassesA(invMasses,);
+                contact.normalInvMassA = contact.tangentInvMassA = contact.bitangentInvMassA = invMass;
                 //if (rigidbodyIndex >= 0)
                 //    posB += BurstMath.GetRigidbodyVelocityAtPoint(rigidbodyIndex, contact.pointB, rigidbodies, rigidbodyLinearDeltas, rigidbodyAngularDeltas, inertialFrame.frame) * stepTime;
 
@@ -90,7 +93,7 @@ namespace bluebean.Physics.PBD
                 //float lambda = contact.SolveAdhesion(posA, posB, material.stickDistance, material.stickiness, stepTime);
 
                 // depenetration:
-                float lambda = contact.SolvePenetration(posA, posB, 0.001f * stepTime);
+                float lambda = contact.SolvePenetration(posA, posB, 0.003f * stepTime);
 
                 // Apply normal impulse to both simplex and rigidbody:
                 if (math.abs(lambda) > BurstMath.epsilon)

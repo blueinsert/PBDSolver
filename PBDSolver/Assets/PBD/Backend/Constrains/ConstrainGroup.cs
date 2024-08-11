@@ -19,7 +19,7 @@ namespace bluebean.Physics.PBD
             m_solver = solver;
         }
 
-        public abstract JobHandle Solve(JobHandle inputDeps, float substepTime);
+        public abstract JobHandle Solve(JobHandle inputDeps, float stepTime, float substepTime, int substeps);
         public abstract JobHandle Apply(JobHandle inputDeps, float substepTime);
     }
 }

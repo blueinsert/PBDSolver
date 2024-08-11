@@ -10,7 +10,7 @@ using UnityEngine;
 namespace bluebean.Physics.PBD
 {
     [BurstCompile]
-    public struct ApplyCollisionConstraintsBatchJob : IJob
+    public struct ApplyCollisionConstraintsJob : IJob
     {
         [ReadOnly] public NativeArray<BurstContact> contacts;
 

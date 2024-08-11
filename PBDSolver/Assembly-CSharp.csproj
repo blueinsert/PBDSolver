@@ -91,7 +91,7 @@
     <Compile Include="Assets\PBD\Backend\DataStruct\Native\NativeCellSpanList.cs" />
     <Compile Include="Assets\PBD\Backend\DataStruct\VectorInt2.cs" />
     <Compile Include="Assets\PBD\Backend\DataStruct\BVH\IBounded.cs" />
-    <Compile Include="Assets\PBD\Backend\Job\Collide\ApplyCollisionConstraintsBatchJob.cs" />
+    <Compile Include="Assets\PBD\Backend\Job\Collide\ApplyCollisionConstraintsJob.cs" />
     <Compile Include="Assets\PBD\Backend\DataStruct\Burst\BurstLocalOptimization.cs" />
     <Compile Include="Assets\PBD\Backend\Collide\ColliderWorld.cs" />
     <Compile Include="Assets\PBD\Backend\Job\Constrains\VolumeConstrainSolveJob.cs" />

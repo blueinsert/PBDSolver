@@ -17,41 +17,26 @@ namespace bluebean.Physics.PBD
 
         public override JobHandle Apply(JobHandle inputDeps, float substepTime)
         {
-            var projectConstraints = new CollisionConstraintsJob()
+            var applyConstraints = new ApplyCollisionConstraintsJob()
             {
-                positions = m_solver.ParticlePositions,
-                prevPositions = m_solver.PrevParticlePositions,
-                //orientations = solverImplementation.orientations,
-                //prevOrientations = solverImplementation.prevOrientations,
-                invMasses = m_solver.InvMasses,
-                radii = m_solver.ParticleRadius,
-                //particleMaterialIndices = solverImplementation.collisionMaterials,
+                contacts = m_solver.ColliderContacts,
 
                 //simplices = solverImplementation.simplices,
                 //simplexCounts = solverImplementation.simplexCounts,
 
-                shapes = m_solver.ColliderWorld.m_colliderShapes.AsNativeArray<BurstColliderShape>(),
-                transforms = m_solver.ColliderWorld.m_colliderTransforms.AsNativeArray<BurstAffineTransform>(),
-                //collisionMaterials = ObiColliderWorld.GetInstance().collisionMaterials.AsNativeArray<BurstCollisionMaterial>(),
-                //rigidbodies = ObiColliderWorld.GetInstance().rigidbodies.AsNativeArray<BurstRigidbody>(),
-                //rigidbodyLinearDeltas = solverImplementation.abstraction.rigidbodyLinearDeltas.AsNativeArray<float4>(),
-                //rigidbodyAngularDeltas = solverImplementation.abstraction.rigidbodyAngularDeltas.AsNativeArray<float4>(),
-
+                positions = m_solver.ParticlePositions,
                 deltas = m_solver.PositionDeltas,
                 counts = m_solver.PositionConstraintCounts,
-
-                contacts = m_solver.ColliderContacts,
-                //inertialFrame = ((BurstSolverImpl)constraints.solver).inertialFrame,
-                //constraintParameters = parameters,
-                //solverParameters = solverAbstraction.parameters,
-                substeps = substeps,
-                stepTime = stepTime,
-                substepTime = substepTime
+                //orientations = solverImplementation.orientations,
+                //orientationDeltas = solverImplementation.orientationDeltas,
+                //orientationCounts = solverImplementation.orientationConstraintCounts,
+                //constraintParameters = parameters
             };
-            return projectConstraints.Schedule(inputDeps);
+
+            return applyConstraints.Schedule(inputDeps);
         }
 
-        public override JobHandle Solve(JobHandle inputDeps, float substepTime)
+        public override JobHandle Solve(JobHandle inputDeps, float stepTime, float substepTime, int substeps)
         {
             var projectConstraints = new CollisionConstraintsJob()
             {

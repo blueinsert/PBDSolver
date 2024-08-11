@@ -94,7 +94,7 @@ namespace bluebean.Physics.PBD
             return job.Schedule(this.m_solver.ParticlePositions.Length, 32, inputDeps);
         }
 
-        public override JobHandle Solve(JobHandle inputDeps, float substepTime)
+        public override JobHandle Solve(JobHandle inputDeps, float stepTime, float substepTime, int substeps)
         {
             var job = new VolumeConstrainSolveJob() {
                 m_tets = this.m_tets,

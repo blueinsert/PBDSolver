@@ -329,12 +329,14 @@ namespace bluebean.Physics.PBD
                 colliderContacts.Dispose();
         }
 
-        void Solve()
+
+        void SubStep(float stepTime, float substepTime, int substeps)
         {
+            Profiler.BeginSample("SubStep");
             JobHandle handle = new JobHandle();
             PredictPositionsJob predictPositionsJob = new PredictPositionsJob()
             {
-                m_deltaTime = m_dtSubStep,
+                m_deltaTime = substepTime,
                 m_gravity = new float4(m_g.x, m_g.y, m_g.z, 0),
                 m_positions = ParticlePositions,
                 m_prevPositions = this.PrevParticlePositions,
@@ -350,13 +352,13 @@ namespace bluebean.Physics.PBD
             for (int i = start; i < end; i++)
             {
                 var constrain = m_constrains[i];
-                handle = constrain.Solve(handle, m_dtSubStep);
-                handle = constrain.Apply(handle, m_dtSubStep);
+                handle = constrain.Solve(handle, stepTime, substepTime, substeps);
+                handle = constrain.Apply(handle, substepTime);
             }
 
             var updateVel = new UpdateVelJob()
             {
-                m_deltaTime = m_dtSubStep,
+                m_deltaTime = substepTime,
                 m_positions = this.ParticlePositions,
                 m_prevPositions = this.PrevParticlePositions,
                 m_velocities = this.ParticleVels,
@@ -365,26 +367,6 @@ namespace bluebean.Physics.PBD
             handle = updateVel.Schedule(m_positionList.count, 32, handle);
 
             handle.Complete();
-            /*
-            Profiler.BeginSample("SolveStrethConstrains");
-
-            SolveStrethConstrains();
-            Profiler.EndSample();
-
-            Profiler.BeginSample("SolveVolumeConstrains");
-            SolveVolumeConstrains();
-            Profiler.EndSample();
-
-            Profiler.BeginSample("SolveCollideConstrains");
-            SolveCollideConstrains();
-            Profiler.EndSample();
-            */
-        }
-
-        void SubStep()
-        {
-            Profiler.BeginSample("Solve");
-            Solve();
             Profiler.EndSample();
         }
 
@@ -402,7 +384,7 @@ namespace bluebean.Physics.PBD
                 OnPreSubStep();
                 Profiler.EndSample();
 
-                SubStep();
+                SubStep(m_dtStep,m_dtSubStep,m_subStep - i);
 
                 Profiler.BeginSample("PostSubStep");
                 OnPostSubStep();
