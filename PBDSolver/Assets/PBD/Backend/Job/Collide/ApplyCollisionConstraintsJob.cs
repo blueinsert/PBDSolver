@@ -29,7 +29,7 @@ namespace bluebean.Physics.PBD
 
         public void Execute()
         {
-            float sorFactor = 1;
+            float sorFactor = 0.5f;
             for (int i = 0; i < contacts.Length; ++i)
             {
                 int simplexIndex = contacts[i].bodyA;// simplexCounts.GetSimplexStartAndSize(contacts[i].bodyA, out int simplexSize);

@@ -153,6 +153,7 @@ namespace bluebean.Physics.PBD
 
         private void InitConstrains()
         {
+            m_constrains[(int)ConstrainType.Collide] = new CollideConstrainGroup(this);
             m_constrains[(int)ConstrainType.Stretch] = new StretchConstrainGroup(this);
             m_constrains[(int)ConstrainType.Volume] = new VolumeConstrainGroup(this);
         }
