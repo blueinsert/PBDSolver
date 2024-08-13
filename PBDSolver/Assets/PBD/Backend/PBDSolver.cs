@@ -364,6 +364,7 @@ namespace bluebean.Physics.PBD
                 m_prevPositions = this.PrevParticlePositions,
                 m_velocities = this.ParticleVels,
                 m_velDamping = this.m_damping_subStep,
+                m_sleepThreshold = 0.00001f,
             };
             handle = updateVel.Schedule(m_positionList.count, 32, handle);
 
@@ -433,7 +434,7 @@ namespace bluebean.Physics.PBD
                 radii = this.ParticleRadius,
                 positions = this.ParticlePositions,
                 velocities = this.ParticleVels,
-                collisionMargin = 0,
+                collisionMargin = 0.01f,
                 continuousCollisionDetection = 1,
                 dt = deltaTime,
                 simplexBounds = this.ParticleAabb,

@@ -93,7 +93,7 @@ namespace bluebean.Physics.PBD
                 //float lambda = contact.SolveAdhesion(posA, posB, material.stickDistance, material.stickiness, stepTime);
 
                 // depenetration:
-                float lambda = contact.SolvePenetration(posA, posB, 0.1f * stepTime);
+                float lambda = contact.SolvePenetration(posA, posB, 10.1f * stepTime);
 
                 // Apply normal impulse to both simplex and rigidbody:
                 if (math.abs(lambda) > BurstMath.epsilon)

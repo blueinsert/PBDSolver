@@ -189,7 +189,7 @@ namespace bluebean.Physics.PBD
                         bihNodes = bihNodes,
                         triangles = triangles,
                         vertices = vertices,
-                        //collisionMargin = parameters.collisionMargin,
+                        collisionMargin = 0.01f,
                         dt = deltaTime
                     };
 
