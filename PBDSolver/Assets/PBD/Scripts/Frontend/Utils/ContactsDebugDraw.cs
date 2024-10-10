@@ -19,12 +19,12 @@ public class ContactsDebugDraw : MonoBehaviour
 
     void OnEnable()
     {
-        solver.OnCollision += Solver_OnCollision;
+        solver.EventOnCollision += Solver_OnCollision;
     }
 
     void OnDisable()
     {
-        solver.OnCollision -= Solver_OnCollision;
+        solver.EventOnCollision -= Solver_OnCollision;
     }
 
     void Solver_OnCollision(object sender, PBDSolver.CollisionEventArgs e)
@@ -34,15 +34,15 @@ public class ContactsDebugDraw : MonoBehaviour
 
     void OnDrawGizmos()
     {
-        if (solver == null || frame == null || frame.contacts == null) return;
+        if (solver == null || frame == null || frame.m_contacts == null) return;
 
         //Gizmos.matrix = solver.transform.localToWorldMatrix;
 
-        contactCount = frame.contacts.Count;
+        contactCount = frame.m_contacts.Count;
 
-        for (int i = 0; i < frame.contacts.Count; ++i)
+        for (int i = 0; i < frame.m_contacts.Count; ++i)
         {
-            var contact = frame.contacts.Data[i];
+            var contact = frame.m_contacts.Data[i];
 
             //if (contact.distance > 0.001f) continue;
 

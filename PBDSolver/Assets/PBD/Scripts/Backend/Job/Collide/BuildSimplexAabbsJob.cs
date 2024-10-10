@@ -1,37 +1,30 @@
 using bluebean.Physics.PBD.DataStruct;
-using System.Collections;
-using System.Collections.Generic;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Jobs;
 using Unity.Mathematics;
-using UnityEngine;
 
-namespace bluebean.Physics.PBD.DataStruct
+namespace bluebean.Physics.PBD
 {
+    /// <summary>
+    /// 根据粒子速度，deltaTime等更新这一帧内粒子的可能活动范围
+    /// </summary>
     [BurstCompile]
-    struct BuildSimplexAabbsJob : IJobParallelFor
+    public struct BuildSimplexAabbsJob : IJobParallelFor
     {
+        //输入
         [ReadOnly] public NativeArray<float4> radii;
-        //[ReadOnly] public NativeArray<float> fluidRadii;
         [ReadOnly] public NativeArray<float4> positions;
         [ReadOnly] public NativeArray<float4> velocities;
-
-        // simplex arrays:
-        //[ReadOnly] public NativeArray<int> simplices;
-        //[ReadOnly] public SimplexCounts simplexCounts;
-
-        //[ReadOnly] public NativeArray<int> particleMaterialIndices;
-        //[ReadOnly] public NativeArray<BurstCollisionMaterial> collisionMaterials;
         [ReadOnly] public float collisionMargin;
         [ReadOnly] public float continuousCollisionDetection;
         [ReadOnly] public float dt;
 
+        //输出
         public NativeArray<BurstAabb> simplexBounds;
 
         public void Execute(int i)
         {
-
             var bounds = new BurstAabb(float.MaxValue, float.MinValue);
 
             {

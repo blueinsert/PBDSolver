@@ -12,6 +12,8 @@ namespace bluebean.Physics.PBD
         ColliderWorld ColliderWorld { get; }
         float StretchConstrainCompliance { get; }
         float VolumeConstrainCompliance { get; }
+
+        #region 粒子数据获取接口
         NativeArray<float4> ParticleRadius { get; }
         NativeArray<float4> ParticlePositions { get; }
         NativeArray<float4> PrevParticlePositions { get; }
@@ -22,6 +24,8 @@ namespace bluebean.Physics.PBD
         NativeArray<float> InvMasses { get; }
         NativeArray<float4> PositionDeltas { get; }
         NativeArray<float4> Gradients { get; }
+        #endregion
+
         NativeArray<int> PositionConstraintCounts { get; }
         NativeArray<BurstContact> ColliderContacts { get; }
 

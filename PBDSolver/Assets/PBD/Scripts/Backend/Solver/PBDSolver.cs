@@ -13,7 +13,7 @@ using UnityEngine.UIElements;
 
 namespace bluebean.Physics.PBD
 {
-    public class PBDSolver : MonoBehaviour, ISolver
+    public partial class PBDSolver : MonoBehaviour, ISolver
     {
         public ColliderWorld ColliderWorld
         {
@@ -22,6 +22,8 @@ namespace bluebean.Physics.PBD
                 return m_colliderWorld;
             }
         }
+
+        #region 内部变量
 
         public int m_targetFrameRate = 60;
         public float m_dtSubStep = 0.0333f;
@@ -43,8 +45,6 @@ namespace bluebean.Physics.PBD
         private Dictionary<int, PDBActor> m_actorDic = new Dictionary<int, PDBActor>();
 
         private Dictionary<int, ConstrainGroup> m_constrains = new Dictionary<int, ConstrainGroup>();
-
-        private ColliderWorld m_colliderWorld = new ColliderWorld();
 
         #region 粒子数据
 
@@ -102,19 +102,12 @@ namespace bluebean.Physics.PBD
 
         public NativeArray<BurstAabb> ParticleAabb => m_particleAabbs;
 
-        public NativeArray<BurstContact> ColliderContacts => colliderContacts;
+        public NativeArray<BurstContact> ColliderContacts => m_colliderContacts;
         #endregion
 
-        public NativeArray<BurstContact> colliderContacts;
+        #endregion
 
-        public class CollisionEventArgs : System.EventArgs
-        {
-            public ObiList<Contact> contacts = new ObiList<Contact>();  /**< collision contacts.*/
-        }
-
-        public delegate void CollisionCallback(PBDSolver solver, CollisionEventArgs contacts);
-        private CollisionEventArgs collisionArgs = new CollisionEventArgs();
-        public event CollisionCallback OnCollision;
+        #region 生命周期
 
         public void Awake()
         {
@@ -141,7 +134,7 @@ namespace bluebean.Physics.PBD
             m_propertyList.Dispose();
             m_externalForceList.Dispose();
             m_freeList.Dispose();
-            m_invMassList.DefaultIfEmpty();
+            m_invMassList.Dispose();
             m_positionDeltaList.Dispose();
             m_gradientList.Dispose();
             m_positionConstraintCountList.Dispose();
@@ -149,6 +142,138 @@ namespace bluebean.Physics.PBD
             m_aabbList.Dispose();
 
             m_colliderWorld.Destroy();
+        }
+
+        void OnPreStep()
+        {
+            //碰撞侦测在step之前做一次，不在substep中进行
+            //之后在每个substep中会做碰撞求解
+            m_colliderWorld.UpdateWorld(m_dtStep);
+            CollisionDetection(m_dtStep);
+
+            for (int i = 0; i < m_actors.Count; i++)
+            {
+                m_actors[i].OnPreStep();
+            }
+        }
+
+        void OnPostStep()
+        {
+            for (int i = 0; i < m_actors.Count; i++)
+            {
+                m_actors[i].OnPostStep();
+            }
+
+            ClearForce();
+
+            //对外抛出碰撞事件，传出碰撞信息，用于调试绘图等
+            if (EventOnCollision != null)
+            {
+                var contactCount = this.m_colliderContacts.Length;
+                m_collisionArgs.m_contacts.SetCount(contactCount);
+
+                if (contactCount > 0)
+                    GetCollisionContacts(m_collisionArgs.m_contacts.Data, contactCount);
+
+                EventOnCollision(this, m_collisionArgs);
+            }
+
+            if (m_colliderContacts.IsCreated)
+                m_colliderContacts.Dispose();
+        }
+
+        void OnPreSubStep()
+        {
+            for (int i = 0; i < m_actors.Count; i++)
+            {
+                m_actors[i].OnPreSubStep(m_dtSubStep, m_g);
+            }
+        }
+
+        void OnPostSubStep()
+        {
+            for (int i = 0; i < m_actors.Count; i++)
+            {
+                m_actors[i].OnPostSubStep(m_dtSubStep, m_damping_subStep);
+            }
+        }
+
+        void SubStep(float stepTime, float substepTime, int substeps)
+        {
+            Profiler.BeginSample("SubStep");
+            JobHandle handle = new JobHandle();
+            //1.预测位置
+            PredictPositionsJob predictPositionsJob = new PredictPositionsJob()
+            {
+                m_deltaTime = substepTime,
+                m_gravity = new float4(m_g.x, m_g.y, m_g.z, 0),
+                m_positions = ParticlePositions,
+                m_prevPositions = this.PrevParticlePositions,
+                m_externalForces = ExternalForces,
+                m_velocities = ParticleVels,
+                m_inverseMasses = InvMasses,
+                m_particleProperties = this.ParticleProperties,
+            };
+            handle = predictPositionsJob.Schedule(ParticlePositions.Count(), 4, handle);
+
+            //2.求解约束
+            var start = (int)ConstrainType.Start + 1;
+            var end = (int)ConstrainType.Max;
+            for (int i = start; i < end; i++)
+            {
+                var constrain = m_constrains[i];
+                handle = constrain.Solve(handle, stepTime, substepTime, substeps);
+                handle = constrain.Apply(handle, substepTime);
+            }
+            //3.更新速度
+            var updateVel = new UpdateVelJob()
+            {
+                m_deltaTime = substepTime,
+                m_positions = this.ParticlePositions,
+                m_prevPositions = this.PrevParticlePositions,
+                m_velocities = this.ParticleVels,
+                m_velDamping = this.m_damping_subStep,
+                m_sleepThreshold = 0.00001f,
+            };
+            handle = updateVel.Schedule(m_positionList.count, 32, handle);
+
+            handle.Complete();
+            Profiler.EndSample();
+        }
+
+
+        // Update is called once per frame
+        void FixedUpdate()
+        {
+            Profiler.BeginSample("PreStep");
+            OnPreStep();
+            Profiler.EndSample();
+            Profiler.BeginSample("SubStep");
+            for (int i = 0; i < m_subStep; i++)
+            {
+                Profiler.BeginSample("PreSubStep");
+                OnPreSubStep();
+                Profiler.EndSample();
+
+                SubStep(m_dtStep, m_dtSubStep, m_subStep - i);
+
+                Profiler.BeginSample("PostSubStep");
+                OnPostSubStep();
+                Profiler.EndSample();
+            }
+            Profiler.EndSample();
+            Profiler.BeginSample("PreStep");
+            OnPostStep();
+            Profiler.EndSample();
+        }
+
+        #endregion
+
+        #region 内部方法
+
+        private void ClearForce()
+        {
+            m_externalForceList.WipeToZero();
         }
 
         private void InitConstrains()
@@ -160,6 +285,7 @@ namespace bluebean.Physics.PBD
 
         private void OnParticleCountChange()
         {
+            //重新从nativeList中获取nativeArray引用
             m_particlePositions = m_positionList.AsNativeArray<float4>();
             m_particleVels = m_velList.AsNativeArray<float4>();
             m_externalForces = m_externalForceList.AsNativeArray<float4>();
@@ -192,11 +318,6 @@ namespace bluebean.Physics.PBD
 
                 OnParticleCountChange();
             }
-
-            //if (count >= m_ParticleToActor.Length)
-            //{
-            //    Array.Resize(ref m_ParticleToActor, count * 2);
-            //}
         }
 
         private void AllocateParticles(int[] particleIndices)
@@ -226,6 +347,9 @@ namespace bluebean.Physics.PBD
 
         }
 
+        #endregion
+
+        #region 对外接口
         public void AddActor(PDBActor actor)
         {
             if (!m_actorDic.ContainsKey(actor.ActorId))
@@ -233,14 +357,14 @@ namespace bluebean.Physics.PBD
                 m_actorDic.Add(actor.ActorId, actor);
                 m_actors.Add(actor);
 
+                //初始化actor的粒子索引数组
                 actor.m_particleIndicesInSolver = new int[actor.GetParticleCount()];
-
                 AllocateParticles(actor.m_particleIndicesInSolver);
 
-                //load init position
+                //初始化这个actor的所有粒子的数据
                 for (int i = 0; i < actor.GetParticleCount(); i++)
                 {
-                    var index = actor.m_particleIndicesInSolver[i];
+                    var index = actor.m_particleIndicesInSolver[i];//在求解器中的索引
                     var pos = actor.GetParticleInitPosition(i);
                     this.m_positionList[index] = pos;
                     this.m_externalForceList[index] = Vector4.zero;
@@ -252,14 +376,6 @@ namespace bluebean.Physics.PBD
                     float radius = 0.1f;
                     this.m_radiusList[index] = new Vector4(radius, radius, radius, radius);
                     this.m_aabbList[index] = new Aabb();
-                    //if(i == 25)
-                    //{
-                    //    this.m_propertyList[index] = new Vector4(1, 0, 0, 0);
-                    //}
-                    //else
-                    //{
-                    //    this.m_propertyList[index] = Vector4.zero;
-                    //}
                 }
                 Debug.Log("AddActor Finish");
             }
@@ -270,134 +386,6 @@ namespace bluebean.Physics.PBD
             m_actors.Remove(actor);
             m_actorDic.Remove(actor.ActorId);
         }
-
-
-        void OnPreSubStep()
-        {
-            for (int i = 0; i < m_actors.Count; i++)
-            {
-                m_actors[i].OnPreSubStep(m_dtSubStep, m_g);
-            }
-        }
-
-        void OnPostSubStep()
-        {
-            for (int i = 0; i < m_actors.Count; i++)
-            {
-                m_actors[i].OnPostSubStep(m_dtSubStep, m_damping_subStep);
-            }
-        }
-
-        void OnPreStep()
-        {
-            m_colliderWorld.UpdateWorld(m_dtStep);
-            for (int i = 0; i < m_actors.Count; i++)
-            {
-                m_actors[i].OnPreStep();
-            }
-
-            CollisionDetection(m_dtStep);
-        }
-
-
-        private void ClearForce()
-        {
-            m_externalForceList.WipeToZero();
-        }
-
-        void OnPostStep()
-        {
-            for (int i = 0; i < m_actors.Count; i++)
-            {
-                m_actors[i].OnPostStep();
-            }
-
-            ClearForce();
-
-            if (OnCollision != null)
-            {
-                var contactCount = this.colliderContacts.Length;
-                collisionArgs.contacts.SetCount(contactCount);
-
-                if (contactCount > 0)
-                    GetCollisionContacts(collisionArgs.contacts.Data, contactCount);
-
-                OnCollision(this, collisionArgs);
-
-            }
-
-            if (colliderContacts.IsCreated)
-                colliderContacts.Dispose();
-        }
-
-
-        void SubStep(float stepTime, float substepTime, int substeps)
-        {
-            Profiler.BeginSample("SubStep");
-            JobHandle handle = new JobHandle();
-            PredictPositionsJob predictPositionsJob = new PredictPositionsJob()
-            {
-                m_deltaTime = substepTime,
-                m_gravity = new float4(m_g.x, m_g.y, m_g.z, 0),
-                m_positions = ParticlePositions,
-                m_prevPositions = this.PrevParticlePositions,
-                m_externalForces = ExternalForces,
-                m_velocities = ParticleVels,
-                m_inverseMasses = InvMasses,
-                m_particleProperties = this.ParticleProperties,
-            };
-            handle = predictPositionsJob.Schedule(ParticlePositions.Count(), 4, handle);
-
-            var start = (int)ConstrainType.Start + 1;
-            var end = (int)ConstrainType.Max;
-            for (int i = start; i < end; i++)
-            {
-                var constrain = m_constrains[i];
-                handle = constrain.Solve(handle, stepTime, substepTime, substeps);
-                handle = constrain.Apply(handle, substepTime);
-            }
-
-            var updateVel = new UpdateVelJob()
-            {
-                m_deltaTime = substepTime,
-                m_positions = this.ParticlePositions,
-                m_prevPositions = this.PrevParticlePositions,
-                m_velocities = this.ParticleVels,
-                m_velDamping = this.m_damping_subStep,
-                m_sleepThreshold = 0.00001f,
-            };
-            handle = updateVel.Schedule(m_positionList.count, 32, handle);
-
-            handle.Complete();
-            Profiler.EndSample();
-        }
-
-
-        // Update is called once per frame
-        void FixedUpdate()
-        {
-            Profiler.BeginSample("PreStep");
-            OnPreStep();
-            Profiler.EndSample();
-            Profiler.BeginSample("SubStep");
-            for (int i = 0; i < m_subStep; i++)
-            {
-                Profiler.BeginSample("PreSubStep");
-                OnPreSubStep();
-                Profiler.EndSample();
-
-                SubStep(m_dtStep,m_dtSubStep,m_subStep - i);
-
-                Profiler.BeginSample("PostSubStep");
-                OnPostSubStep();
-                Profiler.EndSample();
-            }
-            Profiler.EndSample();
-            Profiler.BeginSample("PreStep");
-            OnPostStep();
-            Profiler.EndSample();
-        }
-
 
         public void PushStretchConstrain(StretchConstrainData stretchConstrainData)
         {
@@ -427,45 +415,6 @@ namespace bluebean.Physics.PBD
             return pos;
         }
 
-        protected JobHandle UpdateSimplexBounds(float deltaTime)
-        {
-            var buildAabbs = new BuildSimplexAabbsJob
-            {
-                radii = this.ParticleRadius,
-                positions = this.ParticlePositions,
-                velocities = this.ParticleVels,
-                collisionMargin = 0.01f,
-                continuousCollisionDetection = 1,
-                dt = deltaTime,
-                simplexBounds = this.ParticleAabb,
-            };
-            return buildAabbs.Schedule(this.ParticlePositions.Count(), 32);
-        }
-
-        public void GetCollisionContacts(Contact[] contacts, int count)
-        {
-            NativeArray<Contact>.Copy(colliderContacts.Reinterpret<Contact>(), 0, contacts, 0, count);
-        }
-
-        private void CollisionDetection(float deltaTime)
-        {
-            var updateSimplexBoundsHandle = UpdateSimplexBounds(deltaTime);
-           
-            var gemterateCpmtactsHandle = m_colliderWorld.GenerateContacts(deltaTime, updateSimplexBoundsHandle);
-            gemterateCpmtactsHandle.Complete();
-
-            colliderContacts = new NativeArray<BurstContact>(m_colliderWorld.colliderContactQueue.Count, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
-
-            DequeueIntoArrayJob<BurstContact> dequeueColliderContacts = new DequeueIntoArrayJob<BurstContact>()
-            {
-                InputQueue = m_colliderWorld.colliderContactQueue,
-                OutputArray = colliderContacts
-            };
-            dequeueColliderContacts.Schedule().Complete();
-            if (colliderContacts.Length > 0)
-            {
-                Debug.Log($"contacts count: {colliderContacts.Length}");
-            }
-        }
+        #endregion
     }
 }

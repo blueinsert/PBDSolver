@@ -11,7 +11,7 @@ namespace bluebean.Physics.PBD
         public int ActorId { get { return m_actorId; } }
 
         /// <summary>
-        /// ÿ��������solver positions�����е�����
+        /// 记录了此actor的每个粒子在求解器数据数组中的索引
         /// </summary>
         //[HideInInspector]
         public int[] m_particleIndicesInSolver;
