@@ -18,6 +18,23 @@ namespace bluebean.Physics.PBD.DataStruct
         public const float one = 1;
         public static readonly float golden = (math.sqrt(5.0f) + 1) / 2.0f;
 
+        /// <summary>
+        /// 计算四面体体积
+        /// </summary>
+        /// <param name="p1"></param>
+        /// <param name="p2"></param>
+        /// <param name="p3"></param>
+        /// <param name="p4"></param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float CalcTetVolume(float3 p1, float3 p2, float3 p3, float3 p4)
+        {
+            var temp = math.cross(p2 - p1, p3 - p1);
+            float res = math.dot(p4 - p1, temp);
+            res *= (1.0f / 6);
+            return res;
+        }
+
         // multiplies a column vector by a row vector.
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float3x3 multrnsp(float4 column, float4 row)
