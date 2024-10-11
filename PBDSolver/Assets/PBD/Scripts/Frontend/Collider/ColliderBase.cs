@@ -31,6 +31,10 @@ namespace bluebean.Physics.PBD
             }
         }
 
+        /// <summary>
+        /// 向CollideWorld同步数据
+        /// 从前端向后端
+        /// </summary>
         public virtual void UpdateIfNeeded()
         {
             

@@ -31,7 +31,7 @@ namespace bluebean.Physics.PBD
         /// <returns></returns>
         private JobHandle UpdateParticleBounds(float deltaTime)
         {
-            var buildAabbs = new BuildSimplexAabbsJob
+            var buildAabbs = new BuildParticleAabbsJob
             {
                 //输入
                 radii = this.ParticleRadius,
@@ -46,6 +46,11 @@ namespace bluebean.Physics.PBD
             return buildAabbs.Schedule(this.ParticlePositions.Count(), 32);
         }
 
+        /// <summary>
+        /// 从m_colliderContacts复制数据到contacts
+        /// </summary>
+        /// <param name="contacts"></param>
+        /// <param name="count"></param>
         private void GetCollisionContacts(Contact[] contacts, int count)
         {
             NativeArray<Contact>.Copy(m_colliderContacts.Reinterpret<Contact>(), 0, contacts, 0, count);
@@ -59,11 +64,11 @@ namespace bluebean.Physics.PBD
             var gemterateCpmtactsHandle = m_colliderWorld.GenerateContacts(deltaTime, updateSimplexBoundsHandle);
             gemterateCpmtactsHandle.Complete();
 
-            m_colliderContacts = new NativeArray<BurstContact>(m_colliderWorld.colliderContactQueue.Count, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
+            m_colliderContacts = new NativeArray<BurstContact>(m_colliderWorld.m_colliderContactQueue.Count, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
             //将碰撞接触数据从collideWorld提取到本地变量m_colliderContacts中
             DequeueIntoArrayJob<BurstContact> dequeueColliderContacts = new DequeueIntoArrayJob<BurstContact>()
             {
-                InputQueue = m_colliderWorld.colliderContactQueue,
+                InputQueue = m_colliderWorld.m_colliderContactQueue,
                 OutputArray = m_colliderContacts
             };
             dequeueColliderContacts.Schedule().Complete();

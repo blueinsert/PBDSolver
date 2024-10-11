@@ -17,21 +17,28 @@ namespace bluebean.Physics.PBD
     [BurstCompile]
     public struct IdentifyMovingCollidersJob : IJobParallelFor
     {
-        [WriteOnly]
-        [NativeDisableParallelForRestriction]
-        public NativeQueue<MovingCollider>.ParallelWriter movingColliders;
-
+        //输入
         [ReadOnly] public NativeArray<BurstColliderShape> shapes;
         //[ReadOnly] public NativeArray<BurstRigidbody> rigidbodies;
         //[ReadOnly] public NativeArray<BurstCollisionMaterial> collisionMaterials;
         /// <summary>
-        /// 碰撞体Aabb世界坐标
+        /// 碰撞体Aabb,世界坐标
         /// </summary>
-        public NativeArray<BurstAabb> bounds;
-
-        public NativeArray<BurstCellSpan> cellIndices;
-        [ReadOnly] public int colliderCount;
+        [ReadOnly] public NativeArray<BurstAabb> bounds;
+        //[ReadOnly] public int colliderCount;
         [ReadOnly] public float dt;
+
+        //输出
+        /// <summary>
+        /// 移动了的碰撞体数据
+        /// </summary>
+        [WriteOnly]
+        [NativeDisableParallelForRestriction]
+        public NativeQueue<MovingCollider>.ParallelWriter movingColliders;
+        /// <summary>
+        /// 碰撞体新的cellSpan
+        /// </summary>
+        public NativeArray<BurstCellSpan> colliderCellSpans;
 
         public void Execute(int i)
         {
@@ -52,24 +59,26 @@ namespace bluebean.Physics.PBD
             int level = NativeMultilevelGrid<int>.GridLevelForSize(size);
             float cellSize = NativeMultilevelGrid<int>.CellSizeOfLevel(level);
 
+            //计算collider的aabb在对应size的grid的坐标范围
             // get new collider bounds cell coordinates:
             BurstCellSpan newSpan = new BurstCellSpan(new int4(GridHash.Quantize(velocityBounds.min.xyz, cellSize), level),
                                                       new int4(GridHash.Quantize(velocityBounds.max.xyz, cellSize), level));
 
             // if the collider is at the tail (removed), we will only remove it from its current cellspan.
             // if the new cellspan and the current one are different, we must remove it from its current cellspan and add it to its new one.
-            if (i >= colliderCount || cellIndices[i] != newSpan)
+            if (//i >= colliderCount || 
+                colliderCellSpans[i] != newSpan)
             {
                 // Add the collider to the list of moving colliders:
                 movingColliders.Enqueue(new MovingCollider()
                 {
-                    oldSpan = cellIndices[i],
-                    newSpan = newSpan,
-                    entity = i
+                    m_oldSpan = colliderCellSpans[i],
+                    m_newSpan = newSpan,
+                    m_entity = i
                 });
 
                 // Update previous coords:
-                cellIndices[i] = newSpan;
+                colliderCellSpans[i] = newSpan;
             }
         }
     }

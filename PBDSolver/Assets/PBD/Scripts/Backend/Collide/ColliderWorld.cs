@@ -15,9 +15,9 @@ namespace bluebean.Physics.PBD
 {
     public struct MovingCollider
     {
-        public BurstCellSpan oldSpan;
-        public BurstCellSpan newSpan;
-        public int entity;
+        public BurstCellSpan m_oldSpan;
+        public BurstCellSpan m_newSpan;
+        public int m_entity;
     }
 
     public class ColliderWorld
@@ -34,24 +34,34 @@ namespace bluebean.Physics.PBD
         ISolver m_solver;
 
         #region 碰撞体数据
+        /// <summary>
+        /// 前端对象引用
+        /// </summary>
         [NonSerialized] public List<ColliderHandle> m_colliderHandles;
         [NonSerialized] public NativeColliderShapeList m_colliderShapes;         // list of collider shapes.
         [NonSerialized] public NativeAabbList m_colliderAabbs;                   // list of collider bounds.
         [NonSerialized] public NativeAffineTransformList m_colliderTransforms;   // list of collider transforms.
+        /// <summary>
+        /// 碰撞体的三角网格数据容器，如果shapeType为TriangleMesh
+        /// </summary>
         [NonSerialized] public TriangleMeshContainer m_triangleMeshContainer;
+        /// <summary>
+        /// 每个碰撞体在网格坐标上跨域的范围
+        /// </summary>
+        [NonSerialized] public NativeCellSpanList m_colliderCellSpans;
+
         private int m_colliderCount = 0;
         #endregion
 
         #region 碰撞体网格划分，空间优化
-        private NativeQueue<MovingCollider> movingColliders;
-        private NativeMultilevelGrid<int> grid;
-        /// <summary>
-        /// 每个碰撞体在网格坐标上跨域的范围
-        /// </summary>
-        public NativeCellSpanList cellSpans;
+        private NativeQueue<MovingCollider> m_movingColliders;
+        private NativeMultilevelGrid<int> m_grid;
         #endregion
 
-        public NativeQueue<BurstContact> colliderContactQueue;
+        /// <summary>
+        /// 碰撞接触
+        /// </summary>
+        public NativeQueue<BurstContact> m_colliderContactQueue;
 
         #endregion
 
@@ -63,13 +73,13 @@ namespace bluebean.Physics.PBD
             m_colliderShapes = new NativeColliderShapeList();
             m_colliderAabbs = new NativeAabbList();
             m_colliderTransforms = new NativeAffineTransformList();
-            cellSpans = new NativeCellSpanList();
+            m_colliderCellSpans = new NativeCellSpanList();
             m_triangleMeshContainer = new TriangleMeshContainer();
             m_colliderCount = 0;
 
-            movingColliders = new NativeQueue<MovingCollider>(Allocator.Persistent);
-            grid = new NativeMultilevelGrid<int>(1000, Allocator.Persistent);
-            colliderContactQueue = new NativeQueue<BurstContact>(Allocator.Persistent);
+            m_movingColliders = new NativeQueue<MovingCollider>(Allocator.Persistent);
+            m_grid = new NativeMultilevelGrid<int>(1000, Allocator.Persistent);
+            m_colliderContactQueue = new NativeQueue<BurstContact>(Allocator.Persistent);
         }
 
         public void Destroy()
@@ -78,12 +88,12 @@ namespace bluebean.Physics.PBD
             m_colliderShapes.Dispose(); m_colliderShapes = null;
             m_colliderAabbs.Dispose(); m_colliderAabbs = null;
             m_colliderTransforms.Dispose(); m_colliderTransforms = null;
-            cellSpans.Dispose(); cellSpans = null;
+            m_colliderCellSpans.Dispose(); m_colliderCellSpans = null;
             m_triangleMeshContainer.Dispose(); m_triangleMeshContainer = null;
             m_colliderCount = 0;
-            movingColliders.Dispose();
-            grid.Dispose();
-            colliderContactQueue.Dispose();
+            m_movingColliders.Dispose();
+            m_grid.Dispose();
+            m_colliderContactQueue.Dispose();
         }
 
         public ColliderHandle CreateCollider()
@@ -94,8 +104,8 @@ namespace bluebean.Physics.PBD
             m_colliderShapes.Add(new ColliderShape() {  });
             m_colliderAabbs.Add(new Aabb());
             m_colliderTransforms.Add(new AffineTransform());
+            m_colliderCellSpans.Add(new CellSpan());
 
-            cellSpans.Add(new CellSpan());
             m_colliderCount++;
 
             return handle;
@@ -108,6 +118,7 @@ namespace bluebean.Physics.PBD
 
         /// <summary>
         /// 更新碰撞体数据
+        /// 从前端向后端同步碰撞体shape,transform,aabb等数据
         /// </summary>
         public void UpdateColliders()
         {
@@ -126,33 +137,48 @@ namespace bluebean.Physics.PBD
             //获取移动的碰撞体和其范围
             var identifyMoving = new IdentifyMovingCollidersJob
             {
-                movingColliders = this.movingColliders.AsParallelWriter(),
-                shapes = this.m_colliderShapes.AsNativeArray<BurstColliderShape>(cellSpans.count),
+                //输入
+                shapes = this.m_colliderShapes.AsNativeArray<BurstColliderShape>(m_colliderCellSpans.count),
                 //rigidbodies = world.rigidbodies.AsNativeArray<BurstRigidbody>(),
                 //collisionMaterials = world.collisionMaterials.AsNativeArray<BurstCollisionMaterial>(),
-                bounds = this.m_colliderAabbs.AsNativeArray<BurstAabb>(cellSpans.count),
-                cellIndices = this.cellSpans.AsNativeArray<BurstCellSpan>(),
-                colliderCount = m_colliderCount,
-                dt = deltaTime
+                bounds = this.m_colliderAabbs.AsNativeArray<BurstAabb>(m_colliderCellSpans.count),
+                //colliderCount = m_colliderCount,
+                dt = deltaTime,
+                //输出
+                movingColliders = this.m_movingColliders.AsParallelWriter(),
+                colliderCellSpans = this.m_colliderCellSpans.AsNativeArray<BurstCellSpan>(),
             };
             JobHandle movingHandle = identifyMoving.Schedule(m_colliderCount, 128);
             //更新multiGrid
-            var updateMoving = new UpdateMovingCollidersJob
+            var updateMoving = new UpdateMultiGridByMovingCollidersJob
             {
-                movingColliders = movingColliders,
-                grid = grid,
+                movingColliders = m_movingColliders,
+                grid = m_grid,
                 colliderCount = m_colliderCount
             };
             updateMoving.Schedule(movingHandle).Complete();
         }
 
+        public void UpdateWorld(float deltaTime)
+        {
+            UpdateColliders();
+            UpdateCollidersMultiGrid(deltaTime);
+        }
+
+        /// <summary>
+        /// 碰撞侦测，产生接触
+        /// </summary>
+        /// <param name="deltaTime"></param>
+        /// <param name="inputDeps"></param>
+        /// <returns></returns>
         public JobHandle GenerateContacts(float deltaTime, JobHandle inputDeps)
         {
 
             var generateColliderContactsJob = new GenerateContactsJob
             {
-                colliderGrid = grid,
-                gridLevels = grid.populatedLevels.GetKeyArray(Allocator.TempJob),
+                //输入
+                colliderGrid = m_grid,
+                gridLevels = m_grid.populatedLevels.GetKeyArray(Allocator.TempJob),
 
                 positions = Solver.ParticlePositions,
                 //orientations = solver.orientations,
@@ -187,21 +213,17 @@ namespace bluebean.Physics.PBD
                 //heightFieldHeaders = world.heightFieldContainer.headers.AsNativeArray<HeightFieldHeader>(),
                 //heightFieldSamples = world.heightFieldContainer.samples.AsNativeArray<float>(),
 
-                contactsQueue = this.colliderContactQueue.AsParallelWriter(),
+                
                 //solverToWorld = solver.solverToWorld,
                 //worldToSolver = solver.worldToSolver,
                 deltaTime = deltaTime,
                 //parameters = solver.abstraction.parameters
+                //输出
+                contactsQueue = this.m_colliderContactQueue.AsParallelWriter(),
             };
 
             return generateColliderContactsJob.Schedule(Solver.ParticlePositions.Count(), 16, inputDeps);
 
         }
-
-        public void UpdateWorld(float deltaTime) {
-            UpdateColliders();
-            UpdateCollidersMultiGrid(deltaTime);
-        }
- 
     }
 }

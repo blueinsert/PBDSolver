@@ -13,7 +13,7 @@ namespace bluebean.Physics.PBD
     /// 根据MovingCollider更新MultiGrid
     /// </summary>
     [BurstCompile]
-    public struct UpdateMovingCollidersJob : IJob
+    public struct UpdateMultiGridByMovingCollidersJob : IJob
     {
         public NativeQueue<MovingCollider> movingColliders;
         public NativeMultilevelGrid<int> grid;
@@ -26,12 +26,12 @@ namespace bluebean.Physics.PBD
                 MovingCollider movingCollider = movingColliders.Dequeue();
 
                 // remove from old cells:
-                grid.RemoveFromCells(movingCollider.oldSpan, movingCollider.entity);
+                grid.RemoveFromCells(movingCollider.m_oldSpan, movingCollider.m_entity);
 
                 // insert in new cells, as long as the index is below the amount of colliders.
                 // otherwise, the collider is at the "tail" and there's no need to add it back.
-                if (movingCollider.entity < colliderCount)
-                    grid.AddToCells(movingCollider.newSpan, movingCollider.entity);
+                if (movingCollider.m_entity < colliderCount)
+                    grid.AddToCells(movingCollider.m_newSpan, movingCollider.m_entity);
             }
 
             // remove all empty cells from the grid:

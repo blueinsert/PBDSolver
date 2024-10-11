@@ -9,7 +9,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <RootNamespace></RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
     <ProjectGuid>{2EF99C51-B330-DDBF-9579-9EE8C293CE0E}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -75,7 +76,7 @@
     <Compile Include="Assets\PBD\Scripts\Backend\DataStruct\Native\NativeAffineTransformList.cs" />
     <Compile Include="Assets\PBD\Scripts\Backend\Job\Constrains\StretchConstrainApplyJob.cs" />
     <Compile Include="Assets\PBD\Scripts\Backend\Actor\BunnyTetMeshImpl.cs" />
-    <Compile Include="Assets\PBD\Scripts\Backend\Job\Collide\UpdateMovingCollidersJob.cs" />
+    <Compile Include="Assets\PBD\Scripts\Backend\Job\Collide\UpdateMultiGridByMovingCollidersJob.cs" />
     <Compile Include="Assets\PBD\Scripts\Backend\Util\BurstMath.cs" />
     <Compile Include="Assets\PBD\Scripts\Backend\DataStruct\ObiList.cs" />
     <Compile Include="Assets\PBD\Scripts\Backend\Util\PhysicsUtil.cs" />
@@ -87,6 +88,7 @@
     <Compile Include="Assets\PBD\Scripts\Backend\DataStruct\VectorInt3.cs" />
     <Compile Include="Assets\PBD\Scripts\Backend\DataStruct\Native\NativeAabbList.cs" />
     <Compile Include="Assets\PBD\Scripts\Backend\DataStruct\Burst\BurstAffineTransform.cs" />
+    <Compile Include="Assets\PBD\Scripts\Backend\ResourceHandle.cs" />
     <Compile Include="Assets\PBD\Scripts\Backend\Job\PredictPositionsJob.cs" />
     <Compile Include="Assets\PBD\Scripts\Backend\Job\Constrains\VolumeConstrainApplyJob.cs" />
     <Compile Include="Assets\PBD\Scripts\Backend\DataStruct\Native\NativeList.cs" />
@@ -98,7 +100,7 @@
     <Compile Include="Assets\PBD\Scripts\Backend\Collide\ColliderWorld.cs" />
     <Compile Include="Assets\PBD\Scripts\Backend\DataStruct\VectorInt4.cs" />
     <Compile Include="Assets\PBD\Scripts\Backend\Constrains\CollideConstrainGroup.cs" />
-    <Compile Include="Assets\PBD\Scripts\Backend\Job\Collide\BuildSimplexAabbsJob.cs" />
+    <Compile Include="Assets\PBD\Scripts\Backend\Job\Collide\BuildParticleAabbsJob.cs" />
     <Compile Include="Assets\PBD\Scripts\Frontend\PDBSolver.cs" />
     <Compile Include="Assets\PBD\Scripts\Backend\Job\Constrains\StretchConstrainSolveJob.cs" />
     <Compile Include="Assets\PBD\Scripts\Backend\DataStruct\SDF\DFNode.cs" />
@@ -133,7 +135,6 @@
     <Compile Include="Assets\PBD\Scripts\Backend\DataStruct\Native\NativeInt2List.cs" />
     <Compile Include="Assets\PBD\Scripts\Backend\Job\PositionDeltaApplyJob.cs" />
     <Compile Include="Assets\PBD\Scripts\Backend\DataStruct\Native\NativeMultilevelGrid.cs" />
-    <Compile Include="Assets\PBD\Scripts\Backend\Collide\ResourceHandle.cs" />
     <Compile Include="Assets\PBD\Scripts\Backend\DataStruct\Burst\BurstRigidbody.cs" />
     <Compile Include="Assets\PBD\Scripts\Backend\Actor\PDBActor.cs" />
     <Compile Include="Assets\PBD\Scripts\Backend\DataStruct\Native\NativeFloatList.cs" />

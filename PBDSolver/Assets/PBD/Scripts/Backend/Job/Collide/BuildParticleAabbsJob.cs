@@ -10,7 +10,7 @@ namespace bluebean.Physics.PBD
     /// 根据粒子速度，deltaTime等更新这一帧内粒子的可能活动范围
     /// </summary>
     [BurstCompile]
-    public struct BuildSimplexAabbsJob : IJobParallelFor
+    public struct BuildParticleAabbsJob : IJobParallelFor
     {
         //输入
         [ReadOnly] public NativeArray<float4> radii;

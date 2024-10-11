@@ -7,10 +7,12 @@ using Unity.Collections;
 using Unity.Jobs;
 using Unity.Mathematics;
 using UnityEngine;
-using System.Security.Cryptography;
 
 namespace bluebean.Physics.PBD
 {
+    /// <summary>
+    /// 对于每个粒子与环境碰撞体判断碰撞，产生接触数据
+    /// </summary>
     [BurstCompile]
     unsafe struct GenerateContactsJob : IJobParallelFor
     {
@@ -60,16 +62,16 @@ namespace bluebean.Physics.PBD
         //[ReadOnly] public NativeArray<HeightFieldHeader> heightFieldHeaders;
         //[ReadOnly] public NativeArray<float> heightFieldSamples;
 
-        // output contacts queue:
-        [WriteOnly]
-        [NativeDisableParallelForRestriction]
-        public NativeQueue<BurstContact>.ParallelWriter contactsQueue;
-
         // auxiliar data:
         //[ReadOnly] public BurstAffineTransform solverToWorld;
         //[ReadOnly] public BurstAffineTransform worldToSolver;
         [ReadOnly] public float deltaTime;
         //[ReadOnly] public Oni.SolverParameters parameters;
+
+        // output contacts queue:
+        [WriteOnly]
+        [NativeDisableParallelForRestriction]
+        public NativeQueue<BurstContact>.ParallelWriter contactsQueue;
 
         public void Execute(int i)
         {
@@ -82,15 +84,15 @@ namespace bluebean.Physics.PBD
 
             // max size of the particle bounds in cells:
             int3 maxSize = new int3(10);
-
+            //遍历当前multiGrid中的所有level
             for (int l = 0; l < gridLevels.Length; ++l)
             {
                 float cellSize = NativeMultilevelGrid<int>.CellSizeOfLevel(gridLevels[l]);
-
+                //粒子bound的覆盖范围
                 int3 minCell = GridHash.Quantize(simplexBoundsWS.min.xyz, cellSize);
                 int3 maxCell = GridHash.Quantize(simplexBoundsWS.max.xyz, cellSize);
                 maxCell = minCell + math.min(maxCell - minCell, maxSize);
-
+                //查找该范围内的collider,作为可能碰撞的候选集
                 for (int x = minCell[0]; x <= maxCell[0]; ++x)
                 {
                     for (int y = minCell[1]; y <= maxCell[1]; ++y)
@@ -113,7 +115,7 @@ namespace bluebean.Physics.PBD
                 NativeArray<int> uniqueCandidates = candidates.AsArray();
                 uniqueCandidates.Sort();
                 int uniqueCount = uniqueCandidates.Unique();
-
+                //遍历候选集中每个collider，和粒子做具体的碰撞检测
                 // iterate over candidate colliders, generating contacts for each one
                 for (int k = 0; k < uniqueCount; ++k)
                 {
@@ -155,6 +157,14 @@ namespace bluebean.Physics.PBD
             }
         }
 
+        /// <summary>
+        /// 具体的几何级别的碰撞侦测
+        /// </summary>
+        /// <param name="shape"></param>
+        /// <param name="colliderToWorld"></param>
+        /// <param name="colliderIndex"></param>
+        /// <param name="simplexIndex"></param>
+        /// <param name="simplexBoundsWS"></param>
         private void GenerateContacts(in BurstColliderShape shape,
                                       in BurstAffineTransform colliderToWorld,
                                       int colliderIndex,
