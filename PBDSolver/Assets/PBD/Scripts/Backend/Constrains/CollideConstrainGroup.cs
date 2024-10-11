@@ -21,9 +21,6 @@ namespace bluebean.Physics.PBD
             {
                 contacts = m_solver.ColliderContacts,
 
-                //simplices = solverImplementation.simplices,
-                //simplexCounts = solverImplementation.simplexCounts,
-
                 positions = m_solver.ParticlePositions,
                 deltas = m_solver.PositionDeltas,
                 counts = m_solver.PositionConstraintCounts,
@@ -47,9 +44,6 @@ namespace bluebean.Physics.PBD
                 invMasses = m_solver.InvMasses,
                 radii = m_solver.ParticleRadius,
                 //particleMaterialIndices = solverImplementation.collisionMaterials,
-
-                //simplices = solverImplementation.simplices,
-                //simplexCounts = solverImplementation.simplexCounts,
 
                 shapes = m_solver.ColliderWorld.m_colliderShapes.AsNativeArray<BurstColliderShape>(),
                 transforms = m_solver.ColliderWorld.m_colliderTransforms.AsNativeArray<BurstAffineTransform>(),

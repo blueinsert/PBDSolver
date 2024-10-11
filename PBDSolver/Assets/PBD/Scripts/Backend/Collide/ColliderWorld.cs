@@ -189,7 +189,7 @@ namespace bluebean.Physics.PBD
 
                 //simplices = solver.simplices,
                 //simplexCounts = solver.simplexCounts,
-                simplexBounds = Solver.ParticleAabb,
+                particleBounds = Solver.ParticleAabb,
 
                 transforms = this.m_colliderTransforms.AsNativeArray<BurstAffineTransform>(),
                 shapes = this.m_colliderShapes.AsNativeArray<BurstColliderShape>(),

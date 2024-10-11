@@ -33,7 +33,7 @@ namespace bluebean.Physics.PBD
         // simplex arrays:
         //[ReadOnly] public NativeArray<int> simplices;
         //[ReadOnly] public SimplexCounts simplexCounts;
-        [ReadOnly] public NativeArray<BurstAabb> simplexBounds;
+        [ReadOnly] public NativeArray<BurstAabb> particleBounds;
 
         // collider arrays:
         [ReadOnly] public NativeArray<BurstAffineTransform> transforms;
@@ -76,7 +76,7 @@ namespace bluebean.Physics.PBD
         public void Execute(int i)
         {
             //int simplexStart = simplexCounts.GetSimplexStartAndSize(i, out int simplexSize);
-            BurstAabb simplexBoundsWS = simplexBounds[i];
+            BurstAabb simplexBoundsWS = particleBounds[i];
 
             // get all colliders overlapped by the cell bounds, in all grid levels:
             //BurstAabb simplexBoundsWS = simplexBoundsSS.Transformed(solverToWorld);
@@ -163,20 +163,18 @@ namespace bluebean.Physics.PBD
         /// <param name="shape"></param>
         /// <param name="colliderToWorld"></param>
         /// <param name="colliderIndex"></param>
-        /// <param name="simplexIndex"></param>
-        /// <param name="simplexBoundsWS"></param>
+        /// <param name="particleIndex"></param>
+        /// <param name="particleBoundsWS"></param>
         private void GenerateContacts(in BurstColliderShape shape,
                                       in BurstAffineTransform colliderToWorld,
                                       int colliderIndex,
                                       //int rigidbodyIndex,
-                                      int simplexIndex,
-                                      //int simplexStart,
-                                      //int simplexSize,
-                                      in BurstAabb simplexBoundsWS)
+                                      int particleIndex,
+                                      in BurstAabb particleBoundsWS)
         {
             //float4x4 solverToCollider;
             float4x4 worldToCollider;
-            BurstAabb simplexBoundsCS;
+            BurstAabb particleBoundsCS;
 
             switch (shape.type)
             {
@@ -187,7 +185,7 @@ namespace bluebean.Physics.PBD
                     // invert a full matrix here to accurately represent collider bounds scale.
                     //solverToCollider = math.inverse(float4x4.TRS(colliderToSolver.translation.xyz, colliderToSolver.rotation, colliderToSolver.scale.xyz));
                     worldToCollider = math.inverse(float4x4.TRS(colliderToWorld.translation.xyz, colliderToWorld.rotation, colliderToWorld.scale.xyz));
-                    simplexBoundsCS = simplexBoundsWS.Transformed(worldToCollider);
+                    particleBoundsCS = particleBoundsWS.Transformed(worldToCollider);
 
                     BurstTriangleMesh triangleMeshShape = new BurstTriangleMesh()
                     {
@@ -203,8 +201,8 @@ namespace bluebean.Physics.PBD
                         dt = deltaTime
                     };
 
-                    triangleMeshShape.Contacts(colliderIndex, positions, velocities, radii, in simplexBoundsCS,
-                        simplexIndex, contactsQueue);
+                    triangleMeshShape.Contacts(colliderIndex, positions, velocities, radii, in particleBoundsCS,
+                        particleIndex, contactsQueue);
 
                     break;
                     //case ColliderShape.ShapeType.Sphere:

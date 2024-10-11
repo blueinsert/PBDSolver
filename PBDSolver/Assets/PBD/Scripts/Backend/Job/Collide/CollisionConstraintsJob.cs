@@ -20,10 +20,6 @@ namespace bluebean.Physics.PBD
         [ReadOnly] public NativeArray<float4> radii;
         //[ReadOnly] public NativeArray<int> particleMaterialIndices;
 
-        // simplex arrays:
-        //[ReadOnly] public NativeArray<int> simplices;
-        //[ReadOnly] public SimplexCounts simplexCounts;
-
         [ReadOnly] public NativeArray<BurstColliderShape> shapes;
         [ReadOnly] public NativeArray<BurstAffineTransform> transforms;
         //[ReadOnly] public NativeArray<BurstCollisionMaterial> collisionMaterials;
@@ -31,17 +27,18 @@ namespace bluebean.Physics.PBD
         //public NativeArray<float4> rigidbodyLinearDeltas;
         //public NativeArray<float4> rigidbodyAngularDeltas;
 
+        [ReadOnly] public float stepTime;
+        [ReadOnly] public float substepTime;
+        /// <summary>
+        /// 当前step剩余的subStep迭代数量
+        /// </summary>
+        [ReadOnly] public int substeps;
+
         [NativeDisableContainerSafetyRestriction][NativeDisableParallelForRestriction] public NativeArray<float4> positions;
         [NativeDisableContainerSafetyRestriction][NativeDisableParallelForRestriction] public NativeArray<float4> deltas;
         [NativeDisableContainerSafetyRestriction][NativeDisableParallelForRestriction] public NativeArray<int> counts;
 
         public NativeArray<BurstContact> contacts;
-        //[ReadOnly] public BurstInertialFrame inertialFrame;
-        //[ReadOnly] public Oni.ConstraintParameters constraintParameters;
-        //[ReadOnly] public Oni.SolverParameters solverParameters;
-        [ReadOnly] public float stepTime;
-        [ReadOnly] public float substepTime;
-        [ReadOnly] public int substeps;
 
         public void Execute()
         {
@@ -49,7 +46,7 @@ namespace bluebean.Physics.PBD
             {
                 var contact = contacts[i];
 
-                int simplexIndex = contact.bodyA;// simplexCounts.GetSimplexStartAndSize(contact.bodyA, out int simplexSize);
+                int particleIndex = contact.bodyA;// simplexCounts.GetSimplexStartAndSize(contact.bodyA, out int simplexSize);
                 int colliderIndex = contact.bodyB;
 
                 // Skip contacts involving triggers:
@@ -65,10 +62,10 @@ namespace bluebean.Physics.PBD
                 // Get relative velocity at contact point.
                 // As we do not consider true ellipses for collision detection, particle contact points are never off-axis.
                 // So particle angular velocity does not contribute to normal impulses, and we can skip it.
-                float4 simplexPosition = positions[simplexIndex];
-                float4 simplexPrevPosition = prevPositions[simplexIndex];
-                float simplexRadius = radii[simplexIndex].x;
-                float invMass = invMasses[simplexIndex];
+                float4 particlePosition = positions[particleIndex];
+                float4 particlePrevPosition = prevPositions[particleIndex];
+                float particleRadius = radii[particleIndex].x;
+                float invMass = invMasses[particleIndex];
 
                 //for (int j = 0; j < simplexSize; ++j)
                 //{
@@ -78,10 +75,13 @@ namespace bluebean.Physics.PBD
                 //    simplexRadius += BurstMath.EllipsoidRadius(contact.normal, orientations[particleIndex], radii[particleIndex].xyz) * contact.pointA[j];
                 //}
 
+                //外插值，用线性速度外插得到这个step结束时的位置
                 // project position to the end of the full step:
-                float4 posA = math.lerp(simplexPrevPosition, simplexPosition, substeps);
-                posA += -contact.normal * simplexRadius;
+                float4 posA = math.lerp(particlePrevPosition, particlePosition, substeps);
+                //粒子表面距离碰撞点的最近点
+                posA += -contact.normal * particleRadius;
 
+                //碰撞点，碰撞体表面上的点，世界坐标系
                 float4 posB = contact.pointB;
 
                 //contact.CalculateContactMassesA(invMasses,);
@@ -98,9 +98,9 @@ namespace bluebean.Physics.PBD
                 // Apply normal impulse to both simplex and rigidbody:
                 if (math.abs(lambda) > BurstMath.epsilon)
                 {
+                    //除以substeps得到当前substep需要更新的delta
                     float4 delta = lambda * contact.normal / substeps;
 
-                    int particleIndex = simplexIndex;
                     deltas[particleIndex] += delta * invMasses[particleIndex];
                     counts[particleIndex]++;
 

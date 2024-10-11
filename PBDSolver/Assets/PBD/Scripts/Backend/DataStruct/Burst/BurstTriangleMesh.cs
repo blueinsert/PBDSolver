@@ -32,7 +32,7 @@ namespace bluebean.Physics.PBD.DataStruct
             //从世界坐标系转碰撞体本地坐标系
             point = colliderToWorld.InverseTransformPoint(point);
             //point = colliderToSolver.InverseTransformPointUnscaled(point);
-
+            //计算距离当前tri的最近点
             float4 nearestPoint = BurstMath.NearestPointOnTri(tri, point, out float4 bary);
             float4 normal = math.normalizesafe(point - nearestPoint);
 
@@ -42,65 +42,57 @@ namespace bluebean.Physics.PBD.DataStruct
         }
 
         public void Contacts(int colliderIndex,
-                             //int rigidbodyIndex,
-                            // NativeArray<BurstRigidbody> rigidbodies,
+                              //int rigidbodyIndex,
+                              // NativeArray<BurstRigidbody> rigidbodies,
 
                               NativeArray<float4> positions,
                               //NativeArray<quaternion> orientations,
                               NativeArray<float4> velocities,
                               NativeArray<float4> radii,
+                              in BurstAabb particleBounds,
+                              int particleIndex,
 
-                              //NativeArray<int> simplices,
-                              in BurstAabb simplexBounds,
-                              int simplexIndex,
-                              //int simplexStart,
-                              //int simplexSize,
-
-                              NativeQueue<BurstContact>.ParallelWriter contacts,
-                              int optimizationIterations = 14,
-                              float optimizationTolerance = 0.001f)
+                              NativeQueue<BurstContact>.ParallelWriter contacts
+                              )
         {
 
-            BIHTraverse(colliderIndex, simplexIndex,
-                        positions, velocities, radii, in simplexBounds, 0, contacts, optimizationIterations, optimizationTolerance);
-            
+            BIHTraverse(colliderIndex, particleIndex,
+                        positions, velocities, radii, in particleBounds, 0, contacts);
+
         }
 
         private void BIHTraverse(int colliderIndex,
                                  //int rigidbodyIndex,
-                                 int simplexIndex,
-                                 //int simplexStart,
-                                 //int simplexSize,
+                                 int particleIndex,
                                  //NativeArray<BurstRigidbody> rigidbodies,
                                  NativeArray<float4> positions,
                                  //NativeArray<quaternion> orientations,
                                  NativeArray<float4> velocities,
                                  NativeArray<float4> radii,
-                                 //NativeArray<int> simplices,
-                                 in BurstAabb simplexBounds,
+                                 in BurstAabb particleBounds,
                                  int nodeIndex,
-                                 NativeQueue<BurstContact>.ParallelWriter contacts,
-                                 int optimizationIterations,
-                                 float optimizationTolerance)
+                                 NativeQueue<BurstContact>.ParallelWriter contacts
+            )
         {
             var node = bihNodes[header.firstNode + nodeIndex];
 
             if (node.firstChild >= 0)
-            { 
+            {
                 // visit min node:
-                if (simplexBounds.min[node.axis] <= node.leftSplitPlane)
-                    BIHTraverse(colliderIndex, simplexIndex,
-                                positions, velocities, radii, in simplexBounds,
-                                node.firstChild, contacts, optimizationIterations, optimizationTolerance);
+                if (particleBounds.min[node.axis] <= node.leftSplitPlane)
+                    BIHTraverse(colliderIndex, particleIndex,
+                                positions, velocities, radii, in particleBounds,
+                                node.firstChild, contacts);
 
                 // visit max node:
-                if (simplexBounds.max[node.axis] >= node.rightSplitPlane)
-                    BIHTraverse(colliderIndex, simplexIndex,
-                                positions, velocities, radii, in simplexBounds,
-                                node.firstChild + 1, contacts, optimizationIterations, optimizationTolerance);
+                if (particleBounds.max[node.axis] >= node.rightSplitPlane)
+                    BIHTraverse(colliderIndex, particleIndex,
+                                positions, velocities, radii, in particleBounds,
+                                node.firstChild + 1, contacts);
             }
             else
             {
+                //已经是叶子节点，将叶子节点包含的所有三角形与粒子做蛮力碰撞检测
                 // check for contact against all triangles:
                 for (int dataOffset = node.start; dataOffset < node.start + node.count; ++dataOffset)
                 {
@@ -110,41 +102,41 @@ namespace bluebean.Physics.PBD.DataStruct
                     float4 v3 = new float4(vertices[header.firstVertex + t.i3], 0);
                     BurstAabb triangleBounds = new BurstAabb(v1, v2, v3, shape.contactOffset + collisionMargin);
 
-                    if (triangleBounds.IntersectsAabb(simplexBounds))
+                    //先判断aabb是否相交，再判断顶点级别
+                    if (triangleBounds.IntersectsAabb(particleBounds))
                     {
-                        //float4 simplexBary = BurstMath.BarycenterForSimplexOfSize(simplexSize);
-                        //tri.Cache(v1 * colliderToSolver.scale, v2 * colliderToSolver.scale, v3 * colliderToSolver.scale);
                         tri.Cache(v1, v2, v3);
 
                         //var colliderPoint = BurstLocalOptimization.Optimize<BurstTriangleMesh>(ref this, positions, orientations, radii, simplices, simplexStart, simplexSize,
                         //                                                   ref simplexBary, out float4 simplexPoint, optimizationIterations, optimizationTolerance);
-                        var colliderPoint = BurstLocalOptimization.NoOptimize<BurstTriangleMesh>(ref this, positions, radii, simplexIndex);
-                        float4 simplexPoint = positions[simplexIndex];
-                        float4 velocity = velocities[simplexIndex];
-                        float simplexRadius = radii[simplexIndex].x;
-                        //for (int j = 0; j < simplexSize; ++j)
-                        //{
-                        //    int particleIndex = simplices[simplexStart + j];
-                        //    simplexRadius += radii[particleIndex].x * simplexBary[j];
-                        //    velocity += velocities[particleIndex] * simplexBary[j];
-                        //}
+                        var surfacePoint = new SurfacePoint();
+                        var convexPoint = positions[particleIndex];
+                        var convexThickness = radii[particleIndex];
+                        this.Evaluate(convexPoint, convexThickness, quaternion.identity, ref surfacePoint);
+                        var nearestPointInTri = surfacePoint;
+                        //BurstLocalOptimization.NoOptimize<BurstTriangleMesh>(ref this, positions, radii, simplexIndex);
+
+                        float4 particlePoint = positions[particleIndex];
+                        float4 particleVelocity = velocities[particleIndex];
+                        float particleRadius = radii[particleIndex].x;
+
 
                         float4 rbVelocity = float4.zero;
                         //if (rigidbodyIndex >= 0)
-                         //   rbVelocity = BurstMath.GetRigidbodyVelocityAtPoint(rigidbodyIndex, colliderPoint.point, rigidbodies, solverToWorld);
-
-                        float dAB = math.dot(simplexPoint - colliderPoint.point, colliderPoint.normal);
-                        float vel = math.dot(velocity     - rbVelocity, colliderPoint.normal); 
-
-                        if (vel * dt + dAB <= simplexRadius + shape.contactOffset + collisionMargin)
+                        //   rbVelocity = BurstMath.GetRigidbodyVelocityAtPoint(rigidbodyIndex, colliderPoint.point, rigidbodies, solverToWorld);
+                        //计算粒子点距离表面最近点的相对距离和相对速度
+                        float dAB = math.dot(particlePoint - nearestPointInTri.point, nearestPointInTri.normal);
+                        float vel = math.dot(particleVelocity - rbVelocity, nearestPointInTri.normal);
+                        //判断在这一帧内是否会碰撞
+                        if (vel * dt + dAB <= particleRadius + shape.contactOffset + collisionMargin)
                         {
                             contacts.Enqueue(new BurstContact()
                             {
-                                bodyA = simplexIndex,
+                                bodyA = particleIndex,
                                 bodyB = colliderIndex,
-                                pointA = new float4(1,0,0,0),
-                                pointB = colliderPoint.point,
-                                normal = colliderPoint.normal,
+                                pointA = new float4(1, 0, 0, 0),
+                                pointB = nearestPointInTri.point,
+                                normal = nearestPointInTri.normal,
                                 distance = dAB,
                             });
                         }
