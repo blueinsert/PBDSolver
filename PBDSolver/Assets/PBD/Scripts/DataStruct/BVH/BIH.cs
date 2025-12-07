@@ -49,8 +49,11 @@ namespace bluebean.Physics.PBD.DataStruct
                     float pivot = b.min[axis] + size[axis] * 0.5f;
 
                     // partition elements according to which side of the split plane they're at:
+                    //重排elements，将在pivot左侧的元素排在数组前部，pivot右侧数组排在数组后边，
+                    //并返回左侧最后一个元素索引
                     int j = HoarePartition(elements, start, end, pivot, ref node, axis);
-
+                    //这样，子节点包含的范围就已确定
+                    //之后看元素数量决定是否需要再细分，再继续在内部重排，继续产生子节点，不影响父节点的范围
                     // create two child nodes:
                     var minChild = new BIHNode(start, j - start + 1);
                     var maxChild = new BIHNode(j + 1, end - j);

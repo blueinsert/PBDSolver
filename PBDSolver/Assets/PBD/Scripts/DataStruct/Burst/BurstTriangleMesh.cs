@@ -6,8 +6,6 @@ namespace bluebean.Physics.PBD.DataStruct
     public struct BurstTriangleMesh : IDistanceFunction
     {
         public BurstColliderShape shape;
-        //public BurstAffineTransform colliderToSolver;
-        //public BurstAffineTransform solverToWorld;
         public BurstAffineTransform colliderToWorld;
 
         public TriangleMeshHeader header;
@@ -25,9 +23,8 @@ namespace bluebean.Physics.PBD.DataStruct
         /// </summary>
         /// <param name="point"></param>
         /// <param name="radii"></param>
-        /// <param name="orientation"></param>
         /// <param name="projectedPoint"></param>
-        public void Evaluate(float4 point, float4 radii, quaternion orientation, ref SurfacePoint projectedPoint)
+        public void Evaluate(float4 point, float4 radii, ref SurfacePoint projectedPoint)
         {
             //从世界坐标系转碰撞体本地坐标系
             point = colliderToWorld.InverseTransformPoint(point);
@@ -37,16 +34,14 @@ namespace bluebean.Physics.PBD.DataStruct
             float4 normal = math.normalizesafe(point - nearestPoint);
 
             //转回世界坐标系
-            projectedPoint.point = colliderToWorld.TransformPoint(nearestPoint + normal * shape.contactOffset);// colliderToSolver.TransformPointUnscaled(nearestPoint + normal * shape.contactOffset);
-            projectedPoint.normal = colliderToWorld.TransformDirection(normal);// colliderToSolver.TransformDirection(normal);
+            projectedPoint.point = colliderToWorld.TransformPoint(nearestPoint + normal * shape.contactOffset);
+            projectedPoint.normal = colliderToWorld.TransformDirection(normal);
         }
 
         public void Contacts(int colliderIndex,
                               //int rigidbodyIndex,
                               // NativeArray<BurstRigidbody> rigidbodies,
-
                               NativeArray<float4> positions,
-                              //NativeArray<quaternion> orientations,
                               NativeArray<float4> velocities,
                               NativeArray<float4> radii,
                               in BurstAabb particleBounds,
@@ -66,7 +61,6 @@ namespace bluebean.Physics.PBD.DataStruct
                                  int particleIndex,
                                  //NativeArray<BurstRigidbody> rigidbodies,
                                  NativeArray<float4> positions,
-                                 //NativeArray<quaternion> orientations,
                                  NativeArray<float4> velocities,
                                  NativeArray<float4> radii,
                                  in BurstAabb particleBounds,
@@ -107,36 +101,29 @@ namespace bluebean.Physics.PBD.DataStruct
                     {
                         tri.Cache(v1, v2, v3);
 
-                        //var colliderPoint = BurstLocalOptimization.Optimize<BurstTriangleMesh>(ref this, positions, orientations, radii, simplices, simplexStart, simplexSize,
-                        //                                                   ref simplexBary, out float4 simplexPoint, optimizationIterations, optimizationTolerance);
-                        var surfacePoint = new SurfacePoint();
-                        var convexPoint = positions[particleIndex];
-                        var convexThickness = radii[particleIndex];
-                        this.Evaluate(convexPoint, convexThickness, quaternion.identity, ref surfacePoint);
-                        var nearestPointInTri = surfacePoint;
-                        //BurstLocalOptimization.NoOptimize<BurstTriangleMesh>(ref this, positions, radii, simplexIndex);
-
                         float4 particlePoint = positions[particleIndex];
                         float4 particleVelocity = velocities[particleIndex];
                         float particleRadius = radii[particleIndex].x;
 
+                        var nearestPoint = new SurfacePoint();
+                        this.Evaluate(particlePoint, particleRadius, ref nearestPoint);
 
-                        float4 rbVelocity = float4.zero;
+                        float4 rbVelocity = float4.zero;  
                         //if (rigidbodyIndex >= 0)
                         //   rbVelocity = BurstMath.GetRigidbodyVelocityAtPoint(rigidbodyIndex, colliderPoint.point, rigidbodies, solverToWorld);
                         //计算粒子点距离表面最近点的相对距离和相对速度
-                        float dAB = math.dot(particlePoint - nearestPointInTri.point, nearestPointInTri.normal);
-                        float vel = math.dot(particleVelocity - rbVelocity, nearestPointInTri.normal);
+                        float dAB = math.dot(particlePoint - nearestPoint.point, nearestPoint.normal);
+                        float dVel = math.dot(particleVelocity - rbVelocity, nearestPoint.normal);
                         //判断在这一帧内是否会碰撞
-                        if (vel * dt + dAB <= particleRadius + shape.contactOffset + collisionMargin)
+                        if (dVel * dt + dAB <= particleRadius + shape.contactOffset + collisionMargin)
                         {
                             contacts.Enqueue(new BurstContact()
                             {
                                 bodyA = particleIndex,
                                 bodyB = colliderIndex,
                                 pointA = new float4(1, 0, 0, 0),
-                                pointB = nearestPointInTri.point,
-                                normal = nearestPointInTri.normal,
+                                pointB = nearestPoint.point,
+                                normal = nearestPoint.normal,
                                 distance = dAB,
                             });
                         }

@@ -18,6 +18,10 @@ namespace bluebean.Physics.PBD
         public int m_entity;
     }
 
+    /// <summary>
+    /// 存放unity中的碰撞体数据；
+    /// 这些碰撞体会与pbd粒子发生碰撞
+    /// </summary>
     public class ColliderWorld
     {
         ISolver Solver
@@ -114,10 +118,17 @@ namespace bluebean.Physics.PBD
             return m_triangleMeshContainer.GetOrCreateTriangleMesh(mesh);
         }
 
+        public void UpdateColliderData(int index, ColliderShape shape,Aabb aabb,AffineTransform transform)
+        {
+            m_colliderShapes[index] = shape;
+            m_colliderAabbs[index] = aabb;
+            m_colliderTransforms[index] = transform;
+        }
+
         /// <summary>
         /// 更新碰撞体数据
         /// </summary>
-        public void UpdateColliders()
+        private void UpdateColliders()
         {
             // update all colliders:
             for (int i = 0; i < m_colliderHandles.Count; ++i)
@@ -127,7 +138,7 @@ namespace bluebean.Physics.PBD
         /// <summary>
         /// 使用多重网格，更新碰撞体的空间划分
         /// </summary>
-        public void UpdateCollidersMultiGrid(float deltaTime)
+        private void UpdateCollidersMultiGrid(float deltaTime)
         {
             if (m_colliderCount <= 0)
                 return;

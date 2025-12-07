@@ -11,15 +11,11 @@ namespace bluebean.Physics.PBD
     public struct CollisionConstraintsJob : IJob
     {
         [ReadOnly] public NativeArray<float4> prevPositions;
-        //[ReadOnly] public NativeArray<quaternion> orientations;
-        //[ReadOnly] public NativeArray<quaternion> prevOrientations;
         [ReadOnly] public NativeArray<float> invMasses;
         [ReadOnly] public NativeArray<float4> radii;
-        //[ReadOnly] public NativeArray<int> particleMaterialIndices;
 
         [ReadOnly] public NativeArray<BurstColliderShape> shapes;
         [ReadOnly] public NativeArray<BurstAffineTransform> transforms;
-        //[ReadOnly] public NativeArray<BurstCollisionMaterial> collisionMaterials;
         //[ReadOnly] public NativeArray<BurstRigidbody> rigidbodies;
         //public NativeArray<float4> rigidbodyLinearDeltas;
         //public NativeArray<float4> rigidbodyAngularDeltas;
@@ -46,31 +42,12 @@ namespace bluebean.Physics.PBD
                 int particleIndex = contact.bodyA;// simplexCounts.GetSimplexStartAndSize(contact.bodyA, out int simplexSize);
                 int colliderIndex = contact.bodyB;
 
-                // Skip contacts involving triggers:
-                //if (shapes[colliderIndex].flags > 0)
-                //    continue;
-
-                // Get the rigidbody index (might be < 0, in that case there's no rigidbody present)
-                //int rigidbodyIndex = shapes[colliderIndex].rigidbodyIndex;
-
-                // Combine collision materials (use material from first particle in simplex)
-                //BurstCollisionMaterial material = CombineCollisionMaterials(simplices[simplexIndex], colliderIndex);
-
-                // Get relative velocity at contact point.
-                // As we do not consider true ellipses for collision detection, particle contact points are never off-axis.
-                // So particle angular velocity does not contribute to normal impulses, and we can skip it.
+                //这个substep的预测位置
                 float4 particlePosition = positions[particleIndex];
+                //上个substep的位置
                 float4 particlePrevPosition = prevPositions[particleIndex];
                 float particleRadius = radii[particleIndex].x;
                 float invMass = invMasses[particleIndex];
-
-                //for (int j = 0; j < simplexSize; ++j)
-                //{
-                //    int particleIndex = simplices[simplexIndex + j];
-                //    simplexPosition += positions[particleIndex] * contact.pointA[j];
-                //    simplexPrevPosition += prevPositions[particleIndex] * contact.pointA[j];
-                //    simplexRadius += BurstMath.EllipsoidRadius(contact.normal, orientations[particleIndex], radii[particleIndex].xyz) * contact.pointA[j];
-                //}
 
                 //外插值，用线性速度外插得到这个step结束时的位置
                 // project position to the end of the full step:
@@ -81,7 +58,6 @@ namespace bluebean.Physics.PBD
                 //碰撞点，碰撞体表面上的点，世界坐标系
                 float4 posB = contact.pointB;
 
-                //contact.CalculateContactMassesA(invMasses,);
                 contact.normalInvMassA = contact.tangentInvMassA = contact.bitangentInvMassA = invMass;
                 //if (rigidbodyIndex >= 0)
                 //    posB += BurstMath.GetRigidbodyVelocityAtPoint(rigidbodyIndex, contact.pointB, rigidbodies, rigidbodyLinearDeltas, rigidbodyAngularDeltas, inertialFrame.frame) * stepTime;
@@ -98,6 +74,7 @@ namespace bluebean.Physics.PBD
                     //除以substeps得到当前substep需要更新的delta
                     float4 delta = lambda * contact.normal / substeps;
 
+                    //冲量直接改变位置
                     deltas[particleIndex] += delta * invMasses[particleIndex];
                     counts[particleIndex]++;
 

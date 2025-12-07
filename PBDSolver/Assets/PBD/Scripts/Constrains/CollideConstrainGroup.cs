@@ -19,10 +19,6 @@ namespace bluebean.Physics.PBD
                 positions = m_solver.ParticlePositions,
                 deltas = m_solver.PositionDeltas,
                 counts = m_solver.PositionConstraintCounts,
-                //orientations = solverImplementation.orientations,
-                //orientationDeltas = solverImplementation.orientationDeltas,
-                //orientationCounts = solverImplementation.orientationConstraintCounts,
-                //constraintParameters = parameters
             };
 
             return applyConstraints.Schedule(inputDeps);
@@ -34,15 +30,11 @@ namespace bluebean.Physics.PBD
             {
                 positions = m_solver.ParticlePositions,
                 prevPositions = m_solver.PrevParticlePositions,
-                //orientations = solverImplementation.orientations,
-                //prevOrientations = solverImplementation.prevOrientations,
                 invMasses = m_solver.InvMasses,
                 radii = m_solver.ParticleRadius,
-                //particleMaterialIndices = solverImplementation.collisionMaterials,
 
                 shapes = m_solver.ColliderWorld.m_colliderShapes.AsNativeArray<BurstColliderShape>(),
                 transforms = m_solver.ColliderWorld.m_colliderTransforms.AsNativeArray<BurstAffineTransform>(),
-                //collisionMaterials = ObiColliderWorld.GetInstance().collisionMaterials.AsNativeArray<BurstCollisionMaterial>(),
                 //rigidbodies = ObiColliderWorld.GetInstance().rigidbodies.AsNativeArray<BurstRigidbody>(),
                 //rigidbodyLinearDeltas = solverImplementation.abstraction.rigidbodyLinearDeltas.AsNativeArray<float4>(),
                 //rigidbodyAngularDeltas = solverImplementation.abstraction.rigidbodyAngularDeltas.AsNativeArray<float4>(),

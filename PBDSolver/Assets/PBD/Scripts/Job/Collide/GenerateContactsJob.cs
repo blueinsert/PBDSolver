@@ -133,15 +133,11 @@ namespace bluebean.Physics.PBD
 
                     if (colliderShape.dataIndex < 0) return;
 
-                    // invert a full matrix here to accurately represent collider bounds scale.
-                    //solverToCollider = math.inverse(float4x4.TRS(colliderToSolver.translation.xyz, colliderToSolver.rotation, colliderToSolver.scale.xyz));
                     worldToColliderTransform = math.inverse(float4x4.TRS(colliderToWorldTransform.translation.xyz, colliderToWorldTransform.rotation, colliderToWorldTransform.scale.xyz));
                     particleBoundCS = particleBound.Transformed(worldToColliderTransform);
 
                     BurstTriangleMesh triangleMeshShape = new BurstTriangleMesh()
                     {
-                        //colliderToSolver = colliderToSolver,
-                        //solverToWorld = solverToWorld,
                         colliderToWorld = colliderToWorldTransform,
                         shape = colliderShape,
                         header = triangleMeshHeaders[colliderShape.dataIndex],

@@ -6,7 +6,7 @@ namespace bluebean.Physics.PBD
     [RequireComponent(typeof(MeshCollider))]
     public class PBDMeshCollider : ColliderBase
     {
-        TriangleMeshHandle m_shapeHandle;
+        TriangleMeshHandle m_triMeshHandle;
         private UnityEngine.MeshCollider m_unityMeshCollider = null;
 
         private void Awake()
@@ -22,24 +22,22 @@ namespace bluebean.Physics.PBD
         public override void UpdateIfNeeded()
         {
             var colliderWorld = Solver.ColliderWorld;
-            if (m_shapeHandle == null)
+            if (m_triMeshHandle == null)
             {
-                m_shapeHandle = colliderWorld.GetOrCreateTriangleMesh(m_unityMeshCollider.sharedMesh);
-                m_shapeHandle.Reference();
+                m_triMeshHandle = colliderWorld.GetOrCreateTriangleMesh(m_unityMeshCollider.sharedMesh);
+                m_triMeshHandle.Reference();
             }
             var index = m_colliderHandle.index;
-            var shape = colliderWorld.m_colliderShapes[index];
+
+            var shape = new ColliderShape();
             shape.type = ColliderShapeType.TriangleMesh;
-            shape.dataIndex = m_shapeHandle.index;
-            colliderWorld.m_colliderShapes[index] = shape;
-
-            var aabb = colliderWorld.m_colliderAabbs[index];
+            shape.dataIndex = m_triMeshHandle.index;
+            var aabb = new Aabb();
             aabb.FromBounds(m_unityMeshCollider.bounds, 0);
-            colliderWorld.m_colliderAabbs[index] = aabb;
-
-            var trfm = colliderWorld.m_colliderTransforms[index];
+            var trfm = new AffineTransform();
             trfm.FromTransform(m_unityMeshCollider.transform);
-            colliderWorld.m_colliderTransforms[index] = trfm;
+
+            colliderWorld.UpdateColliderData(index, shape, aabb, trfm);
         }
     }
 }

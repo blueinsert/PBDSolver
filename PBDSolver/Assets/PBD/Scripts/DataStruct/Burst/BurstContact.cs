@@ -147,19 +147,28 @@ namespace bluebean.Physics.PBD.DataStruct
             return lambdaChange;
         }
 
+        /// <summary>
+        /// 返回冲量大小
+        /// </summary>
+        /// <param name="posA"></param>
+        /// <param name="posB"></param>
+        /// <param name="maxDepenetrationDelta"></param>
+        /// <returns></returns>
         public float SolvePenetration(float4 posA, float4 posB, float maxDepenetrationDelta)
         {
 
             if (TotalNormalInvMass <= 0)
                 return 0;
-
+            //穿越时为负值
             //project position delta to normal vector:
             distance = math.dot(posA - posB, normal);
-
+            //根据速度限制，这一帧结束时，穿透距离应该处于的值
             // calculate max projection distance based on depenetration velocity:
             float maxProjection = math.max(-distance - maxDepenetrationDelta, 0);
-
+            //计算一帧内改变位置需要的冲量大小
             // calculate lambda multiplier:
+            //TotalNormalInvMass是碰撞时两个物体分配冲量大小时的公共分母，
+            //质量大的位置变化小，质量小的变化大
             float dlambda = -(distance + maxProjection) / TotalNormalInvMass;
 
             // accumulate lambda:

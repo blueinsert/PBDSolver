@@ -31,26 +31,32 @@ namespace bluebean.Physics.PBD
 
             if (source != null && !handles.TryGetValue(source, out handle))
             {
+                //mesh的三角面的顶点索引数组
                 var sourceTris = source.triangles;
+                //mesh的顶点素组
                 var sourceVertices = source.vertices;
 
-                // Build a bounding interval hierarchy from the triangles:
-                IBounded[] t = new IBounded[sourceTris.Length / 3];
-                for (int i = 0; i < t.Length; ++i)
+                //为网格的每个三角面建立bound
+                IBounded[] bounds = new IBounded[sourceTris.Length / 3];
+                for (int i = 0; i < bounds.Length; ++i)
                 {
                     int t1 = sourceTris[i * 3];
                     int t2 = sourceTris[i * 3 + 1];
                     int t3 = sourceTris[i * 3 + 2];
-                    t[i] = new Triangle(t1, t2, t3, sourceVertices[t1], sourceVertices[t2], sourceVertices[t3]);
+                    bounds[i] = new Triangle(t1, t2, t3, sourceVertices[t1], sourceVertices[t2], sourceVertices[t3]);
                 }
-                var sourceBih = BIH.Build(ref t);
+                //构建空间划分结构
+                var sourceBih = BIH.Build(ref bounds);
 
-                Triangle[] tris = Array.ConvertAll(t, x => (Triangle)x);
+                Triangle[] tris = Array.ConvertAll(bounds, x => (Triangle)x);
 
                 handle = new TriangleMeshHandle(source, headers.count);
+                //保存数据
                 handles.Add(source, handle);
-                headers.Add(new TriangleMeshHeader(bihNodes.count, sourceBih.Length, triangles.count, tris.Length, vertices.count, sourceVertices.Length));
-
+                headers.Add(new TriangleMeshHeader(bihNodes.count, sourceBih.Length, 
+                    triangles.count, tris.Length, 
+                    vertices.count, sourceVertices.Length));
+                //每个网格的数据在数组中占据一段
                 bihNodes.AddRange(sourceBih);
                 triangles.AddRange(tris);
                 vertices.AddRange(sourceVertices);
