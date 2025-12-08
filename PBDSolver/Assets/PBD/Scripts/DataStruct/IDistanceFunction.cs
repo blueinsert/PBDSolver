@@ -11,6 +11,6 @@ namespace bluebean.Physics.PBD.DataStruct
         /// <param name="radii"></param>
         /// <param name="orientation"></param>
         /// <param name="projectedPoint"></param>
-        void Evaluate(float4 point, float4 radii, ref SurfacePoint projectedPoint);
+        void Evaluate(float4 point, float4 radii, quaternion orientation, ref SurfacePoint projectedPoint);
     }
 }

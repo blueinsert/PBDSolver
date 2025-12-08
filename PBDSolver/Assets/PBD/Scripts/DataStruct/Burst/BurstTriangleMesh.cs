@@ -24,7 +24,7 @@ namespace bluebean.Physics.PBD.DataStruct
         /// <param name="point"></param>
         /// <param name="radii"></param>
         /// <param name="projectedPoint"></param>
-        public void Evaluate(float4 point, float4 radii, ref SurfacePoint projectedPoint)
+        public void Evaluate(float4 point, float4 radii, quaternion quaternion, ref SurfacePoint projectedPoint)
         {
             //从世界坐标系转碰撞体本地坐标系
             point = colliderToWorld.InverseTransformPoint(point);
@@ -106,7 +106,7 @@ namespace bluebean.Physics.PBD.DataStruct
                         float particleRadius = radii[particleIndex].x;
 
                         var nearestPoint = new SurfacePoint();
-                        this.Evaluate(particlePoint, particleRadius, ref nearestPoint);
+                        this.Evaluate(particlePoint, particleRadius, quaternion.identity, ref nearestPoint);
 
                         float4 rbVelocity = float4.zero;  
                         //if (rigidbodyIndex >= 0)
