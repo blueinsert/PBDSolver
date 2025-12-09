@@ -7,7 +7,7 @@ using Unity.Mathematics;
 namespace bluebean.Physics.PBD
 {
     [BurstCompile]
-    struct UpdateGrid : IJob
+    struct UpdateParticleGridJob : IJob
     {
         public NativeMultilevelGrid<int> grid;
         [ReadOnly] public NativeArray<int4> cellCoords;

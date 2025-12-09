@@ -8,7 +8,7 @@ using Unity.Mathematics;
 namespace bluebean.Physics.PBD
 {
     [BurstCompile]
-    struct CalculateCellCoords : IJobParallelFor
+    struct CalculateCellCoordsJob : IJobParallelFor
     {
         [ReadOnly] public NativeArray<BurstAabb> simplexBounds;
         public NativeArray<int4> cellCoords;

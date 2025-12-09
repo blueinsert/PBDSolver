@@ -73,15 +73,18 @@
     <Compile Include="Assets\PBD\Scripts\Job\Constrains\StretchConstrainApplyJob.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Native\NativeInt3List.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Triangle.cs" />
+    <Compile Include="Assets\PBD\Scripts\Job\ParticleCollide\ParticleCollisionConstraintsBatchJob.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Native\NativeInt2List.cs" />
     <Compile Include="Assets\PBD\Scripts\Utils\ParticleDragger.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\IDistanceFunction.cs" />
-    <Compile Include="Assets\PBD\Scripts\Job\ParticleCollide\UpdateGrid.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Burst\BurstRigidbody.cs" />
     <Compile Include="Assets\PBD\Scripts\Utils\ContactsDebugDraw.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\PriorityQueue.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Native\NativeAabbList.cs" />
+    <Compile Include="Assets\PBD\Scripts\DataStruct\Batcher\BatchData.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Aabb.cs" />
+    <Compile Include="Assets\PBD\Scripts\DataStruct\Batcher\BatchLUT.cs" />
+    <Compile Include="Assets\PBD\Scripts\Job\ParticleCollide\UpdateParticleContactsJob.cs" />
     <Compile Include="Assets\PBD\Scripts\Collider\PBDMeshCollider.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Burst\BurstContact.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\ColliderShapeType.cs" />
@@ -91,8 +94,11 @@
     <Compile Include="Assets\PBD\Scripts\Job\Constrains\StretchConstrainSolveJob.cs" />
     <Compile Include="Assets\PBD\Scripts\Util\PhysicsUtil.cs" />
     <Compile Include="Assets\PBD\Scripts\Constrains\VolumeConstrainGroup.cs" />
+    <Compile Include="Assets\PBD\Scripts\Job\ParticleCollide\UpdateParticleGridJob.cs" />
+    <Compile Include="Assets\PBD\Scripts\DataStruct\Batcher\ContactProvider.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Burst\BurstCellSpan.cs" />
     <Compile Include="Assets\PBD\Scripts\Collide\ColliderWorld.cs" />
+    <Compile Include="Assets\PBD\Scripts\DataStruct\Batcher\WorkItem.cs" />
     <Compile Include="Assets\PBD\Scripts\ResourceHandle.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\TriangleMeshHeader.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Native\NativeInt4List.cs" />
@@ -121,7 +127,6 @@
     <Compile Include="Assets\PBD\Scripts\Actor\TetMesh.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\VectorInt3.cs" />
     <Compile Include="Assets\PBD\Scripts\Solver\PBDSolver.cs" />
-    <Compile Include="Assets\PBD\Scripts\Job\ParticleCollide\CalculateCellCoords.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Burst\BurstLocalOptimization.cs" />
     <Compile Include="Assets\PBD\Scripts\Job\ParticleCollide\GenerateParticleParticleContactsJob.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Native\NativeList.cs" />
@@ -136,6 +141,7 @@
     <Compile Include="Assets\PBD\Scripts\Constrains\CollideConstrainGroup.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Native\NativeColliderShapeList.cs" />
     <Compile Include="Assets\PBD\Scripts\Util\GeometryUtil.cs" />
+    <Compile Include="Assets\PBD\Scripts\Job\ParticleCollide\CalculateCellCoordsJob.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Burst\GridHash.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\ObiList.cs" />
     <Compile Include="Assets\PBD\Scripts\Job\Constrains\VolumeConstrainSolveJob.cs" />
@@ -144,6 +150,7 @@
     <Compile Include="Assets\PBD\Scripts\Job\UpdateVelJob.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Native\NativeFloatList.cs" />
     <Compile Include="Assets\PBD\Scripts\Util\PBDUtil.cs" />
+    <Compile Include="Assets\PBD\Scripts\Job\ParticleCollide\BatchContactsJob.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Native\NativeVector2List.cs" />
     <Compile Include="Assets\PBD\Scripts\Solver\PBDSolver_Collide.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Burst\BurstMath.cs" />
