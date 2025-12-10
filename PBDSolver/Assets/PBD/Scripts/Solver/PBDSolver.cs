@@ -127,6 +127,8 @@ namespace bluebean.Physics.PBD
             m_colliderWorld.Initialzie(this);
             InitConstrains();
             EnsureParticleArraysCapacity(0);
+            m_particleGrid = new ParticleGrid();
+            m_particleContactBatcher = new ContactBatcher(MaxBatches);
         }
 
         void OnDestroy()
@@ -143,14 +145,13 @@ namespace bluebean.Physics.PBD
             m_positionConstraintCountList.Dispose();
             m_radiusList.Dispose();
             m_aabbList.Dispose();
+            m_cellCoordsList.Dispose();
 
             m_colliderWorld.Destroy();
             //m_colliderContacts.Dispose();
 
             m_particleGrid.Dispose();
             m_particleContactBatcher.Dispose();
-            m_particleContacts.Dispose();
-            m_particleBatchData.Dispose();
         }
 
         void OnPreStep()
@@ -189,6 +190,11 @@ namespace bluebean.Physics.PBD
 
             if (m_colliderContacts.IsCreated)
                 m_colliderContacts.Dispose();
+
+            if (m_particleContacts.IsCreated)
+                m_particleContacts.Dispose();
+            if (m_particleBatchData.IsCreated)
+                m_particleBatchData.Dispose();
         }
 
         void OnPreSubStep()
@@ -283,6 +289,7 @@ namespace bluebean.Physics.PBD
         private void ClearForce()
         {
             m_externalForceList.WipeToZero();
+           
         }
 
         private void InitConstrains()
@@ -324,6 +331,7 @@ namespace bluebean.Physics.PBD
                 m_propertyList.ResizeInitialized(count);
                 m_prevPositionList.ResizeInitialized(count);
                 m_aabbList.ResizeInitialized(count);
+                m_cellCoordsList.ResizeInitialized(count);
                 m_radiusList.ResizeInitialized(count);
 
                 OnParticleCountChange();

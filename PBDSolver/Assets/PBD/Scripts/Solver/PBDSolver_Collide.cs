@@ -18,16 +18,16 @@ namespace bluebean.Physics.PBD
 
         public delegate void CollisionCallback(PBDSolver solver, CollisionEventArgs contacts);
 
-        private ColliderWorld m_colliderWorld = new ColliderWorld();
+        private ColliderWorld m_colliderWorld;
         public NativeArray<BurstContact> m_colliderContacts;
 
         private CollisionEventArgs m_collisionArgs = new CollisionEventArgs();
         public event CollisionCallback EventOnCollision;
 
-        private ParticleGrid m_particleGrid = new ParticleGrid();
+        private ParticleGrid m_particleGrid;
         public NativeArray<BurstContact> m_particleContacts;
         public NativeArray<BatchData> m_particleBatchData;
-        private ContactBatcher m_particleContactBatcher = new ContactBatcher(MaxBatches);
+        private ContactBatcher m_particleContactBatcher;
 
         /// <summary>
         /// 根据粒子速度，deltaTime等更新这一帧内粒子的可能活动范围
