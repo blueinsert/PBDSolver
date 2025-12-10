@@ -145,7 +145,12 @@ namespace bluebean.Physics.PBD
             m_aabbList.Dispose();
 
             m_colliderWorld.Destroy();
+            //m_colliderContacts.Dispose();
+
             m_particleGrid.Dispose();
+            m_particleContactBatcher.Dispose();
+            m_particleContacts.Dispose();
+            m_particleBatchData.Dispose();
         }
 
         void OnPreStep()

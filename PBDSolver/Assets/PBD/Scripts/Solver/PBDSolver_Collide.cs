@@ -164,6 +164,10 @@ namespace bluebean.Physics.PBD
             {
                 Debug.Log($"particle contacts count: {m_particleContacts.Length}");
             }
+
+            rawParticleContacts.Dispose();
+            sortedParticleContacts.Dispose();
+            activeParticleBatchCount.Dispose();
         }
 
         private void CollisionDetection(float deltaTime)

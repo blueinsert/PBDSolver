@@ -63,8 +63,8 @@
     <Compile Include="Assets\PBD\Scripts\Job\ParticleCollide\CountSortPerFirstParticleJob.cs" />
     <Compile Include="Assets\PBD\Scripts\Constrains\ConstrainData.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\SurfacePoint.cs" />
-    <Compile Include="Assets\PBD\Scripts\DataStruct\BVH\BIHNode.cs" />
     <Compile Include="Assets\PBD\Scripts\Collide\ParticleGrid.cs" />
+    <Compile Include="Assets\PBD\Scripts\DataStruct\BVH\BIHNode.cs" />
     <Compile Include="Assets\PBD\Scripts\Actor\BunnyTetMeshImpl.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\SDF\DFNode.cs" />
     <Compile Include="Assets\PBD\Scripts\Constrains\StretchConstrainGroup.cs" />
@@ -94,8 +94,8 @@
     <Compile Include="Assets\PBD\Scripts\Solver\ISolver.cs" />
     <Compile Include="Assets\PBD\Scripts\Job\Constrains\StretchConstrainSolveJob.cs" />
     <Compile Include="Assets\PBD\Scripts\Util\PhysicsUtil.cs" />
-    <Compile Include="Assets\PBD\Scripts\Constrains\VolumeConstrainGroup.cs" />
     <Compile Include="Assets\PBD\Scripts\Job\ParticleCollide\UpdateParticleGridJob.cs" />
+    <Compile Include="Assets\PBD\Scripts\Constrains\VolumeConstrainGroup.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Batcher\ContactProvider.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Burst\BurstCellSpan.cs" />
     <Compile Include="Assets\PBD\Scripts\Collide\ColliderWorld.cs" />
@@ -151,8 +151,8 @@
     <Compile Include="Assets\PBD\Scripts\Job\ParticleCollide\SortSubArraysJob.cs" />
     <Compile Include="Assets\PBD\Scripts\Job\UpdateVelJob.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Native\NativeFloatList.cs" />
-    <Compile Include="Assets\PBD\Scripts\Util\PBDUtil.cs" />
     <Compile Include="Assets\PBD\Scripts\Job\ParticleCollide\BatchContactsJob.cs" />
+    <Compile Include="Assets\PBD\Scripts\Util\PBDUtil.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Native\NativeVector2List.cs" />
     <Compile Include="Assets\PBD\Scripts\Solver\PBDSolver_Collide.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Burst\BurstMath.cs" />
@@ -1059,20 +1059,20 @@
       <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.Core.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="UnityEngine.UI">
-      <HintPath>Library\ScriptAssemblies\UnityEngine.UI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="Unity.VisualScripting.Core.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.Core.Editor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.ProBuilder.AddOns.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.ProBuilder.AddOns.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Rider.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.Rider.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Unity.ProBuilder.AddOns.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.ProBuilder.AddOns.Editor.dll</HintPath>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>Library\ScriptAssemblies\UnityEngine.UI.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.RenderPipelines.Universal.Config.Runtime">
