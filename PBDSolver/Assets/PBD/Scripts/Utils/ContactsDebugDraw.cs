@@ -49,7 +49,7 @@ public class ContactsDebugDraw : MonoBehaviour
             //Gizmos.color = new Color(((i * 100) % 255) / 255.0f, ((i * 50) % 255) / 255.0f, ((i * 20) % 255) / 255.0f);
 
             int simplexIndex = contact.bodyA;
-            var radius = solver.ParticleRadius[simplexIndex].x;
+            var radius = solver.ParticleRadius[simplexIndex];
             var particlePoint = solver.GetParticlePosition(simplexIndex);
 
             var distance = contact.distance;

@@ -10,17 +10,17 @@ namespace bluebean.Physics.PBD
     [BurstCompile]
     struct CalculateCellCoordsJob : IJobParallelFor
     {
-        [ReadOnly] public NativeArray<BurstAabb> simplexBounds;
+        [ReadOnly] public NativeArray<BurstAabb> particleBounds;
         public NativeArray<int4> cellCoords;
         [ReadOnly] public bool is2D;
 
         public void Execute(int i)
         {
-            int level = NativeMultilevelGrid<int>.GridLevelForSize(simplexBounds[i].AverageAxisLength());
+            int level = NativeMultilevelGrid<int>.GridLevelForSize(particleBounds[i].AverageAxisLength());
             float cellSize = NativeMultilevelGrid<int>.CellSizeOfLevel(level);
 
             // get new particle cell coordinate:
-            int4 newCellCoord = new int4(GridHash.Quantize(simplexBounds[i].center.xyz, cellSize), level);
+            int4 newCellCoord = new int4(GridHash.Quantize(particleBounds[i].center.xyz, cellSize), level);
 
             // if the solver is 2D, project the particle to the z = 0 cell.
             if (is2D) newCellCoord[2] = 0;

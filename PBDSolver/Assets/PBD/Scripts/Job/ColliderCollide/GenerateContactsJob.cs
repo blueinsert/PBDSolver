@@ -22,7 +22,7 @@ namespace bluebean.Physics.PBD
         [ReadOnly] public NativeArray<float4> velocities;
         [ReadOnly] public NativeArray<float4> positions;
         [ReadOnly] public NativeArray<float> invMasses;
-        [ReadOnly] public NativeArray<float4> radii;
+        [ReadOnly] public NativeArray<float> radii;
         [ReadOnly] public NativeArray<BurstAabb> particleBounds;
 
         // collider arrays:

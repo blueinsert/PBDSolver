@@ -12,7 +12,7 @@ namespace bluebean.Physics.PBD
     {
         [ReadOnly] public NativeArray<float4> prevPositions;
         [ReadOnly] public NativeArray<float> invMasses;
-        [ReadOnly] public NativeArray<float4> radii;
+        [ReadOnly] public NativeArray<float> radii;
 
         [ReadOnly] public NativeArray<BurstColliderShape> shapes;
         [ReadOnly] public NativeArray<BurstAffineTransform> transforms;
@@ -46,7 +46,7 @@ namespace bluebean.Physics.PBD
                 float4 particlePosition = positions[particleIndex];
                 //上个substep的位置
                 float4 particlePrevPosition = prevPositions[particleIndex];
-                float particleRadius = radii[particleIndex].x;
+                float particleRadius = radii[particleIndex];
                 float invMass = invMasses[particleIndex];
 
                 //外插值，用线性速度外插得到这个step结束时的位置

@@ -12,11 +12,13 @@ namespace bluebean.Physics.PBD
         float VolumeConstrainCompliance { get; }
 
         #region 粒子数据获取接口
-        NativeArray<float4> ParticleRadius { get; }
+        NativeArray<float> ParticleRadius { get; }
         NativeArray<float4> ParticlePositions { get; }
         NativeArray<float4> PrevParticlePositions { get; }
         NativeArray<float4> ParticleVels { get; }
         public NativeArray<BurstAabb> ParticleAabb { get; }
+        //每个粒子的网格坐标
+        public NativeArray<int4> CellCoords { get; }
         NativeArray<float4> ParticleProperties { get; }
         NativeArray<float4> ExternalForces { get; }
         NativeArray<float> InvMasses { get; }
@@ -30,6 +32,8 @@ namespace bluebean.Physics.PBD
         void AddActor(PBDActor actor);
 
         Vector3 GetParticlePosition(int particleIndex);
+
+        int GetParticleCount();
 
         void PushStretchConstrain(StretchConstrainData stretchConstrainData);
 

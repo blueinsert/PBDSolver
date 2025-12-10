@@ -13,7 +13,7 @@ namespace bluebean.Physics.PBD
     public struct BuildParticleAabbsJob : IJobParallelFor
     {
         // ‰»Î
-        [ReadOnly] public NativeArray<float4> radii;
+        [ReadOnly] public NativeArray<float> radii;
         [ReadOnly] public NativeArray<float4> positions;
         [ReadOnly] public NativeArray<float4> velocities;
         [ReadOnly] public float collisionMargin;
@@ -33,7 +33,7 @@ namespace bluebean.Physics.PBD
                 float stickDistance = 0;
 
                 bounds.EncapsulateParticle(positions[p], positions[p] + velocities[p] * continuousCollisionDetection * dt,
-                                            math.max(radii[p].x + stickDistance, 0.0f) + collisionMargin);
+                                            math.max(radii[p] + stickDistance, 0.0f) + collisionMargin);
             }
 
             simplexBounds[i] = bounds;

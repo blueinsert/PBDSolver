@@ -56,10 +56,11 @@ namespace bluebean.Physics.PBD
         public NativeFloatList InvMassList { get { return m_invMassList; } }
 
         private NativeVector4List m_positionList = new NativeVector4List();
-        private NativeVector4List m_radiusList = new NativeVector4List();
+        private NativeFloatList m_radiusList = new NativeFloatList();
         private NativeVector4List m_prevPositionList = new NativeVector4List();
         private NativeVector4List m_velList = new NativeVector4List();
         private NativeVector4List m_propertyList = new NativeVector4List();
+        private NativeInt4List m_cellCoordsList = new NativeInt4List();
         private NativeAabbList m_aabbList = new NativeAabbList();
         private NativeVector4List m_externalForceList = new NativeVector4List();
         private NativeIntList m_freeList = new NativeIntList();
@@ -72,8 +73,9 @@ namespace bluebean.Physics.PBD
         private NativeArray<float4> m_prevParticlePositions;
         private NativeArray<float4> m_particleVels;
         private NativeArray<float4> m_particleProperties;
-        private NativeArray<float4> m_particleRadius;
+        private NativeArray<float> m_particleRadius;
         private NativeArray<BurstAabb> m_particleAabbs;
+        public NativeArray<int4> m_cellCoords;
         private NativeArray<float4> m_externalForces;
         private NativeArray<float> m_invMasses;
         private NativeArray<float4> m_positionDeltas;
@@ -95,12 +97,15 @@ namespace bluebean.Physics.PBD
 
         public float VolumeConstrainCompliance => m_volumeCompliance;
 
-        public NativeArray<float4> ParticleRadius => m_particleRadius;
+        public NativeArray<float> ParticleRadius => m_particleRadius;
 
         public NativeArray<BurstAabb> ParticleAabb => m_particleAabbs;
 
+        public NativeArray<int4> CellCoords => m_cellCoords;
         public NativeArray<BurstContact> ColliderContacts => m_colliderContacts;
         #endregion
+
+        private const int MaxBatches = 17;
 
         #endregion
 
@@ -140,6 +145,7 @@ namespace bluebean.Physics.PBD
             m_aabbList.Dispose();
 
             m_colliderWorld.Destroy();
+            m_particleGrid.Dispose();
         }
 
         void OnPreStep()
@@ -293,8 +299,9 @@ namespace bluebean.Physics.PBD
             m_positionConstraintCounts = m_positionConstraintCountList.AsNativeArray<int>();
             m_particleProperties = m_propertyList.AsNativeArray<float4>();
             m_prevParticlePositions = m_prevPositionList.AsNativeArray<float4>();
-            m_particleRadius = m_radiusList.AsNativeArray<float4>();
+            m_particleRadius = m_radiusList.AsNativeArray<float>();
             m_particleAabbs = m_aabbList.AsNativeArray<BurstAabb>();
+            m_cellCoords = m_cellCoordsList.AsNativeArray<int4>();
         }
 
         private void EnsureParticleArraysCapacity(int count)
@@ -372,7 +379,7 @@ namespace bluebean.Physics.PBD
                     this.m_gradientList[index] = Vector4.zero;
                     this.m_positionConstraintCountList[index] = 0;
                     float radius = 0.1f;
-                    this.m_radiusList[index] = new Vector4(radius, radius, radius, radius);
+                    this.m_radiusList[index] = radius;
                     this.m_aabbList[index] = new Aabb();
                 }
                 Debug.Log("AddActor Finish");
@@ -411,6 +418,11 @@ namespace bluebean.Physics.PBD
         {
             var pos = m_positionList[particleIndex];
             return pos;
+        }
+
+        public int GetParticleCount()
+        {
+            return m_positionList.count;
         }
 
         #endregion

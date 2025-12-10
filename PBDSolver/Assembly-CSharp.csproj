@@ -64,6 +64,7 @@
     <Compile Include="Assets\PBD\Scripts\Constrains\ConstrainData.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\SurfacePoint.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\BVH\BIHNode.cs" />
+    <Compile Include="Assets\PBD\Scripts\Collide\ParticleGrid.cs" />
     <Compile Include="Assets\PBD\Scripts\Actor\BunnyTetMeshImpl.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\SDF\DFNode.cs" />
     <Compile Include="Assets\PBD\Scripts\Constrains\StretchConstrainGroup.cs" />
@@ -127,6 +128,7 @@
     <Compile Include="Assets\PBD\Scripts\Actor\TetMesh.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\VectorInt3.cs" />
     <Compile Include="Assets\PBD\Scripts\Solver\PBDSolver.cs" />
+    <Compile Include="Assets\PBD\Scripts\DataStruct\Batcher\ContactBatcher.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Burst\BurstLocalOptimization.cs" />
     <Compile Include="Assets\PBD\Scripts\Job\ParticleCollide\GenerateParticleParticleContactsJob.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Native\NativeList.cs" />

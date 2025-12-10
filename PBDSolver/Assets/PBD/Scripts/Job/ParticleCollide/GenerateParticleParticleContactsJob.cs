@@ -16,13 +16,11 @@ namespace bluebean.Physics.PBD
         [ReadOnly] public NativeArray<int> gridLevels;
 
         [ReadOnly] public NativeArray<float4> positions;
-        //[ReadOnly] public NativeArray<quaternion> orientations;
-        [ReadOnly] public NativeArray<float4> restPositions;
-        //[ReadOnly] public NativeArray<quaternion> restOrientations;
+        //[ReadOnly] public NativeArray<float4> restPositions;
         [ReadOnly] public NativeArray<float4> velocities;
         [ReadOnly] public NativeArray<float> invMasses;
         [ReadOnly] public NativeArray<float> radii;
-        [ReadOnly] public NativeArray<float4> normals;
+        //[ReadOnly] public NativeArray<float4> normals;
 
         [ReadOnly] public NativeArray<BurstAabb> simplexBounds;
 

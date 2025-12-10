@@ -43,7 +43,7 @@ namespace bluebean.Physics.PBD.DataStruct
                               // NativeArray<BurstRigidbody> rigidbodies,
                               NativeArray<float4> positions,
                               NativeArray<float4> velocities,
-                              NativeArray<float4> radii,
+                              NativeArray<float> radii,
                               in BurstAabb particleBounds,
                               int particleIndex,
 
@@ -62,7 +62,7 @@ namespace bluebean.Physics.PBD.DataStruct
                                  //NativeArray<BurstRigidbody> rigidbodies,
                                  NativeArray<float4> positions,
                                  NativeArray<float4> velocities,
-                                 NativeArray<float4> radii,
+                                 NativeArray<float> radii,
                                  in BurstAabb particleBounds,
                                  int nodeIndex,
                                  NativeQueue<BurstContact>.ParallelWriter contacts
@@ -103,7 +103,7 @@ namespace bluebean.Physics.PBD.DataStruct
 
                         float4 particlePoint = positions[particleIndex];
                         float4 particleVelocity = velocities[particleIndex];
-                        float particleRadius = radii[particleIndex].x;
+                        float particleRadius = radii[particleIndex];
 
                         var nearestPoint = new SurfacePoint();
                         this.Evaluate(particlePoint, particleRadius, quaternion.identity, ref nearestPoint);
