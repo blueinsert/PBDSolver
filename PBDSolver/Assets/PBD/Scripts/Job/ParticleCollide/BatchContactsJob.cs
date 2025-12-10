@@ -6,21 +6,32 @@ using Unity.Mathematics;
 
 namespace bluebean.Physics.PBD
 {
+    /// <summary>
+    /// 将约束分批，每个批次里的约束相互之间不冲突，即不包含相同的粒子。
+    /// </summary>
     [BurstCompile]
     public struct BatchContactsJob : IJob
     {
+        //临时变量
+        /// <summary>
+        /// 每个粒子对应的batcher掩码，数组长度等于粒子数量；
+        /// 详细的说是使用到该粒子的所有约束的batcher掩码，因为粒子可能在多个batcher中被涉及
+        /// </summary>
         [DeallocateOnJobCompletion]
         public NativeArray<ushort> batchMasks;
-
+        /// <summary>
+        /// 每个约束对应的batcher掩码，数组长度等于约束数量
+        /// </summary>
         [DeallocateOnJobCompletion]
         public NativeArray<int> batchIndices;
-
+        //输入
         [ReadOnly] public BatchLUT lut;
         public ContactProvider constraintDesc;
+        public int maxBatches;
+        //输出
         public NativeArray<BatchData> batchData;
         public NativeArray<int> activeBatchCount;
 
-        public int maxBatches;
 
         public unsafe void Execute()
         {
@@ -40,12 +51,14 @@ namespace bluebean.Physics.PBD
             {
                 // OR together the batch masks of all entities involved in the constraint:
                 int batchMask = 0;
+                //粒子可能被包含在其他的约束中,
                 for (int k = 0; k < constraintDesc.GetParticleCount(i); ++k)
-                    batchMask |= batchMasks[constraintDesc.GetParticle(i, k)];
-
+                    batchMask |= batchMasks[constraintDesc.GetParticle(i, k)];//这种情况下不为0
+                //这个时刻batchMask记录了已经被使用了的batch情况
+                //通过查找表返回第一个未被使用的batcher的index
                 // look up the first free batch index for this constraint:
                 int batchIndex = batchIndices[i] = lut.batchIndex[batchMask];
-
+                
                 // update the amount of constraints in the batch:
                 var batch = batchData[batchIndex];
                 batch.constraintCount++;
@@ -55,10 +68,12 @@ namespace bluebean.Physics.PBD
                 if (workItems[batchIndex].Add(i))
                 {
                     // if this work item does not belong to the last batch:
+                    //因为是从低位开始分配未使用的batcher，到了最后一个就没必要记录了
                     if (batchIndex != maxBatches - 1)
                     {
                         // tag all entities in the work item with the batch mask to close it.
                         // this way we know constraints referencing any of these entities can no longer be added to this batch.
+                        //遍历该batcher中所有约束涉及的所有粒子，记录其batcher掩码
                         for (int j = 0; j < workItems[batchIndex].constraintCount; j++)
                         {
                             int constraint = workItems[batchIndex].constraints[j];

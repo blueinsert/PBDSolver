@@ -67,6 +67,8 @@ namespace bluebean.Physics.PBD
             m_invMass = new float[m_numParticles];
             m_mass = new float[m_numParticles];
             InitPhysics();
+            CreateMesh();
+
             m_isInitialized = true;
         }
 

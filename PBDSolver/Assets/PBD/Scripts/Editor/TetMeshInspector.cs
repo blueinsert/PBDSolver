@@ -18,11 +18,11 @@ namespace bluebean.Physics.PBD
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
-            if (GUILayout.Button("��ʼ��"))
+            if (GUILayout.Button("Init"))
             {
                 m_tetMesh.Init();
             }
-            if (GUILayout.Button("ͬ��Mesh"))
+            if (GUILayout.Button("Sync Mesh"))
             {
                 m_tetMesh.Sync2Mesh4Editor();
             }

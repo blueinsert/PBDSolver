@@ -32,7 +32,7 @@ namespace bluebean.Physics.PBD
 
         public VolumeConstrainGroup(ISolver solver) : base(ConstrainType.Volume, solver)
         {
-
+            OnConstrainCountChanged();
         }
 
         private void OnConstrainCountChanged()

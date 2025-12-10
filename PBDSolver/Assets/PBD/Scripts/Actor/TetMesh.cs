@@ -78,9 +78,8 @@ namespace bluebean.Physics.PBD
             return res;
         }
 
-        public void Sync2Mesh4Editor()
+        public virtual void CreateMesh()
         {
-            if (!m_isInitialized) return;
             var meshFilter = this.GetComponent<MeshFilter>();
             if (meshFilter != null)
             {
@@ -104,8 +103,12 @@ namespace bluebean.Physics.PBD
                     }
                     mesh.colors = m_particleColors;
                 }
-
             }
+        }
+
+        public void Sync2Mesh4Editor()
+        {
+            CreateMesh();
         }
 
         public float GetEdgeRestLen(int edgeIndex)

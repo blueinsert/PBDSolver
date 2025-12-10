@@ -29,7 +29,7 @@ namespace bluebean.Physics.PBD
 
         public StretchConstrainGroup(ISolver solver) : base(ConstrainType.Stretch, solver)
         {
-
+            OnConstrainCountChanged();
         }
 
         private void OnConstrainCountChanged()

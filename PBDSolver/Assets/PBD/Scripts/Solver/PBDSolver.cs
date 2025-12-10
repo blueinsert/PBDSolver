@@ -121,6 +121,7 @@ namespace bluebean.Physics.PBD
             m_colliderWorld = new ColliderWorld();
             m_colliderWorld.Initialzie(this);
             InitConstrains();
+            EnsureParticleArraysCapacity(0);
         }
 
         void OnDestroy()

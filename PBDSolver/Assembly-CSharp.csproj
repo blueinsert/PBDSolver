@@ -162,6 +162,7 @@
     <Compile Include="Assets\PBD\Scripts\Job\ColliderCollide\UpdateMultiGridByMovingCollidersJob.cs" />
     <Compile Include="Assets\PBD\Scripts\Job\ColliderCollide\IdentifyMovingCollidersJob.cs" />
     <Compile Include="Assets\PBD\Scripts\Utils\FPS.cs" />
+    <Compile Include="Assets\PBD\Test\Scripts\GameObjectSpawner.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
