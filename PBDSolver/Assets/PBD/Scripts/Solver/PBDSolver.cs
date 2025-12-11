@@ -259,6 +259,11 @@ namespace bluebean.Physics.PBD
             for (int i = start; i < end; i++)
             {
                 var constrain = m_constrains[i];
+                handle = constrain.Initialize(handle, substepTime);
+            }
+            for (int i = start; i < end; i++)
+            {
+                var constrain = m_constrains[i];
                 handle = constrain.Solve(handle, stepTime, substepTime, substeps);
                 handle = constrain.Apply(handle, substepTime);
             }

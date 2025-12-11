@@ -27,22 +27,23 @@ namespace bluebean.Physics.PBD
 
             for (int i = start; i < end; ++i)
             {
-                //int simplexStartA = simplexCounts.GetSimplexStartAndSize(contacts[i].bodyA, out int simplexSizeA);
-                //int simplexStartB = simplexCounts.GetSimplexStartAndSize(contacts[i].bodyB, out int simplexSizeB);
+                var contact = contacts[i];
+                int particleA = contact.bodyA;
+                int particleB = contact.bodyB;
 
-                //for (int j = 0; j < simplexSizeA; ++j)
-                //{
-                //    int particleIndex = simplices[simplexStartA + j];
-                //    BurstConstraintsBatchImpl.ApplyPositionDelta(particleIndex, constraintParameters.SORFactor, ref positions, ref deltas, ref counts);
-                //    BurstConstraintsBatchImpl.ApplyOrientationDelta(particleIndex, constraintParameters.SORFactor, ref orientations, ref orientationDeltas, ref orientationCounts);
-                //}
+                if (counts[particleA] > 0)
+                {
+                    positions[particleA] += deltas[particleA] * 1.0f / counts[particleA];
+                    deltas[particleA] = float4.zero;
+                    counts[particleA] = 0;
+                }
 
-                //for (int j = 0; j < simplexSizeB; ++j)
-                //{
-                //    int particleIndex = simplices[simplexStartB + j];
-                //    BurstConstraintsBatchImpl.ApplyPositionDelta(particleIndex, constraintParameters.SORFactor, ref positions, ref deltas, ref counts);
-                //    BurstConstraintsBatchImpl.ApplyOrientationDelta(particleIndex, constraintParameters.SORFactor, ref orientations, ref orientationDeltas, ref orientationCounts);
-                //}
+                if (counts[particleB] > 0)
+                {
+                    positions[particleB] += deltas[particleB] * 1.0f / counts[particleB];
+                    deltas[particleB] = float4.zero;
+                    counts[particleB] = 0;
+                }
 
             }
 

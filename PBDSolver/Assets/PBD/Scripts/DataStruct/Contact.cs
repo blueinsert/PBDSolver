@@ -20,7 +20,7 @@ namespace bluebean.Physics.PBD.DataStruct
         public float stickImpulse;
         public float rollingFrictionImpulse;
 
-        public int bodyA;    /** simplex index*/
-        public int bodyB;    /** simplex or rigidbody index*/
+        public int bodyA;    /** particle index*/
+        public int bodyB;    /** particle or rigidbody index*/
     }
 }

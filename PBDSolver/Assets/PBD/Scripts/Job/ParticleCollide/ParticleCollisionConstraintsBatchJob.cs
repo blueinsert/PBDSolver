@@ -35,16 +35,16 @@ namespace bluebean.Physics.PBD
                 int particleA = contact.bodyA;
                 int particleB = contact.bodyB;
 
-                float4 simplexPositionA = float4.zero, simplexPositionB = float4.zero;
-                float simplexRadiusA = 0, simplexRadiusB = 0;
+                float4 positionA = float4.zero, positionB = float4.zero;
+                float radiusA = 0, radiusB = 0;
 
-                //todo
-                simplexPositionA = positions[particleA];
+                positionA = positions[particleA];
+                radiusA = radii[particleA];
+                positionB = positions[particleB];
+                radiusB = radii[particleB];
 
-
-
-                float4 posA = simplexPositionA - contact.normal * simplexRadiusA;
-                float4 posB = simplexPositionB + contact.normal * simplexRadiusB;
+                float4 posA = positionA - contact.normal * radiusA;
+                float4 posB = positionB + contact.normal * radiusB;
 
                 // adhesion:
                 float lambda = contact.SolveAdhesion(posA, posB, 0, 0, substepTime);
@@ -58,37 +58,13 @@ namespace bluebean.Physics.PBD
                     float shock = 1.0f * math.dot(contact.normal, math.normalizesafe(gravity));
                     float4 delta = lambda * contact.normal;
 
-                    //for (int j = 0; j < simplexSizeA; ++j)
-                    //{
-                    //    int particleIndex = simplices[simplexStartA + j];
-                    //    deltas[particleIndex] += delta * invMasses[particleIndex] * contact.pointA[j] * baryScale * (1 - shock);
-                    //    counts[particleIndex]++;
-                    //}
+                    deltas[particleA] += delta * invMasses[particleA]* (1 - shock);
+                    counts[particleA]++;
 
-                    //baryScale = BurstMath.BaryScale(contact.pointB);
-                    //for (int j = 0; j < simplexSizeB; ++j)
-                    //{
-                    //    int particleIndex = simplices[simplexStartB + j];
-                    //    deltas[particleIndex] -= delta * invMasses[particleIndex] * contact.pointB[j] * baryScale * (1 + shock);
-                    //    counts[particleIndex]++;
-                    //}
+                    deltas[particleB] -= delta * invMasses[particleB] * (1 - shock);
+                    counts[particleB]++;
+
                 }
-
-                // Apply position deltas immediately, if using sequential evaluation:
-                //if (constraintParameters.evaluationOrder == Oni.ConstraintParameters.EvaluationOrder.Sequential)
-                //{
-                //    for (int j = 0; j < simplexSizeA; ++j)
-                //    {
-                //        int particleIndex = simplices[simplexStartA + j];
-                //        BurstConstraintsBatchImpl.ApplyPositionDelta(particleIndex, constraintParameters.SORFactor, ref positions, ref deltas, ref counts);
-                //    }
-
-                //    for (int j = 0; j < simplexSizeB; ++j)
-                //    {
-                //        int particleIndex = simplices[simplexStartB + j];
-                //        BurstConstraintsBatchImpl.ApplyPositionDelta(particleIndex, constraintParameters.SORFactor, ref positions, ref deltas, ref counts);
-                //    }
-                //}
 
                 contacts[i] = contact;
             }

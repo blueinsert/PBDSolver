@@ -31,39 +31,45 @@ namespace bluebean.Physics.PBD
                 int particleA = contact.bodyA;
                 int particleB = contact.bodyB;
 
-                float4 simplexVelocityA = float4.zero;
-                float4 simplexPrevPositionA = float4.zero;
-                quaternion simplexPrevOrientationA = new quaternion(0, 0, 0, 0);
-                float simplexRadiusA = 0;
-                float simplexInvMassA = 0;
-                float4 simplexInvInertiaA = float4.zero;
+                float4 velocityA = float4.zero;
+                float4 prevPositionA = float4.zero;
+                quaternion prevOrientationA = new quaternion(0, 0, 0, 0);
+                float radiusA = 0;
+                float invMassA = 0;
+                float4 invInertiaA = float4.zero;
 
-                float4 simplexVelocityB = float4.zero;
-                float4 simplexPrevPositionB = float4.zero;
-                quaternion simplexPrevOrientationB = new quaternion(0, 0, 0, 0);
-                float simplexRadiusB = 0;
-                float simplexInvMassB = 0;
-                float4 simplexInvInertiaB = float4.zero;
+                float4 velocityB = float4.zero;
+                float4 prevPositionB = float4.zero;
+                quaternion prevOrientationB = new quaternion(0, 0, 0, 0);
+                float radiusB = 0;
+                float invMassB = 0;
+                float4 invInertiaB = float4.zero;
 
-                //todo
-                simplexVelocityA = velocities[particleA];
-                simplexPrevPositionA = prevPositions[particleA];
+                velocityA = velocities[particleA];
+                prevPositionA = prevPositions[particleA];
+                radiusA = radii[particleA];
+                invMassA = invMasses[particleA];
+
+                velocityB = velocities[particleB];
+                prevPositionB = prevPositions[particleB];
+                radiusB = radii[particleB];
+                invMassB = invMasses[particleB];
 
                 // update contact distance
-                float dAB = math.dot(simplexPrevPositionA - simplexPrevPositionB, contact.normal);
-                contact.distance = dAB - (simplexRadiusA + simplexRadiusB);
+                float dAB = math.dot(prevPositionA - prevPositionB, contact.normal);
+                contact.distance = dAB - (radiusA + radiusB);
 
                 // calculate contact points:
-                float4 contactPointA = simplexPrevPositionB + contact.normal * (contact.distance + simplexRadiusB);
-                float4 contactPointB = simplexPrevPositionA - contact.normal * (contact.distance + simplexRadiusA);
+                float4 contactPointA = prevPositionB + contact.normal * (contact.distance + radiusB);
+                float4 contactPointB = prevPositionA - contact.normal * (contact.distance + radiusA);
 
                 // update contact basis:
-                contact.CalculateBasis(simplexVelocityA - simplexVelocityB);
+                contact.CalculateBasis(velocityA - velocityB);
 
                 // update contact masses:
                 bool rollingContacts = false; 
-                contact.CalculateContactMassesA(simplexInvMassA, simplexInvInertiaA, simplexPrevPositionA, simplexPrevOrientationA, contactPointA, rollingContacts);
-                contact.CalculateContactMassesB(simplexInvMassB, simplexInvInertiaB, simplexPrevPositionB, simplexPrevOrientationB, contactPointB, rollingContacts);
+                contact.CalculateContactMassesA(invMassA, invInertiaA, prevPositionA, prevOrientationA, contactPointA, rollingContacts);
+                contact.CalculateContactMassesB(invMassB, invInertiaB, prevPositionB, prevOrientationB, contactPointB, rollingContacts);
 
                 contacts[i] = contact;
             }

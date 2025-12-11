@@ -62,7 +62,6 @@ namespace bluebean.Physics.PBD
                 invMasses = m_owner.Solver.InvMasses,
                 radii = m_owner.Solver.ParticleRadius,
 
-
                 deltas = m_owner.Solver.PositionDeltas,
                 counts = m_owner.Solver.PositionConstraintCounts,
                 contacts = (m_owner.Solver).ParticleContacts,

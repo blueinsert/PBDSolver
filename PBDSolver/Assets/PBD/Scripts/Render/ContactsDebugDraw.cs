@@ -66,6 +66,31 @@ public class ContactsDebugDraw : MonoBehaviour
         }
     }
 
+    void DrawParticleContacts(PBDSolver.CollisionEventArgs data)
+    {
+        for (int i = 0; i < data.m_contacts.Count; ++i)
+        {
+            var contact = data.m_contacts.Data[i];
+
+            int particleA = contact.bodyA;
+            var radiusA = solver.ParticleRadius[particleA];
+            var pointA = solver.GetParticlePosition(particleA);
+
+            int particleB = contact.bodyB;
+            var radiusB = solver.ParticleRadius[particleB];
+            var pointB = solver.GetParticlePosition(particleB);
+
+            var distance = contact.distance;
+            Vector3 normal = contact.normal;
+
+            Gizmos.color = Color.blue;
+            Gizmos.DrawSphere(pointA, radiusA);
+            Gizmos.color = (distance <= 0) ? Color.red : Color.green;
+            Gizmos.DrawSphere(pointB, radiusB);
+            Gizmos.DrawRay(pointB, normal.normalized * distance);
+        }
+    }
+
     void OnDrawGizmos()
     {
         if (solver == null) return;
@@ -79,7 +104,7 @@ public class ContactsDebugDraw : MonoBehaviour
         if (m_particleCollideFrameData != null)
         {
             m_particleContactCount = m_particleCollideFrameData.m_contacts.Count;
-            DrawContacts(m_particleCollideFrameData);
+            DrawParticleContacts(m_particleCollideFrameData);
         }
     }
 

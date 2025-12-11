@@ -175,7 +175,7 @@ namespace bluebean.Physics.PBD
                 // create extra batches if not enough:
                 if (i == pc.m_batches.Count)
                 {
-                    pc.CreateConstraintsBatch();
+                    pc.CreateConstraintsBatch(); 
                 }
 
                 pc.m_batches[i].enabled = true;
