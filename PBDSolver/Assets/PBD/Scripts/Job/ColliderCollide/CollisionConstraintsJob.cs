@@ -23,7 +23,7 @@ namespace bluebean.Physics.PBD
         [ReadOnly] public float stepTime;
         [ReadOnly] public float substepTime;
         /// <summary>
-        /// µ±Ç°stepÊ£ÓàµÄsubStepµü´úÊıÁ¿
+        /// å½“å‰stepå‰©ä½™çš„subStepè¿­ä»£æ•°é‡
         /// </summary>
         [ReadOnly] public int substeps;
 
@@ -42,20 +42,20 @@ namespace bluebean.Physics.PBD
                 int particleIndex = contact.bodyA;// simplexCounts.GetSimplexStartAndSize(contact.bodyA, out int simplexSize);
                 int colliderIndex = contact.bodyB;
 
-                //Õâ¸ösubstepµÄÔ¤²âÎ»ÖÃ
+                //è¿™ä¸ªsubstepçš„é¢„æµ‹ä½ç½®
                 float4 particlePosition = positions[particleIndex];
-                //ÉÏ¸ösubstepµÄÎ»ÖÃ
+                //ä¸Šä¸ªsubstepçš„ä½ç½®
                 float4 particlePrevPosition = prevPositions[particleIndex];
                 float particleRadius = radii[particleIndex];
                 float invMass = invMasses[particleIndex];
 
-                //Íâ²åÖµ£¬ÓÃÏßĞÔËÙ¶ÈÍâ²åµÃµ½Õâ¸östep½áÊøÊ±µÄÎ»ÖÃ
+                //å¤–æ’å€¼ï¼Œç”¨çº¿æ€§é€Ÿåº¦å¤–æ’å¾—åˆ°è¿™ä¸ªstepç»“æŸæ—¶çš„ä½ç½®
                 // project position to the end of the full step:
                 float4 posA = math.lerp(particlePrevPosition, particlePosition, substeps);
-                //Á£×Ó±íÃæ¾àÀëÅö×²µãµÄ×î½üµã
+                //ç²’å­è¡¨é¢è·ç¦»ç¢°æ’ç‚¹çš„æœ€è¿‘ç‚¹
                 posA += -contact.normal * particleRadius;
 
-                //Åö×²µã£¬Åö×²Ìå±íÃæÉÏµÄµã£¬ÊÀ½ç×ø±êÏµ
+                //ç¢°æ’ç‚¹ï¼Œç¢°æ’ä½“è¡¨é¢ä¸Šçš„ç‚¹ï¼Œä¸–ç•Œåæ ‡ç³»
                 float4 posB = contact.pointB;
 
                 contact.normalInvMassA = contact.tangentInvMassA = contact.bitangentInvMassA = invMass;
@@ -71,10 +71,10 @@ namespace bluebean.Physics.PBD
                 // Apply normal impulse to both simplex and rigidbody:
                 if (math.abs(lambda) > BurstMath.epsilon)
                 {
-                    //³ıÒÔsubstepsµÃµ½µ±Ç°substepĞèÒª¸üĞÂµÄdelta
+                    //é™¤ä»¥substepså¾—åˆ°å½“å‰substepéœ€è¦æ›´æ–°çš„delta
                     float4 delta = lambda * contact.normal / substeps;
 
-                    //³åÁ¿Ö±½Ó¸Ä±äÎ»ÖÃ
+                    //å†²é‡ç›´æ¥æ”¹å˜ä½ç½®
                     deltas[particleIndex] += delta * invMasses[particleIndex];
                     counts[particleIndex]++;
 

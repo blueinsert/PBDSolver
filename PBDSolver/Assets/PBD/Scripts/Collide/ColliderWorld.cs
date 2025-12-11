@@ -19,8 +19,8 @@ namespace bluebean.Physics.PBD
     }
 
     /// <summary>
-    /// ´æ·ÅunityÖĞµÄÅö×²ÌåÊı¾İ£»
-    /// ÕâĞ©Åö×²Ìå»áÓëpbdÁ£×Ó·¢ÉúÅö×²
+    /// å­˜æ”¾unityä¸­çš„ç¢°æ’ä½“æ•°æ®ï¼›
+    /// è¿™äº›ç¢°æ’ä½“ä¼šä¸pbdç²’å­å‘ç”Ÿç¢°æ’
     /// </summary>
     public class ColliderWorld
     {
@@ -32,36 +32,36 @@ namespace bluebean.Physics.PBD
             }
         }
 
-        #region ÄÚ²¿±äÁ¿
+        #region å†…éƒ¨å˜é‡
         ISolver m_solver;
 
-        #region Åö×²ÌåÊı¾İ
+        #region ç¢°æ’ä½“æ•°æ®
         /// <summary>
-        /// Ç°¶Ë¶ÔÏóÒıÓÃ
+        /// å‰ç«¯å¯¹è±¡å¼•ç”¨
         /// </summary>
         [NonSerialized] public List<ColliderHandle> m_colliderHandles;
         [NonSerialized] public NativeColliderShapeList m_colliderShapes;         // list of collider shapes.
         [NonSerialized] public NativeAabbList m_colliderAabbs;                   // list of collider bounds.
         [NonSerialized] public NativeAffineTransformList m_colliderTransforms;   // list of collider transforms.
         /// <summary>
-        /// Åö×²ÌåµÄÈı½ÇÍø¸ñÊı¾İÈİÆ÷£¬Èç¹ûshapeTypeÎªTriangleMesh
+        /// ç¢°æ’ä½“çš„ä¸‰è§’ç½‘æ ¼æ•°æ®å®¹å™¨ï¼Œå¦‚æœshapeTypeä¸ºTriangleMesh
         /// </summary>
         [NonSerialized] public TriangleMeshContainer m_triangleMeshContainer;
         /// <summary>
-        /// Ã¿¸öÅö×²ÌåÔÚÍø¸ñ×ø±êÉÏ¿çÓòµÄ·¶Î§
+        /// æ¯ä¸ªç¢°æ’ä½“åœ¨ç½‘æ ¼åæ ‡ä¸Šè·¨åŸŸçš„èŒƒå›´
         /// </summary>
         [NonSerialized] public NativeCellSpanList m_colliderCellSpans;
 
         private int m_colliderCount = 0;
         #endregion
 
-        #region Åö×²ÌåÍø¸ñ»®·Ö£¬¿Õ¼äÓÅ»¯
+        #region ç¢°æ’ä½“ç½‘æ ¼åˆ’åˆ†ï¼Œç©ºé—´ä¼˜åŒ–
         private NativeQueue<MovingCollider> m_movingColliders;
         private NativeMultilevelGrid<int> m_grid;
         #endregion
 
         /// <summary>
-        /// Åö×²½Ó´¥
+        /// ç¢°æ’æ¥è§¦
         /// </summary>
         public NativeQueue<BurstContact> m_colliderContactQueue;
 
@@ -126,7 +126,7 @@ namespace bluebean.Physics.PBD
         }
 
         /// <summary>
-        /// ¸üĞÂÅö×²ÌåÊı¾İ
+        /// æ›´æ–°ç¢°æ’ä½“æ•°æ®
         /// </summary>
         private void UpdateColliders()
         {
@@ -136,28 +136,28 @@ namespace bluebean.Physics.PBD
         }
 
         /// <summary>
-        /// Ê¹ÓÃ¶àÖØÍø¸ñ£¬¸üĞÂÅö×²ÌåµÄ¿Õ¼ä»®·Ö
+        /// ä½¿ç”¨å¤šé‡ç½‘æ ¼ï¼Œæ›´æ–°ç¢°æ’ä½“çš„ç©ºé—´åˆ’åˆ†
         /// </summary>
         private void UpdateCollidersMultiGrid(float deltaTime)
         {
             if (m_colliderCount <= 0)
                 return;
-            //»ñÈ¡ÒÆ¶¯µÄÅö×²ÌåºÍÆä·¶Î§
+            //è·å–ç§»åŠ¨çš„ç¢°æ’ä½“å’Œå…¶èŒƒå›´
             var identifyMoving = new IdentifyMovingCollidersJob
             {
-                //ÊäÈë
+                //è¾“å…¥
                 shapes = this.m_colliderShapes.AsNativeArray<BurstColliderShape>(m_colliderCellSpans.count),
                 //rigidbodies = world.rigidbodies.AsNativeArray<BurstRigidbody>(),
                 //collisionMaterials = world.collisionMaterials.AsNativeArray<BurstCollisionMaterial>(),
                 bounds = this.m_colliderAabbs.AsNativeArray<BurstAabb>(m_colliderCellSpans.count),
                 //colliderCount = m_colliderCount,
                 dt = deltaTime,
-                //Êä³ö
+                //è¾“å‡º
                 movingColliders = this.m_movingColliders.AsParallelWriter(),
                 colliderCellSpans = this.m_colliderCellSpans.AsNativeArray<BurstCellSpan>(),
             };
             JobHandle movingHandle = identifyMoving.Schedule(m_colliderCount, 128);
-            //¸üĞÂmultiGrid
+            //æ›´æ–°multiGrid
             var updateMoving = new UpdateMultiGridByMovingCollidersJob
             {
                 movingColliders = m_movingColliders,
@@ -174,7 +174,7 @@ namespace bluebean.Physics.PBD
         }
 
         /// <summary>
-        /// Åö×²Õì²â£¬²úÉú½Ó´¥
+        /// ç¢°æ’ä¾¦æµ‹ï¼Œäº§ç”Ÿæ¥è§¦
         /// </summary>
         /// <param name="deltaTime"></param>
         /// <param name="inputDeps"></param>
@@ -184,7 +184,7 @@ namespace bluebean.Physics.PBD
 
             var generateColliderContactsJob = new GenerateContactsJob
             {
-                //ÊäÈë
+                //è¾“å…¥
                 colliderMultiGrid = m_grid,
                 gridLevels = m_grid.populatedLevels.GetKeyArray(Allocator.TempJob),
 
@@ -206,7 +206,7 @@ namespace bluebean.Physics.PBD
 
                 deltaTime = deltaTime,
 
-                //Êä³ö
+                //è¾“å‡º
                 contactsQueue = this.m_colliderContactQueue.AsParallelWriter(),
             };
 

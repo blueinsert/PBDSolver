@@ -5,7 +5,7 @@ namespace bluebean.Physics.PBD.DataStruct
     public interface IDistanceFunction
     {
         /// <summary>
-        /// 计算最近点，结果保存在projectedPoint
+        /// 璁＄畻鏈�杩戠偣锛岀粨鏋滀繚瀛樺湪projectedPoint
         /// </summary>
         /// <param name="point"></param>
         /// <param name="radii"></param>

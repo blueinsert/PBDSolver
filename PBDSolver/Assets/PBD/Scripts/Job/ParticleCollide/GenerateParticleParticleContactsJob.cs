@@ -20,6 +20,7 @@ namespace bluebean.Physics.PBD
         [ReadOnly] public NativeArray<float4> velocities;
         [ReadOnly] public NativeArray<float> invMasses;
         [ReadOnly] public NativeArray<float> radii;
+        [ReadOnly] public NativeArray<int> groups;
         //[ReadOnly] public NativeArray<float4> normals;
 
         [ReadOnly] public NativeArray<BurstAabb> simplexBounds;
@@ -43,7 +44,7 @@ namespace bluebean.Physics.PBD
         }
 
         /// <summary>
-        /// µ¥Ôª¸ñÄÚÁ£×ÓÖ®¼äÅĞ¶ÏÊÇ·ñÏà½»
+        /// å•å…ƒæ ¼å†…ç²’å­ä¹‹é—´åˆ¤æ–­æ˜¯å¦ç›¸äº¤
         /// </summary>
         /// <param name="cellIndex"></param>
         private void IntraCellSearch(int cellIndex)
@@ -60,7 +61,7 @@ namespace bluebean.Physics.PBD
         }
 
         /// <summary>
-        /// ÏàÁÚµÄÍ¬Ò»levelµÄ¸ñ×ÓµÄÁ£×Ó¼äÅĞ¶ÏÏà½»
+        /// ç›¸é‚»çš„åŒä¸€levelçš„æ ¼å­çš„ç²’å­é—´åˆ¤æ–­ç›¸äº¤
         /// </summary>
         /// <param name="cellIndex"></param>
         /// <param name="neighborCellIndex"></param>
@@ -79,15 +80,15 @@ namespace bluebean.Physics.PBD
         }
 
         /// <summary>
-        /// ÔÚ´óÓÚµÈÓÚµ±Ç°levelµÄÍø¸ñÉÏ£¬ÅĞ¶ÏÓëÁÚ¾ÓÍø¸ñÖĞµÄÁ£×ÓÊÇ·ñ·¢ËÍÏà½»
+        /// åœ¨å¤§äºç­‰äºå½“å‰levelçš„ç½‘æ ¼ä¸Šï¼Œåˆ¤æ–­ä¸é‚»å±…ç½‘æ ¼ä¸­çš„ç²’å­æ˜¯å¦å‘é€ç›¸äº¤
         /// </summary>
         /// <param name="cellIndex"></param>
         private void IntraLevelSearch(int cellIndex)
         {
             int4 cellCoords = grid.usedCells[cellIndex].Coords;
 
-            //Í¬Ò»²ã¼¶£¬ÔÚÁÚ¾ÓÍø¸ñÖĞËÑË÷£»ÈıÎ¬Çé¿öÏÂ¹²ÓĞ26(3x3x3-1)¸÷ÁÚ¾Ó£»
-            //ËÑË÷Ò»°ëµÄÁÚ¾Ó£¬ÁíÒ»°ë´¦ÀíÁÚ¾ÓÊ±´¦Àí
+            //åŒä¸€å±‚çº§ï¼Œåœ¨é‚»å±…ç½‘æ ¼ä¸­æœç´¢ï¼›ä¸‰ç»´æƒ…å†µä¸‹å…±æœ‰26(3x3x3-1)å„é‚»å±…ï¼›
+            //æœç´¢ä¸€åŠçš„é‚»å±…ï¼Œå¦ä¸€åŠå¤„ç†é‚»å±…æ—¶å¤„ç†
             // neighboring cells in the current level:
             for (int i = 0; i < 13; ++i)
             {
@@ -104,18 +105,18 @@ namespace bluebean.Physics.PBD
             int levelIndex = gridLevels.IndexOf<int, int>(cellCoords.w);
             if (levelIndex >= 0)
             {
-                //ÅĞ¶ÏÓë¸ü¶àsize levelµÄÎïÌåÊÇ·ñÏà½»
+                //åˆ¤æ–­ä¸æ›´å¤šsize levelçš„ç‰©ä½“æ˜¯å¦ç›¸äº¤
                 levelIndex++;
                 for (; levelIndex < gridLevels.Length; ++levelIndex)
                 {
                     int level = gridLevels[levelIndex];
 
                     // calculate index of parent cell in parent level:
-                    //¼ÆËãÔÚµ±Ç°levelÍø¸ñÖĞµÄÍø¸ñ×ø±ê
+                    //è®¡ç®—åœ¨å½“å‰levelç½‘æ ¼ä¸­çš„ç½‘æ ¼åæ ‡
                     int4 parentCellCoords = NativeMultilevelGrid<int>.GetParentCellCoords(cellCoords, level);
 
                     // search in all neighbouring cells:
-                    // ±éÀú¿ÉÄÜÓëĞ¡µ¥Ôª¸ñÖĞÁ£×Ó·¢ÉúÅö×²µÄ´óµ¥Ôª¸ñÖĞµÄ27¸ö£»
+                    // éå†å¯èƒ½ä¸å°å•å…ƒæ ¼ä¸­ç²’å­å‘ç”Ÿç¢°æ’çš„å¤§å•å…ƒæ ¼ä¸­çš„27ä¸ªï¼›
                     for (int x = -1; x <= 1; ++x)
                         for (int y = -1; y <= 1; ++y)
                             for (int z = -1; z <= 1; ++z)
@@ -139,12 +140,13 @@ namespace bluebean.Physics.PBD
             // skip the pair if their bounds don't intersect:
             if (!simplexBounds[A].IntersectsAabb(simplexBounds[B]))
                 return;
-
+            int groupA = groups[A];
+            int groupB = groups[B];
             // if all particles are in the same group:
-            //if (groupA == groupB)
-            //{
-            //    return;
-            //}
+            if (groupA == groupB)
+            {
+                return;
+            }
             float rA = radii[A];
             float rB = radii[B];
             float4 pA = positions[A];

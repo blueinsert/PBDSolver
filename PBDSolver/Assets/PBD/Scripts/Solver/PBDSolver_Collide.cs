@@ -20,7 +20,6 @@ namespace bluebean.Physics.PBD
 
         private ColliderWorld m_colliderWorld;
         public NativeArray<BurstContact> m_colliderContacts;
-
         private CollisionEventArgs m_collisionArgs = new CollisionEventArgs();
         public event CollisionCallback EventOnCollision;
 
@@ -28,9 +27,12 @@ namespace bluebean.Physics.PBD
         public NativeArray<BurstContact> m_particleContacts;
         public NativeArray<BatchData> m_particleBatchData;
         private ContactBatcher m_particleContactBatcher;
+        public event CollisionCallback OnParticleCollision;
+        private CollisionEventArgs particleCollisionArgs = new CollisionEventArgs();
+
 
         /// <summary>
-        /// ¸ù¾İÁ£×ÓËÙ¶È£¬deltaTimeµÈ¸üĞÂÕâÒ»Ö¡ÄÚÁ£×ÓµÄ¿ÉÄÜ»î¶¯·¶Î§
+        /// æ ¹æ®ç²’å­é€Ÿåº¦ï¼ŒdeltaTimeç­‰æ›´æ–°è¿™ä¸€å¸§å†…ç²’å­çš„å¯èƒ½æ´»åŠ¨èŒƒå›´
         /// </summary>
         /// <param name="deltaTime"></param>
         /// <returns></returns>
@@ -38,21 +40,21 @@ namespace bluebean.Physics.PBD
         {
             var buildAabbs = new BuildParticleAabbsJob
             {
-                //ÊäÈë
+                //è¾“å…¥
                 radii = this.ParticleRadius,
                 positions = this.ParticlePositions,
                 velocities = this.ParticleVels,
                 collisionMargin = 0.01f,
                 continuousCollisionDetection = 1,
                 dt = deltaTime,
-                //Êä³ö
+                //è¾“å‡º
                 simplexBounds = this.ParticleAabb,
             };
             return buildAabbs.Schedule(this.ParticlePositions.Count(), 32);
         }
 
         /// <summary>
-        /// ´Óm_colliderContacts¸´ÖÆÊı¾İµ½contacts
+        /// ä»m_colliderContactså¤åˆ¶æ•°æ®åˆ°contacts
         /// </summary>
         /// <param name="contacts"></param>
         /// <param name="count"></param>
@@ -62,18 +64,18 @@ namespace bluebean.Physics.PBD
         }
 
         /// <summary>
-        /// ²úÉúÁ£×ÓÓëunityÅö×²ÌåÖ±½ÓµÄÅö×²Êı¾İ
+        /// äº§ç”Ÿç²’å­ä¸unityç¢°æ’ä½“ç›´æ¥çš„ç¢°æ’æ•°æ®
         /// </summary>
         /// <param name="deltaTime"></param>
         /// <param name="deps"></param>
         private void GenerateParticleColliderContacts(float deltaTime, JobHandle deps)
         {
-            //²úÉúÁ£×ÓºÍ»·¾³Åö×²ÌåµÄÅö×²½Ó´¥Êı¾İ
+            //äº§ç”Ÿç²’å­å’Œç¯å¢ƒç¢°æ’ä½“çš„ç¢°æ’æ¥è§¦æ•°æ®
             var gemterateCpmtactsHandle = m_colliderWorld.GenerateContacts(deltaTime, deps);
             gemterateCpmtactsHandle.Complete();
 
             m_colliderContacts = new NativeArray<BurstContact>(m_colliderWorld.m_colliderContactQueue.Count, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
-            //½«Åö×²½Ó´¥Êı¾İ´ÓcollideWorldÌáÈ¡µ½±¾µØ±äÁ¿m_colliderContactsÖĞ
+            //å°†ç¢°æ’æ¥è§¦æ•°æ®ä»collideWorldæå–åˆ°æœ¬åœ°å˜é‡m_colliderContactsä¸­
             DequeueIntoArrayJob<BurstContact> dequeueColliderContacts = new DequeueIntoArrayJob<BurstContact>()
             {
                 InputQueue = m_colliderWorld.m_colliderContactQueue,
@@ -148,7 +150,7 @@ namespace bluebean.Physics.PBD
             };
             var dequeueHandle = dequeueParticleContacts.Schedule();
             // Sort contacts for jitter-free gauss-seidel (sequential) solving:
-            // ¸ù¾İÔ¼ÊøµÄµÚÒ»¸ö¼°µÚ¶ş¸öÁ£×Ó±àºÅ£¬ÅÅĞòÔ¼ÊøÊı×é
+            // æ ¹æ®çº¦æŸçš„ç¬¬ä¸€ä¸ªåŠç¬¬äºŒä¸ªç²’å­ç¼–å·ï¼Œæ’åºçº¦æŸæ•°ç»„
              dequeueHandle = SortParticleContacts(GetParticleCount(), rawParticleContacts, ref sortedParticleContacts, dequeueHandle);
 
             ContactProvider contactProvider = new ContactProvider()
@@ -165,6 +167,22 @@ namespace bluebean.Physics.PBD
                 Debug.Log($"particle contacts count: {m_particleContacts.Length}");
             }
 
+            var pc = m_constrains[(int)ConstrainType.ParticleCollide] as ParticleCollideConstrainGroup;
+            for (int i = 0; i < pc.m_batches.Count; ++i)
+                pc.m_batches[i].enabled = false;
+            for (int i = 0; i < activeParticleBatchCount[0]; ++i)
+            {
+                // create extra batches if not enough:
+                if (i == pc.m_batches.Count)
+                {
+                    pc.CreateConstraintsBatch();
+                }
+
+                pc.m_batches[i].enabled = true;
+
+                (pc.m_batches[i]).SetBatchData(m_particleBatchData[i]);
+            }
+
             rawParticleContacts.Dispose();
             sortedParticleContacts.Dispose();
             activeParticleBatchCount.Dispose();
@@ -172,12 +190,18 @@ namespace bluebean.Physics.PBD
 
         private void CollisionDetection(float deltaTime)
         {
-            //¸üĞÂÁ£×Óµ±Ç°Ö¡»î¶¯µÄaabb
+            //æ›´æ–°ç²’å­å½“å‰å¸§æ´»åŠ¨çš„aabb
             var updateParticleBoundsHandle = UpdateParticleBounds(deltaTime);
 
             GenerateParticleColliderContacts(deltaTime, updateParticleBoundsHandle);
 
             GenerateParticleParticleContacts(deltaTime, updateParticleBoundsHandle);
+        }
+
+
+        public void GetParticleCollisionContacts(Contact[] contacts, int count)
+        {
+            NativeArray<Contact>.Copy(m_particleContacts.Reinterpret<Contact>(), 0, contacts, 0, count);
         }
     }
 }

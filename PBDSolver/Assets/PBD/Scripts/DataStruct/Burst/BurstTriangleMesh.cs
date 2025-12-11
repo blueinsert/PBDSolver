@@ -19,21 +19,21 @@ namespace bluebean.Physics.PBD.DataStruct
         private BurstMath.CachedTri tri;
 
         /// <summary>
-        /// ÔÚmeshµÄ±¾µØ×ø±êÏµÖĞ¼ÆËã×î½üµã
+        /// åœ¨meshçš„æœ¬åœ°åæ ‡ç³»ä¸­è®¡ç®—æœ€è¿‘ç‚¹
         /// </summary>
         /// <param name="point"></param>
         /// <param name="radii"></param>
         /// <param name="projectedPoint"></param>
         public void Evaluate(float4 point, float4 radii, quaternion quaternion, ref SurfacePoint projectedPoint)
         {
-            //´ÓÊÀ½ç×ø±êÏµ×ªÅö×²Ìå±¾µØ×ø±êÏµ
+            //ä»ä¸–ç•Œåæ ‡ç³»è½¬ç¢°æ’ä½“æœ¬åœ°åæ ‡ç³»
             point = colliderToWorld.InverseTransformPoint(point);
             //point = colliderToSolver.InverseTransformPointUnscaled(point);
-            //¼ÆËã¾àÀëµ±Ç°triµÄ×î½üµã
+            //è®¡ç®—è·ç¦»å½“å‰triçš„æœ€è¿‘ç‚¹
             float4 nearestPoint = BurstMath.NearestPointOnTri(tri, point, out float4 bary);
             float4 normal = math.normalizesafe(point - nearestPoint);
 
-            //×ª»ØÊÀ½ç×ø±êÏµ
+            //è½¬å›ä¸–ç•Œåæ ‡ç³»
             projectedPoint.point = colliderToWorld.TransformPoint(nearestPoint + normal * shape.contactOffset);
             projectedPoint.normal = colliderToWorld.TransformDirection(normal);
         }
@@ -86,7 +86,7 @@ namespace bluebean.Physics.PBD.DataStruct
             }
             else
             {
-                //ÒÑ¾­ÊÇÒ¶×Ó½Úµã£¬½«Ò¶×Ó½Úµã°üº¬µÄËùÓĞÈı½ÇĞÎÓëÁ£×Ó×öÂùÁ¦Åö×²¼ì²â
+                //å·²ç»æ˜¯å¶å­èŠ‚ç‚¹ï¼Œå°†å¶å­èŠ‚ç‚¹åŒ…å«çš„æ‰€æœ‰ä¸‰è§’å½¢ä¸ç²’å­åšè›®åŠ›ç¢°æ’æ£€æµ‹
                 // check for contact against all triangles:
                 for (int dataOffset = node.start; dataOffset < node.start + node.count; ++dataOffset)
                 {
@@ -96,7 +96,7 @@ namespace bluebean.Physics.PBD.DataStruct
                     float4 v3 = new float4(vertices[header.firstVertex + t.i3], 0);
                     BurstAabb triangleBounds = new BurstAabb(v1, v2, v3, shape.contactOffset + collisionMargin);
 
-                    //ÏÈÅĞ¶ÏaabbÊÇ·ñÏà½»£¬ÔÙÅĞ¶Ï¶¥µã¼¶±ğ
+                    //å…ˆåˆ¤æ–­aabbæ˜¯å¦ç›¸äº¤ï¼Œå†åˆ¤æ–­é¡¶ç‚¹çº§åˆ«
                     if (triangleBounds.IntersectsAabb(particleBounds))
                     {
                         tri.Cache(v1, v2, v3);
@@ -111,10 +111,10 @@ namespace bluebean.Physics.PBD.DataStruct
                         float4 rbVelocity = float4.zero;  
                         //if (rigidbodyIndex >= 0)
                         //   rbVelocity = BurstMath.GetRigidbodyVelocityAtPoint(rigidbodyIndex, colliderPoint.point, rigidbodies, solverToWorld);
-                        //¼ÆËãÁ£×Óµã¾àÀë±íÃæ×î½üµãµÄÏà¶Ô¾àÀëºÍÏà¶ÔËÙ¶È
+                        //è®¡ç®—ç²’å­ç‚¹è·ç¦»è¡¨é¢æœ€è¿‘ç‚¹çš„ç›¸å¯¹è·ç¦»å’Œç›¸å¯¹é€Ÿåº¦
                         float dAB = math.dot(particlePoint - nearestPoint.point, nearestPoint.normal);
                         float dVel = math.dot(particleVelocity - rbVelocity, nearestPoint.normal);
-                        //ÅĞ¶ÏÔÚÕâÒ»Ö¡ÄÚÊÇ·ñ»áÅö×²
+                        //åˆ¤æ–­åœ¨è¿™ä¸€å¸§å†…æ˜¯å¦ä¼šç¢°æ’
                         if (dVel * dt + dAB <= particleRadius + shape.contactOffset + collisionMargin)
                         {
                             contacts.Enqueue(new BurstContact()

@@ -7,28 +7,28 @@ using Unity.Mathematics;
 namespace bluebean.Physics.PBD
 {
     /// <summary>
-    /// ½«Ô¼Êø·ÖÅú£¬Ã¿¸öÅú´ÎÀïµÄÔ¼ÊøÏà»¥Ö®¼ä²»³åÍ»£¬¼´²»°üº¬ÏàÍ¬µÄÁ£×Ó¡£
+    /// å°†çº¦æŸåˆ†æ‰¹ï¼Œæ¯ä¸ªæ‰¹æ¬¡é‡Œçš„çº¦æŸç›¸äº’ä¹‹é—´ä¸å†²çªï¼Œå³ä¸åŒ…å«ç›¸åŒçš„ç²’å­ã€‚
     /// </summary>
     [BurstCompile]
     public struct BatchContactsJob : IJob
     {
-        //ÁÙÊ±±äÁ¿
+        //ä¸´æ—¶å˜é‡
         /// <summary>
-        /// Ã¿¸öÁ£×Ó¶ÔÓ¦µÄbatcherÑÚÂë£¬Êı×é³¤¶ÈµÈÓÚÁ£×ÓÊıÁ¿£»
-        /// ÏêÏ¸µÄËµÊÇÊ¹ÓÃµ½¸ÃÁ£×ÓµÄËùÓĞÔ¼ÊøµÄbatcherÑÚÂë£¬ÒòÎªÁ£×Ó¿ÉÄÜÔÚ¶à¸öbatcherÖĞ±»Éæ¼°
+        /// æ¯ä¸ªç²’å­å¯¹åº”çš„batcheræ©ç ï¼Œæ•°ç»„é•¿åº¦ç­‰äºç²’å­æ•°é‡ï¼›
+        /// è¯¦ç»†çš„è¯´æ˜¯ä½¿ç”¨åˆ°è¯¥ç²’å­çš„æ‰€æœ‰çº¦æŸçš„batcheræ©ç ï¼Œå› ä¸ºç²’å­å¯èƒ½åœ¨å¤šä¸ªbatcherä¸­è¢«æ¶‰åŠ
         /// </summary>
         [DeallocateOnJobCompletion]
         public NativeArray<ushort> batchMasks;
         /// <summary>
-        /// Ã¿¸öÔ¼Êø¶ÔÓ¦µÄbatcherÑÚÂë£¬Êı×é³¤¶ÈµÈÓÚÔ¼ÊøÊıÁ¿
+        /// æ¯ä¸ªçº¦æŸå¯¹åº”çš„batcheræ©ç ï¼Œæ•°ç»„é•¿åº¦ç­‰äºçº¦æŸæ•°é‡
         /// </summary>
         [DeallocateOnJobCompletion]
         public NativeArray<int> batchIndices;
-        //ÊäÈë
+        //è¾“å…¥
         [ReadOnly] public BatchLUT lut;
         public ContactProvider constraintDesc;
         public int maxBatches;
-        //Êä³ö
+        //è¾“å‡º
         public NativeArray<BatchData> batchData;
         public NativeArray<int> activeBatchCount;
 
@@ -51,11 +51,11 @@ namespace bluebean.Physics.PBD
             {
                 // OR together the batch masks of all entities involved in the constraint:
                 int batchMask = 0;
-                //Á£×Ó¿ÉÄÜ±»°üº¬ÔÚÆäËûµÄÔ¼ÊøÖĞ,
+                //ç²’å­å¯èƒ½è¢«åŒ…å«åœ¨å…¶ä»–çš„çº¦æŸä¸­,
                 for (int k = 0; k < constraintDesc.GetParticleCount(i); ++k)
-                    batchMask |= batchMasks[constraintDesc.GetParticle(i, k)];//ÕâÖÖÇé¿öÏÂ²»Îª0
-                //Õâ¸öÊ±¿ÌbatchMask¼ÇÂ¼ÁËÒÑ¾­±»Ê¹ÓÃÁËµÄbatchÇé¿ö
-                //Í¨¹ı²éÕÒ±í·µ»ØµÚÒ»¸öÎ´±»Ê¹ÓÃµÄbatcherµÄindex
+                    batchMask |= batchMasks[constraintDesc.GetParticle(i, k)];//è¿™ç§æƒ…å†µä¸‹ä¸ä¸º0
+                //è¿™ä¸ªæ—¶åˆ»batchMaskè®°å½•äº†å·²ç»è¢«ä½¿ç”¨äº†çš„batchæƒ…å†µ
+                //é€šè¿‡æŸ¥æ‰¾è¡¨è¿”å›ç¬¬ä¸€ä¸ªæœªè¢«ä½¿ç”¨çš„batcherçš„index
                 // look up the first free batch index for this constraint:
                 int batchIndex = batchIndices[i] = lut.batchIndex[batchMask];
                 
@@ -68,12 +68,12 @@ namespace bluebean.Physics.PBD
                 if (workItems[batchIndex].Add(i))
                 {
                     // if this work item does not belong to the last batch:
-                    //ÒòÎªÊÇ´ÓµÍÎ»¿ªÊ¼·ÖÅäÎ´Ê¹ÓÃµÄbatcher£¬µ½ÁË×îºóÒ»¸ö¾ÍÃ»±ØÒª¼ÇÂ¼ÁË
+                    //å› ä¸ºæ˜¯ä»ä½ä½å¼€å§‹åˆ†é…æœªä½¿ç”¨çš„batcherï¼Œåˆ°äº†æœ€åä¸€ä¸ªå°±æ²¡å¿…è¦è®°å½•äº†
                     if (batchIndex != maxBatches - 1)
                     {
                         // tag all entities in the work item with the batch mask to close it.
                         // this way we know constraints referencing any of these entities can no longer be added to this batch.
-                        //±éÀú¸ÃbatcherÖĞËùÓĞÔ¼ÊøÉæ¼°µÄËùÓĞÁ£×Ó£¬¼ÇÂ¼ÆäbatcherÑÚÂë
+                        //éå†è¯¥batcherä¸­æ‰€æœ‰çº¦æŸæ¶‰åŠçš„æ‰€æœ‰ç²’å­ï¼Œè®°å½•å…¶batcheræ©ç 
                         for (int j = 0; j < workItems[batchIndex].constraintCount; j++)
                         {
                             int constraint = workItems[batchIndex].constraints[j];

@@ -31,7 +31,7 @@ namespace bluebean.Physics.PBD
         }
 
         /// <summary>
-        /// 向CollideWorld同步数据
+        /// 鍚慍ollideWorld鍚屾鏁版嵁
         /// </summary>
         public virtual void UpdateIfNeeded()
         {

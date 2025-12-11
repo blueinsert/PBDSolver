@@ -62,6 +62,7 @@
   <ItemGroup>
     <Compile Include="Assets\PBD\Scripts\Job\ParticleCollide\CountSortPerFirstParticleJob.cs" />
     <Compile Include="Assets\PBD\Scripts\Constrains\ConstrainData.cs" />
+    <Compile Include="Assets\PBD\Scripts\Job\ParticleCollide\ApplyBatchedCollisionConstraintsBatchJob.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\SurfacePoint.cs" />
     <Compile Include="Assets\PBD\Scripts\Collide\ParticleGrid.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\BVH\BIHNode.cs" />
@@ -79,7 +80,6 @@
     <Compile Include="Assets\PBD\Scripts\Utils\ParticleDragger.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\IDistanceFunction.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Burst\BurstRigidbody.cs" />
-    <Compile Include="Assets\PBD\Scripts\Utils\ContactsDebugDraw.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\PriorityQueue.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Native\NativeAabbList.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Batcher\BatchData.cs" />
@@ -90,6 +90,7 @@
     <Compile Include="Assets\PBD\Scripts\DataStruct\Burst\BurstContact.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\ColliderShapeType.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Native\NativeTriangleMeshHeaderList.cs" />
+    <Compile Include="Assets\PBD\Scripts\Render\ContactsDebugDraw.cs" />
     <Compile Include="Assets\PBD\Scripts\Job\DequeueIntoArrayJob.cs" />
     <Compile Include="Assets\PBD\Scripts\Solver\ISolver.cs" />
     <Compile Include="Assets\PBD\Scripts\Job\Constrains\StretchConstrainSolveJob.cs" />
@@ -159,8 +160,10 @@
     <Compile Include="Assets\PBD\Scripts\DataStruct\Native\NativeIntList.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Native\NativeCellSpanList.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\VectorInt4.cs" />
+    <Compile Include="Assets\PBD\Scripts\Constrains\ParticleCollideConstrainGroup.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Burst\BurstTriangleMesh.cs" />
     <Compile Include="Assets\PBD\Scripts\Job\ColliderCollide\CollisionConstraintsJob.cs" />
+    <Compile Include="Assets\PBD\Scripts\Constrains\ParticleCollisionConstraintsBatch.cs" />
     <Compile Include="Assets\PBD\Scripts\Job\ColliderCollide\UpdateMultiGridByMovingCollidersJob.cs" />
     <Compile Include="Assets\PBD\Scripts\Job\ColliderCollide\IdentifyMovingCollidersJob.cs" />
     <Compile Include="Assets\PBD\Scripts\Utils\FPS.cs" />

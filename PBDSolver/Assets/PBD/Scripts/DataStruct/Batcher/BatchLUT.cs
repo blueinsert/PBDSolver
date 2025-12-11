@@ -4,13 +4,13 @@ using Unity.Collections;
 namespace bluebean.Physics.PBD.DataStruct
 {
     /// <summary>
-    /// ÊäÈëÒ»¸öÎ»ÑÚÂëUInut16£¬Î»ÑÚÂëÖĞÃ¿Ò»Î»´ú±í¸ÃÎ»ÖÃµÄbatcherµÄÊ¹ÓÃÇé¿ö£»
-    /// Êä³öÎ»ÑÚÂëÖĞµÚÒ»¸ö0Î»µÄÎ»ÖÃ£¬¼´µÚÒ»¸ö¿ÉÓÃµÄbatcherµÄË÷Òı£»
+    /// è¾“å…¥ä¸€ä¸ªä½æ©ç UInut16ï¼Œä½æ©ç ä¸­æ¯ä¸€ä½ä»£è¡¨è¯¥ä½ç½®çš„batcherçš„ä½¿ç”¨æƒ…å†µï¼›
+    /// è¾“å‡ºä½æ©ç ä¸­ç¬¬ä¸€ä¸ª0ä½çš„ä½ç½®ï¼Œå³ç¬¬ä¸€ä¸ªå¯ç”¨çš„batcherçš„ç´¢å¼•ï¼›
     /// </summary>
     public struct BatchLUT : IDisposable
     {
         public readonly int numBatches;
-        //¿Õ¼ä»»Ê±¼ä
+        //ç©ºé—´æ¢æ—¶é—´
         public readonly NativeArray<ushort> batchIndex;
 
         public BatchLUT(int numBatches)

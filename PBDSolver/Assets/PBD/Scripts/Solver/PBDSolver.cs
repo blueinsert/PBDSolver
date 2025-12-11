@@ -22,6 +22,7 @@ namespace bluebean.Physics.PBD
         }
 
         #region 内部变量
+        private int m_scheduledJobCounter = 0;
 
         public int m_targetFrameRate = 60;
         public float m_dtSubStep = 0.0333f;
@@ -62,6 +63,7 @@ namespace bluebean.Physics.PBD
         private NativeVector4List m_propertyList = new NativeVector4List();
         private NativeInt4List m_cellCoordsList = new NativeInt4List();
         private NativeAabbList m_aabbList = new NativeAabbList();
+        private NativeIntList m_groupsList = new NativeIntList();
         private NativeVector4List m_externalForceList = new NativeVector4List();
         private NativeIntList m_freeList = new NativeIntList();
         private NativeFloatList m_invMassList = new NativeFloatList();
@@ -76,6 +78,7 @@ namespace bluebean.Physics.PBD
         private NativeArray<float> m_particleRadius;
         private NativeArray<BurstAabb> m_particleAabbs;
         public NativeArray<int4> m_cellCoords;
+        public NativeArray<int> m_groups;
         private NativeArray<float4> m_externalForces;
         private NativeArray<float> m_invMasses;
         private NativeArray<float4> m_positionDeltas;
@@ -102,7 +105,14 @@ namespace bluebean.Physics.PBD
         public NativeArray<BurstAabb> ParticleAabb => m_particleAabbs;
 
         public NativeArray<int4> CellCoords => m_cellCoords;
+
+        public NativeArray<int> Groups => m_groups;
+
         public NativeArray<BurstContact> ColliderContacts => m_colliderContacts;
+
+        public NativeArray<BurstContact> ParticleContacts => m_particleContacts;
+
+        public Vector3 Gravity => m_g;
         #endregion
 
         private const int MaxBatches = 17;
@@ -146,6 +156,7 @@ namespace bluebean.Physics.PBD
             m_radiusList.Dispose();
             m_aabbList.Dispose();
             m_cellCoordsList.Dispose();
+            m_groupsList.Dispose();
 
             m_colliderWorld.Destroy();
             //m_colliderContacts.Dispose();
@@ -186,6 +197,17 @@ namespace bluebean.Physics.PBD
                     GetCollisionContacts(m_collisionArgs.m_contacts.Data, contactCount);
 
                 EventOnCollision(this, m_collisionArgs);
+            }
+            if (OnParticleCollision != null)
+            {
+                var particleContactCount = m_particleContacts.Length;
+                particleCollisionArgs.m_contacts.SetCount(particleContactCount);
+
+                if (particleContactCount > 0)
+                    GetParticleCollisionContacts(particleCollisionArgs.m_contacts.Data, particleContactCount);
+
+                OnParticleCollision(this, particleCollisionArgs);
+
             }
 
             if (m_colliderContacts.IsCreated)
@@ -295,6 +317,7 @@ namespace bluebean.Physics.PBD
         private void InitConstrains()
         {
             m_constrains[(int)ConstrainType.Collide] = new CollideConstrainGroup(this);
+            m_constrains[(int)ConstrainType.ParticleCollide] = new ParticleCollideConstrainGroup(this);
             m_constrains[(int)ConstrainType.Stretch] = new StretchConstrainGroup(this);
             m_constrains[(int)ConstrainType.Volume] = new VolumeConstrainGroup(this);
         }
@@ -314,6 +337,7 @@ namespace bluebean.Physics.PBD
             m_particleRadius = m_radiusList.AsNativeArray<float>();
             m_particleAabbs = m_aabbList.AsNativeArray<BurstAabb>();
             m_cellCoords = m_cellCoordsList.AsNativeArray<int4>();
+            m_groups = m_groupsList.AsNativeArray<int>();
         }
 
         private void EnsureParticleArraysCapacity(int count)
@@ -332,6 +356,7 @@ namespace bluebean.Physics.PBD
                 m_prevPositionList.ResizeInitialized(count);
                 m_aabbList.ResizeInitialized(count);
                 m_cellCoordsList.ResizeInitialized(count);
+                m_groupsList.ResizeInitialized(count);
                 m_radiusList.ResizeInitialized(count);
 
                 OnParticleCountChange();
@@ -394,6 +419,7 @@ namespace bluebean.Physics.PBD
                     float radius = 0.1f;
                     this.m_radiusList[index] = radius;
                     this.m_aabbList[index] = new Aabb();
+                    this.m_groups[index] = actor.ActorId;
                 }
                 Debug.Log("AddActor Finish");
             }
@@ -436,6 +462,15 @@ namespace bluebean.Physics.PBD
         public int GetParticleCount()
         {
             return m_positionList.count;
+        }
+
+        public void ScheduleBatchedJobsIfNeeded()
+        {
+            if (m_scheduledJobCounter++ > 16)
+            {
+                m_scheduledJobCounter = 0;
+                JobHandle.ScheduleBatchedJobs();
+            }
         }
 
         #endregion

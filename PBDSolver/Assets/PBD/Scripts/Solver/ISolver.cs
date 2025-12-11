@@ -11,14 +11,15 @@ namespace bluebean.Physics.PBD
         float StretchConstrainCompliance { get; }
         float VolumeConstrainCompliance { get; }
 
-        #region Á£×ÓÊı¾İ»ñÈ¡½Ó¿Ú
+        #region ç²’å­æ•°æ®è·å–æ¥å£
         NativeArray<float> ParticleRadius { get; }
         NativeArray<float4> ParticlePositions { get; }
         NativeArray<float4> PrevParticlePositions { get; }
         NativeArray<float4> ParticleVels { get; }
         public NativeArray<BurstAabb> ParticleAabb { get; }
-        //Ã¿¸öÁ£×ÓµÄÍø¸ñ×ø±ê
+        //æ¯ä¸ªç²’å­çš„ç½‘æ ¼åæ ‡
         public NativeArray<int4> CellCoords { get; }
+        public NativeArray<int> Groups { get; }
         NativeArray<float4> ParticleProperties { get; }
         NativeArray<float4> ExternalForces { get; }
         NativeArray<float> InvMasses { get; }
@@ -29,6 +30,10 @@ namespace bluebean.Physics.PBD
         NativeArray<int> PositionConstraintCounts { get; }
         NativeArray<BurstContact> ColliderContacts { get; }
 
+        NativeArray<BurstContact> ParticleContacts { get; }
+
+        Vector3 Gravity { get; }
+
         void AddActor(PBDActor actor);
 
         Vector3 GetParticlePosition(int particleIndex);
@@ -38,5 +43,7 @@ namespace bluebean.Physics.PBD
         void PushStretchConstrain(StretchConstrainData stretchConstrainData);
 
         void PushVolumeConstrain(VolumeConstrainData volumeConstrainData);
+
+        void ScheduleBatchedJobsIfNeeded();
     }
 }

@@ -7,12 +7,12 @@ using Unity.Mathematics;
 namespace bluebean.Physics.PBD
 {
     /// <summary>
-    /// ¸ù¾İÁ£×ÓËÙ¶È£¬deltaTimeµÈ¸üĞÂÕâÒ»Ö¡ÄÚÁ£×ÓµÄ¿ÉÄÜ»î¶¯·¶Î§
+    /// æ ¹æ®ç²’å­é€Ÿåº¦ï¼ŒdeltaTimeç­‰æ›´æ–°è¿™ä¸€å¸§å†…ç²’å­çš„å¯èƒ½æ´»åŠ¨èŒƒå›´
     /// </summary>
     [BurstCompile]
     public struct BuildParticleAabbsJob : IJobParallelFor
     {
-        //ÊäÈë
+        //è¾“å…¥
         [ReadOnly] public NativeArray<float> radii;
         [ReadOnly] public NativeArray<float4> positions;
         [ReadOnly] public NativeArray<float4> velocities;
@@ -20,7 +20,7 @@ namespace bluebean.Physics.PBD
         [ReadOnly] public float continuousCollisionDetection;
         [ReadOnly] public float dt;
 
-        //Êä³ö
+        //è¾“å‡º
         public NativeArray<BurstAabb> simplexBounds;
 
         public void Execute(int i)

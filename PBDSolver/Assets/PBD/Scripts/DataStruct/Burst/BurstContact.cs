@@ -148,7 +148,7 @@ namespace bluebean.Physics.PBD.DataStruct
         }
 
         /// <summary>
-        /// ·µ»Ø³åÁ¿´óĞ¡
+        /// è¿”å›å†²é‡å¤§å°
         /// </summary>
         /// <param name="posA"></param>
         /// <param name="posB"></param>
@@ -159,16 +159,16 @@ namespace bluebean.Physics.PBD.DataStruct
 
             if (TotalNormalInvMass <= 0)
                 return 0;
-            //´©Ô½Ê±Îª¸ºÖµ
+            //ç©¿è¶Šæ—¶ä¸ºè´Ÿå€¼
             //project position delta to normal vector:
             distance = math.dot(posA - posB, normal);
-            //¸ù¾İËÙ¶ÈÏŞÖÆ£¬ÕâÒ»Ö¡½áÊøÊ±£¬´©Í¸¾àÀëÓ¦¸Ã´¦ÓÚµÄÖµ
+            //æ ¹æ®é€Ÿåº¦é™åˆ¶ï¼Œè¿™ä¸€å¸§ç»“æŸæ—¶ï¼Œç©¿é€è·ç¦»åº”è¯¥å¤„äºçš„å€¼
             // calculate max projection distance based on depenetration velocity:
             float maxProjection = math.max(-distance - maxDepenetrationDelta, 0);
-            //¼ÆËãÒ»Ö¡ÄÚ¸Ä±äÎ»ÖÃĞèÒªµÄ³åÁ¿´óĞ¡
+            //è®¡ç®—ä¸€å¸§å†…æ”¹å˜ä½ç½®éœ€è¦çš„å†²é‡å¤§å°
             // calculate lambda multiplier:
-            //TotalNormalInvMassÊÇÅö×²Ê±Á½¸öÎïÌå·ÖÅä³åÁ¿´óĞ¡Ê±µÄ¹«¹²·ÖÄ¸£¬
-            //ÖÊÁ¿´óµÄÎ»ÖÃ±ä»¯Ğ¡£¬ÖÊÁ¿Ğ¡µÄ±ä»¯´ó
+            //TotalNormalInvMassæ˜¯ç¢°æ’æ—¶ä¸¤ä¸ªç‰©ä½“åˆ†é…å†²é‡å¤§å°æ—¶çš„å…¬å…±åˆ†æ¯ï¼Œ
+            //è´¨é‡å¤§çš„ä½ç½®å˜åŒ–å°ï¼Œè´¨é‡å°çš„å˜åŒ–å¤§
             float dlambda = -(distance + maxProjection) / TotalNormalInvMass;
 
             // accumulate lambda:

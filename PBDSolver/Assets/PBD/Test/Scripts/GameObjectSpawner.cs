@@ -3,24 +3,24 @@ using UnityEngine;
 
 public class GameObjectSpawner : MonoBehaviour
 {
-    [Header("Éú³ÉÉèÖÃ")]
-    [Tooltip("½«ÒªÊµÀı»¯µÄPrefab")]
+    [Header("ç”Ÿæˆè®¾ç½®")]
+    [Tooltip("å°†è¦å®ä¾‹åŒ–çš„Prefab")]
     public GameObject prefabToSpawn;
 
-    [Tooltip("Éú³ÉÎ»ÖÃµÄÆ«ÒÆÁ¿£¨Ïà¶ÔÓÚµ±Ç°¶ÔÏóÎ»ÖÃ£©")]
+    [Tooltip("ç”Ÿæˆä½ç½®çš„åç§»é‡ï¼ˆç›¸å¯¹äºå½“å‰å¯¹è±¡ä½ç½®ï¼‰")]
     public Vector3 spawnOffset = Vector3.zero;
 
-    [Tooltip("ÊÇ·ñÊ¹ÓÃµ±Ç°¶ÔÏóµÄĞı×ª")]
+    [Tooltip("æ˜¯å¦ä½¿ç”¨å½“å‰å¯¹è±¡çš„æ—‹è½¬")]
     public bool useCurrentRotation = true;
 
-    [Tooltip("Éú³ÉµÄÎïÌåÊÇ·ñ×÷Îª×Ó¶ÔÏó")]
+    [Tooltip("ç”Ÿæˆçš„ç‰©ä½“æ˜¯å¦ä½œä¸ºå­å¯¹è±¡")]
     public bool asChild = true;
 
-    [Tooltip("Ã¿Ãë×î´óÉú³É´ÎÊı£¨·ÀÖ¹Á¬µã£©")]
+    [Tooltip("æ¯ç§’æœ€å¤§ç”Ÿæˆæ¬¡æ•°ï¼ˆé˜²æ­¢è¿ç‚¹ï¼‰")]
     public float maxSpawnRate = 10f;
 
-    [Header("µ÷ÊÔ")]
-    [Tooltip("Éú³ÉÊ±ÊÇ·ñÏÔÊ¾µ÷ÊÔĞÅÏ¢")]
+    [Header("è°ƒè¯•")]
+    [Tooltip("ç”Ÿæˆæ—¶æ˜¯å¦æ˜¾ç¤ºè°ƒè¯•ä¿¡æ¯")]
     public bool showDebugLog = true;
 
     private float lastSpawnTime = 0f;
@@ -29,13 +29,13 @@ public class GameObjectSpawner : MonoBehaviour
 
     void Update()
     {
-        // ¼ì²â¿Õ¸ñ¼ü°´ÏÂ
+        // æ£€æµ‹ç©ºæ ¼é”®æŒ‰ä¸‹
         if (Input.GetKeyDown(KeyCode.Space))
         {
             TrySpawnPrefab();
         }
 
-        // ¿ÉÑ¡£º°´×¡¿Õ¸ñÁ¬ĞøÉú³É
+        // å¯é€‰ï¼šæŒ‰ä½ç©ºæ ¼è¿ç»­ç”Ÿæˆ
         // if (Input.GetKey(KeyCode.Space))
         // {
         //     TrySpawnPrefab();
@@ -44,59 +44,59 @@ public class GameObjectSpawner : MonoBehaviour
 
     void TrySpawnPrefab()
     {
-        // ¼ì²éPrefabÊÇ·ñÒÑ¸³Öµ
+        // æ£€æŸ¥Prefabæ˜¯å¦å·²èµ‹å€¼
         if (prefabToSpawn == null)
         {
-            Debug.LogWarning("ÇëÏÈÎªGameObjectSpawnerµÄprefabToSpawn±äÁ¿¸³Öµ£¡");
+            Debug.LogWarning("è¯·å…ˆä¸ºGameObjectSpawnerçš„prefabToSpawnå˜é‡èµ‹å€¼ï¼");
             return;
         }
 
-        // ¼ì²éÉú³ÉÆµÂÊÏŞÖÆ
+        // æ£€æŸ¥ç”Ÿæˆé¢‘ç‡é™åˆ¶
         if (Time.time - lastSpawnTime < 1f / maxSpawnRate)
         {
             return;
         }
 
-        // ÊµÀı»¯Prefab
+        // å®ä¾‹åŒ–Prefab
         SpawnPrefab();
     }
 
     void SpawnPrefab()
     {
-        // ¼ÆËãÉú³ÉÎ»ÖÃºÍĞı×ª
+        // è®¡ç®—ç”Ÿæˆä½ç½®å’Œæ—‹è½¬
         Vector3 spawnPosition = transform.position + spawnOffset;
         Quaternion spawnRotation = useCurrentRotation ? transform.rotation : prefabToSpawn.transform.rotation;
 
-        // ÊµÀı»¯¶ÔÏó
+        // å®ä¾‹åŒ–å¯¹è±¡
         GameObject spawnedObject = Instantiate(prefabToSpawn, spawnPosition, spawnRotation);
         var actor = spawnedObject.GetComponent<PBDActor>();
         if (actor != null)
         {
             actor.m_actorId = m_id++;
         }
-        // ÉèÖÃ¸¸¶ÔÏó
+        // è®¾ç½®çˆ¶å¯¹è±¡
         if (asChild)
         {
             spawnedObject.transform.SetParent(transform);
         }
 
-        // ¼ÇÂ¼Éú³ÉÊ±¼ä
+        // è®°å½•ç”Ÿæˆæ—¶é—´
         lastSpawnTime = Time.time;
 
-        // µ÷ÊÔĞÅÏ¢
+        // è°ƒè¯•ä¿¡æ¯
         if (showDebugLog)
         {
-            Debug.Log($"ÒÑÉú³ÉPrefab: {prefabToSpawn.name}£¬Î»ÖÃ: {spawnPosition}£¬¸¸¶ÔÏó: {transform.name}");
+            Debug.Log($"å·²ç”ŸæˆPrefab: {prefabToSpawn.name}ï¼Œä½ç½®: {spawnPosition}ï¼Œçˆ¶å¯¹è±¡: {transform.name}");
         }
     }
 
-    // ¿ÉÑ¡£ºÌá¹©¹«¹²·½·¨¹©ÆäËû½Å±¾µ÷ÓÃ
+    // å¯é€‰ï¼šæä¾›å…¬å…±æ–¹æ³•ä¾›å…¶ä»–è„šæœ¬è°ƒç”¨
     public void Spawn()
     {
         TrySpawnPrefab();
     }
 
-    // ÔÚ³¡¾°ÊÓÍ¼ÖĞÏÔÊ¾Éú³ÉÇøÓò£¨µ÷ÊÔÓÃ£©
+    // åœ¨åœºæ™¯è§†å›¾ä¸­æ˜¾ç¤ºç”ŸæˆåŒºåŸŸï¼ˆè°ƒè¯•ç”¨ï¼‰
     void OnDrawGizmosSelected()
     {
         if (enabled)

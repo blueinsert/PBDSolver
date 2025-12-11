@@ -11,7 +11,7 @@ using System.Linq;
 namespace bluebean.Physics.PBD
 {
     /// <summary>
-    /// Á£×ÓÖ®¼äÅö×²Ïà¹Ø
+    /// ç²’å­ä¹‹é—´ç¢°æ’ç›¸å…³
     /// </summary>
     public class ParticleGrid : IDisposable
     {
@@ -59,14 +59,14 @@ namespace bluebean.Physics.PBD
                 invMasses = solver.InvMasses,
                 radii = solver.ParticleRadius,
                 //normals = solver.nor,
-
+                groups = solver.Groups,
                 simplexBounds = solver.ParticleAabb,
 
 
                 contactsQueue = m_particleContactQueue.AsParallelWriter(),
                 dt = deltaTime,
 
-                //todo È·ÈÏÊıÖµ
+                //todo ç¡®è®¤æ•°å€¼
                 collisionMargin = 0.1f,
                 optimizationIterations = 13,
                 optimizationTolerance = 1,

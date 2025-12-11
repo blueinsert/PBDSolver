@@ -10,18 +10,19 @@ namespace bluebean.Physics.PBD
     [BurstCompile]
     public struct ParticleCollisionConstraintsBatchJob : IJobParallelFor
     {
+        // ‰»Î
         [ReadOnly] public NativeArray<float> invMasses;
-        [ReadOnly] public NativeArray<float4> radii;
+        [ReadOnly] public NativeArray<float> radii;
+        [ReadOnly] public float4 gravity;
+        [ReadOnly] public float substepTime;
+        [NativeDisableContainerSafetyRestriction][NativeDisableParallelForRestriction] public NativeArray<BurstContact> contacts;
+        [ReadOnly] public BatchData batchData;
 
+        // ‰≥ˆ
         [NativeDisableContainerSafetyRestriction][NativeDisableParallelForRestriction] public NativeArray<float4> positions;
         [NativeDisableContainerSafetyRestriction][NativeDisableParallelForRestriction] public NativeArray<float4> deltas;
         [NativeDisableContainerSafetyRestriction][NativeDisableParallelForRestriction] public NativeArray<int> counts;
-        [NativeDisableContainerSafetyRestriction][NativeDisableParallelForRestriction] public NativeArray<BurstContact> contacts;
 
-        [ReadOnly] public float4 gravity;
-        [ReadOnly] public float substepTime;
-
-        [ReadOnly] public BatchData batchData;
 
         public void Execute(int workItemIndex)
         {

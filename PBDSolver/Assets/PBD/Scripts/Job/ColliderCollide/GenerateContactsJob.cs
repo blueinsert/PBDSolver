@@ -8,7 +8,7 @@ using Unity.Mathematics;
 namespace bluebean.Physics.PBD
 {
     /// <summary>
-    /// ¶ÔÓÚÃ¿¸öÁ£×ÓÓë»·¾³Åö×²ÌåÅĞ¶ÏÅö×²£¬²úÉú½Ó´¥Êı¾İ
+    /// å¯¹äºæ¯ä¸ªç²’å­ä¸ç¯å¢ƒç¢°æ’ä½“åˆ¤æ–­ç¢°æ’ï¼Œäº§ç”Ÿæ¥è§¦æ•°æ®
     /// </summary>
     [BurstCompile]
     unsafe struct GenerateContactsJob : IJobParallelFor
@@ -48,20 +48,20 @@ namespace bluebean.Physics.PBD
         {
             BurstAabb particleBound = particleBounds[i];//world space
 
-            //ÔÚ¶àÖØÍø¸ñÖĞ²éÕÒ¿ÉÄÜÓëÁ£×ÓiÅö×²µÄÅö×²Ìå£¬²¢¼ÓÈëºòÑ¡¼¯ÖĞ
+            //åœ¨å¤šé‡ç½‘æ ¼ä¸­æŸ¥æ‰¾å¯èƒ½ä¸ç²’å­iç¢°æ’çš„ç¢°æ’ä½“ï¼Œå¹¶åŠ å…¥å€™é€‰é›†ä¸­
             Unity.Collections.NativeList<int> candidates = new Unity.Collections.NativeList<int>(16, Allocator.Temp);
 
             // max size of the particle bounds in cells:
             int3 maxSize = new int3(10,10,10);
-            //±éÀúµ±Ç°multiGridÖĞµÄËùÓĞlevel
+            //éå†å½“å‰multiGridä¸­çš„æ‰€æœ‰level
             for (int l = 0; l < gridLevels.Length; ++l)
             {
                 float cellSize = NativeMultilevelGrid<int>.CellSizeOfLevel(gridLevels[l]);
-                //Á£×ÓboundµÄ¸²¸Ç·¶Î§, ×ªÎª¸ÃlevelÏÂµÄÍø¸ñ×ø±ê
+                //ç²’å­boundçš„è¦†ç›–èŒƒå›´, è½¬ä¸ºè¯¥levelä¸‹çš„ç½‘æ ¼åæ ‡
                 int3 minCell = GridHash.Quantize(particleBound.min.xyz, cellSize);
                 int3 maxCell = GridHash.Quantize(particleBound.max.xyz, cellSize);
                 maxCell = minCell + math.min(maxCell - minCell, maxSize);
-                //²éÕÒ¸Ã·¶Î§ÄÚµÄËùÓĞ¸ñ×ÓÖĞ´æ·ÅµÄcollider id,×÷Îª¿ÉÄÜÅö×²µÄºòÑ¡¼¯
+                //æŸ¥æ‰¾è¯¥èŒƒå›´å†…çš„æ‰€æœ‰æ ¼å­ä¸­å­˜æ”¾çš„collider id,ä½œä¸ºå¯èƒ½ç¢°æ’çš„å€™é€‰é›†
                 for (int x = minCell[0]; x <= maxCell[0]; ++x)
                 {
                     for (int y = minCell[1]; y <= maxCell[1]; ++y)
@@ -84,7 +84,7 @@ namespace bluebean.Physics.PBD
                 NativeArray<int> uniqueCandidates = candidates.AsArray();
                 uniqueCandidates.Sort();
                 int uniqueCount = uniqueCandidates.Unique();
-                //±éÀúºòÑ¡¼¯ÖĞÃ¿¸öcollider£¬ºÍÁ£×Ó×ö¾ßÌåµÄÅö×²¼ì²â
+                //éå†å€™é€‰é›†ä¸­æ¯ä¸ªcolliderï¼Œå’Œç²’å­åšå…·ä½“çš„ç¢°æ’æ£€æµ‹
                 for (int k = 0; k < uniqueCount; ++k)
                 {
                     int colliderId = uniqueCandidates[k];
@@ -100,7 +100,7 @@ namespace bluebean.Physics.PBD
 
                         if (particleBound.IntersectsAabb(in colliderBound))
                         {
-                            //narrow phase, ¸üÏ¸ÖÂ¼¶±ğµÄÅö×²¼ì²â
+                            //narrow phase, æ›´ç»†è‡´çº§åˆ«çš„ç¢°æ’æ£€æµ‹
                             BurstAffineTransform colliderToWorldTransform = colliderTransforms[colliderId];
                             GenerateContacts(in shape, in colliderToWorldTransform, colliderId, i, particleBound);
                         }
@@ -110,7 +110,7 @@ namespace bluebean.Physics.PBD
         }
 
         /// <summary>
-        /// Ï¸ÖÂµÄ¼¸ºÎ¼¶±ğµÄÅö×²Õì²â
+        /// ç»†è‡´çš„å‡ ä½•çº§åˆ«çš„ç¢°æ’ä¾¦æµ‹
         /// </summary>
         /// <param name="colliderShape"></param>
         /// <param name="colliderToWorldTransform"></param>

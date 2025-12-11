@@ -15,7 +15,7 @@ namespace bluebean.Physics.PBD.DataStruct
         public static readonly float golden = (math.sqrt(5.0f) + 1) / 2.0f;
 
         /// <summary>
-        /// ¼ÆËãËÄÃæÌåÌå»ı
+        /// è®¡ç®—å››é¢ä½“ä½“ç§¯
         /// </summary>
         /// <param name="p1"></param>
         /// <param name="p2"></param>

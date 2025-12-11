@@ -8,32 +8,32 @@ using Unity.Mathematics;
 namespace bluebean.Physics.PBD
 {
     /// <summary>
-    /// ±êÊ¶ÒÆ¶¯µÄÅö×²Ìå£¬
-    /// ÒÆ¶¯µÄÅö×²Ìå²ÅĞèÒª¸üĞÂËùÔÚÍø¸ñ
+    /// æ ‡è¯†ç§»åŠ¨çš„ç¢°æ’ä½“ï¼Œ
+    /// ç§»åŠ¨çš„ç¢°æ’ä½“æ‰éœ€è¦æ›´æ–°æ‰€åœ¨ç½‘æ ¼
     /// </summary>
     [BurstCompile]
     public struct IdentifyMovingCollidersJob : IJobParallelFor
     {
-        //ÊäÈë
+        //è¾“å…¥
         [ReadOnly] public NativeArray<BurstColliderShape> shapes;
         //[ReadOnly] public NativeArray<BurstRigidbody> rigidbodies;
         //[ReadOnly] public NativeArray<BurstCollisionMaterial> collisionMaterials;
         /// <summary>
-        /// Åö×²ÌåAabb,ÊÀ½ç×ø±ê
+        /// ç¢°æ’ä½“Aabb,ä¸–ç•Œåæ ‡
         /// </summary>
         [ReadOnly] public NativeArray<BurstAabb> bounds;
         //[ReadOnly] public int colliderCount;
         [ReadOnly] public float dt;
 
-        //Êä³ö
+        //è¾“å‡º
         /// <summary>
-        /// ÒÆ¶¯ÁËµÄÅö×²ÌåÊı¾İ
+        /// ç§»åŠ¨äº†çš„ç¢°æ’ä½“æ•°æ®
         /// </summary>
         [WriteOnly]
         [NativeDisableParallelForRestriction]
         public NativeQueue<MovingCollider>.ParallelWriter movingColliders;
         /// <summary>
-        /// Åö×²ÌåĞÂµÄcellSpan
+        /// ç¢°æ’ä½“æ–°çš„cellSpan
         /// </summary>
         public NativeArray<BurstCellSpan> colliderCellSpans;
 
@@ -52,12 +52,12 @@ namespace bluebean.Physics.PBD
             //if (shapes[i].materialIndex >= 0)
             //    velocityBounds.Expand(collisionMaterials[shapes[i].materialIndex].stickDistance);
 
-            //¼ÆËãÔÚ¶àÖØÍø¸ñÖĞµÄ¸ñ×ÓlevelºÍsize
+            //è®¡ç®—åœ¨å¤šé‡ç½‘æ ¼ä¸­çš„æ ¼å­levelå’Œsize
             float size = velocityBounds.AverageAxisLength();
             int level = NativeMultilevelGrid<int>.GridLevelForSize(size);
             float cellSize = NativeMultilevelGrid<int>.CellSizeOfLevel(level);
 
-            //¼ÆËãcolliderµÄaabbÔÚ¶ÔÓ¦levelÏÂµÄÍø¸ñ×ø±ê·¶Î§
+            //è®¡ç®—colliderçš„aabbåœ¨å¯¹åº”levelä¸‹çš„ç½‘æ ¼åæ ‡èŒƒå›´
             BurstCellSpan newSpan = new BurstCellSpan(new int4(GridHash.Quantize(velocityBounds.min.xyz, cellSize), level),
                                                       new int4(GridHash.Quantize(velocityBounds.max.xyz, cellSize), level));
 

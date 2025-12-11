@@ -5,6 +5,14 @@ namespace bluebean.Physics.PBD
     public abstract class ConstrainGroup
     {
 
+        public ISolver Solver
+        {
+            get
+            {
+                return m_solver;
+            }
+        }
+
         protected ConstrainType m_constrainType;
         protected ISolver m_solver;
 
@@ -14,6 +22,11 @@ namespace bluebean.Physics.PBD
         {
             m_constrainType = type;
             m_solver = solver;
+        }
+
+        public virtual JobHandle Initialize(JobHandle inputDeps, float substepTime)
+        {
+            return inputDeps;
         }
 
         public abstract JobHandle Solve(JobHandle inputDeps, float stepTime, float substepTime, int substeps);

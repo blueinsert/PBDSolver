@@ -12,7 +12,7 @@ namespace bluebean.Physics.PBD
     {
         [ReadOnly] public NativeArray<float4> prevPositions;
         [ReadOnly] public NativeArray<float4> velocities;
-        [ReadOnly] public NativeArray<float4> radii;
+        [ReadOnly] public NativeArray<float> radii;
         [ReadOnly] public NativeArray<float> invMasses;
 
         [NativeDisableContainerSafetyRestriction][NativeDisableParallelForRestriction] public NativeArray<BurstContact> contacts;

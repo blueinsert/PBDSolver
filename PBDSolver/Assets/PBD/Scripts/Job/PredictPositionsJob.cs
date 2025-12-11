@@ -5,10 +5,10 @@ using Unity.Jobs;
 using Unity.Mathematics;
 
 /// <summary>
-/// ¸üĞÂdeltaTimeÊ±¼äÄÚ·¢ÉúµÄËÙ¶È±ä»¯ºÍÎ»ÖÃ±ä»¯£¬
-/// ¸ù¾İÔË¶¯Ñ§¹«Ê½,ÏÔÊ½Å·À­·¨£º
-/// v += a*dt£»
-/// p += v*dt£»
+/// æ›´æ–°deltaTimeæ—¶é—´å†…å‘ç”Ÿçš„é€Ÿåº¦å˜åŒ–å’Œä½ç½®å˜åŒ–ï¼Œ
+/// æ ¹æ®è¿åŠ¨å­¦å…¬å¼,æ˜¾å¼æ¬§æ‹‰æ³•ï¼š
+/// v += a*dtï¼›
+/// p += v*dtï¼›
 /// </summary>
 [BurstCompile]
 struct PredictPositionsJob : IJobParallelFor

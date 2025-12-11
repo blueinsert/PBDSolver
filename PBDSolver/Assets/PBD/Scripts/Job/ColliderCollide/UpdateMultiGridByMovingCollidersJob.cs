@@ -6,8 +6,8 @@ using Unity.Jobs;
 namespace bluebean.Physics.PBD
 {
     /// <summary>
-    /// 更新Collider的空间划分，使用MultiGrid;
-    /// 根据碰撞体的size，将其id存入对应level的、大小覆盖范围内的格子中
+    /// 鏇存柊Collider鐨勭┖闂村垝鍒嗭紝浣跨敤MultiGrid;
+    /// 鏍规嵁纰版挒浣撶殑size锛屽皢鍏秈d瀛樺叆瀵瑰簲level鐨勩�佸ぇ灏忚鐩栬寖鍥村唴鐨勬牸瀛愪腑
     /// </summary>
     [BurstCompile]
     public struct UpdateMultiGridByMovingCollidersJob : IJob

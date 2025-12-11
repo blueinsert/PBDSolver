@@ -193,7 +193,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 597c1bad6b89f0345865a4702ff06430, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  contactCount: 0
+  m_contactCount: 0
+  m_particleContactCount: 0
+  m_listenColliderContact: 0
+  m_listenParticleContact: 1
 --- !u!1 &67336451
 GameObject:
   m_ObjectHideFlags: 0

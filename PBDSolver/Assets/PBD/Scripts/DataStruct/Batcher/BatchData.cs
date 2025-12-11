@@ -10,7 +10,7 @@ namespace bluebean.Physics.PBD.DataStruct
         public int constraintCount;        // amount of constraints in the batch.
         public int activeConstraintCount;  // auxiliar counter used to sort the constraints in linear time.
 
-        //Éè¼ÆÄ¿µÄÊÇÎªÁË²¢ĞĞ´¦Àí
+        //è®¾è®¡ç›®çš„æ˜¯ä¸ºäº†å¹¶è¡Œå¤„ç†
         public int workItemSize;           // size of each work item.
         public int workItemCount;          // number of work items.
         public bool isLast;
