@@ -61,6 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\PBD\Scripts\Job\ParticleCollide\CountSortPerFirstParticleJob.cs" />
+    <Compile Include="Assets\PBD\Scripts\Job\ShapeMatching\ShapeMatchingCalculateRestJob.cs" />
     <Compile Include="Assets\PBD\Scripts\Constrains\ConstrainData.cs" />
     <Compile Include="Assets\PBD\Scripts\Job\ParticleCollide\ApplyBatchedCollisionConstraintsBatchJob.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\SurfacePoint.cs" />
@@ -68,9 +69,11 @@
     <Compile Include="Assets\PBD\Scripts\DataStruct\BVH\BIHNode.cs" />
     <Compile Include="Assets\PBD\Scripts\Actor\BunnyTetMeshImpl.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\SDF\DFNode.cs" />
+    <Compile Include="Assets\PBD\Scripts\Constrains\ShapeMatchingContrainsBatch.cs" />
     <Compile Include="Assets\PBD\Scripts\Constrains\StretchConstrainGroup.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Native\NativeAffineTransformList.cs" />
     <Compile Include="Assets\PBD\Scripts\Job\ColliderCollide\ApplyCollisionConstraintsJob.cs" />
+    <Compile Include="Assets\PBD\Scripts\DataStruct\Native\NativeQuaternionList.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\ColliderShape.cs" />
     <Compile Include="Assets\PBD\Scripts\Job\Constrains\StretchConstrainApplyJob.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Native\NativeInt3List.cs" />
@@ -116,6 +119,7 @@
     <Compile Include="Assets\PBD\Scripts\Actor\BunnyMeshData.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Burst\BurstAabb.cs" />
     <Compile Include="Assets\PBD\Scripts\Constrains\ConstrainType.cs" />
+    <Compile Include="Assets\PBD\Scripts\Constrains\ShapeMatchingConstrainGroup.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Native\NativeVector3List.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Burst\BurstAffineTransform.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\AffineTransform.cs" />
@@ -153,10 +157,12 @@
     <Compile Include="Assets\PBD\Scripts\Job\UpdateVelJob.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Native\NativeFloatList.cs" />
     <Compile Include="Assets\PBD\Scripts\Job\ParticleCollide\BatchContactsJob.cs" />
+    <Compile Include="Assets\PBD\Scripts\DataStruct\Native\NativeMatrix4x4List.cs" />
     <Compile Include="Assets\PBD\Scripts\Util\PBDUtil.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Native\NativeVector2List.cs" />
     <Compile Include="Assets\PBD\Scripts\Solver\PBDSolver_Collide.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Burst\BurstMath.cs" />
+    <Compile Include="Assets\PBD\Scripts\Job\ShapeMatching\ApplyShapeMatchingConstraintsBatchJob.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Native\NativeIntList.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Native\NativeCellSpanList.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\VectorInt4.cs" />
@@ -166,6 +172,7 @@
     <Compile Include="Assets\PBD\Scripts\Constrains\ParticleCollisionConstraintsBatch.cs" />
     <Compile Include="Assets\PBD\Scripts\Job\ColliderCollide\UpdateMultiGridByMovingCollidersJob.cs" />
     <Compile Include="Assets\PBD\Scripts\Job\ColliderCollide\IdentifyMovingCollidersJob.cs" />
+    <Compile Include="Assets\PBD\Scripts\Job\ShapeMatching\ShapeMatchingConstraintsBatchJob.cs" />
     <Compile Include="Assets\PBD\Scripts\Utils\FPS.cs" />
     <Compile Include="Assets\PBD\Test\Scripts\GameObjectSpawner.cs" />
   </ItemGroup>

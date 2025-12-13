@@ -9,6 +9,7 @@ namespace bluebean.Physics.PBD
         ParticleCollide,
         Volume,
         Stretch,
+        ShapeMatching,
 
         Max,
     }
