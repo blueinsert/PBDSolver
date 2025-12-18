@@ -5,6 +5,8 @@ namespace bluebean.Physics.PBD
 
     public abstract class PBDActor : MonoBehaviour
     {
+        private static int m_idGenerater;
+
         public int m_actorId;
         public int ActorId { get { return m_actorId; } }
 
@@ -16,6 +18,11 @@ namespace bluebean.Physics.PBD
 
         protected ISolver m_solver = null;
 
+        protected int GetNewId()
+        {
+            return m_idGenerater++;
+        }
+
         public abstract int GetParticleCount();
 
         public abstract Vector3 GetParticleInitPosition(int particleIndex);
@@ -25,6 +32,7 @@ namespace bluebean.Physics.PBD
         public virtual void Initialize()
         {
             m_solver = GetComponentInParent<ISolver>();
+            m_actorId = GetNewId();
         }
 
         public virtual void OnPreSubStep(float dt, Vector3 g)

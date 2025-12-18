@@ -23,16 +23,25 @@ namespace bluebean.Physics.PBD
 
         protected bool m_Enabled = true;
 
+        private NativeIntList particleIndexList = new NativeIntList();
+        private NativeIntList firstIndexList = new NativeIntList();
+        private NativeIntList numIndexList = new NativeIntList();
+        private NativeFloatList shapeMaterialParameterList = new NativeFloatList();
+        private NativeVector4List restComList = new NativeVector4List();
+        private NativeVector4List comList = new NativeVector4List();
+        private NativeQuaternionList constraintOrientationList = new NativeQuaternionList();
+        private NativeMatrix4x4List aqqList = new NativeMatrix4x4List();
+        private NativeMatrix4x4List linearTransformList = new NativeMatrix4x4List();
+        private NativeMatrix4x4List plasticDeformationList = new NativeMatrix4x4List();
+
         private int m_ConstraintCount = 0;
         private NativeArray<int> particleIndices;
-
         private NativeArray<int> firstIndex;
         private NativeArray<int> numIndices;
         private NativeArray<float> shapeMaterialParameters;
         private NativeArray<float4> restComs;
         private NativeArray<float4> coms;
         private NativeArray<quaternion> constraintOrientations;
-
         private NativeArray<float4x4> Aqq;
         private NativeArray<float4x4> linearTransforms;
         private NativeArray<float4x4> plasticDeformations;
@@ -42,33 +51,38 @@ namespace bluebean.Physics.PBD
             m_owner = owner;
         }
 
-        public void SetShapeMatchingConstraints(NativeIntList particleIndices,
-                                               NativeIntList firstIndex,
-                                               NativeIntList numIndices,
-                                               NativeFloatList shapeMaterialParameters,
-                                               NativeVector4List restComs,
-                                               NativeVector4List coms,
-                                               NativeQuaternionList constraintOrientations,
-                                               NativeMatrix4x4List linearTransforms,
-                                               NativeMatrix4x4List plasticDeformations,
-                                               int count)
+        public void AddConstrain(List<int> particles)
         {
-            this.particleIndices = particleIndices.AsNativeArray<int>();
-            this.firstIndex = firstIndex.AsNativeArray<int>();
-            this.numIndices = numIndices.AsNativeArray<int>();
-            this.shapeMaterialParameters = shapeMaterialParameters.AsNativeArray<float>();
-            this.restComs = restComs.AsNativeArray<float4>();
-            this.coms = coms.AsNativeArray<float4>();
-            this.constraintOrientations = constraintOrientations.AsNativeArray<quaternion>();
-            this.linearTransforms = linearTransforms.AsNativeArray<float4x4>();
-            this.plasticDeformations = plasticDeformations.AsNativeArray<float4x4>();
+            firstIndexList.Add(particleIndexList.count);
+            particleIndexList.AddRange(particles);
+            numIndexList.Add(particles.Count);
+            shapeMaterialParameterList.Add(0);
+            shapeMaterialParameterList.Add(0);
+            shapeMaterialParameterList.Add(0);
+            shapeMaterialParameterList.Add(0);
+            restComList.Add(new Vector4(0,0,0,0));
+            comList.Add(new Vector4(0, 0, 0, 0));
+            constraintOrientationList.Add(Quaternion.identity);
+            aqqList.Add(Matrix4x4.identity);
+            linearTransformList.Add(Matrix4x4.identity);
+            plasticDeformationList.Add(Matrix4x4.identity);
+            m_ConstraintCount++;
 
-            if (Aqq.IsCreated)
-                Aqq.Dispose();
+            OnConstrainCountChanged();
+        }
 
-            Aqq = new NativeArray<float4x4>(count, Allocator.Persistent);
-
-            m_ConstraintCount = count;
+        private void OnConstrainCountChanged()
+        {
+            particleIndices = particleIndexList.AsNativeArray<int>();
+            firstIndex = firstIndexList.AsNativeArray<int>();
+            numIndices = numIndexList.AsNativeArray<int>();
+            shapeMaterialParameters = shapeMaterialParameterList.AsNativeArray<float>();
+            restComs = restComList.AsNativeArray<float4>();
+            coms = comList.AsNativeArray<float4>();
+            constraintOrientations = constraintOrientationList.AsNativeArray<quaternion>();
+            Aqq = aqqList.AsNativeArray<float4x4>();
+            linearTransforms = linearTransformList.AsNativeArray<float4x4>();
+            plasticDeformations = plasticDeformationList.AsNativeArray<float4x4>();
         }
 
         public  JobHandle Initialize(JobHandle inputDeps, float substepTime)
@@ -123,6 +137,27 @@ namespace bluebean.Physics.PBD
             };
 
             return applyConstraints.Schedule(m_ConstraintCount, 8, inputDeps);
+        }
+
+
+        public void CalculateRestShapeMatching()
+        {
+
+            var calculateRest = new ShapeMatchingCalculateRestJob()
+            {
+                particleIndices = particleIndices,
+                firstIndex = firstIndex,
+                numIndices = numIndices,
+                restComs = restComs,
+                coms = coms,
+                Aqq = Aqq,
+                deformation = plasticDeformations,
+
+                restPositions = m_owner.Solver.ParticlePositions,
+                invMasses = m_owner.Solver.InvMasses,
+            };
+
+            calculateRest.Schedule(numIndices.Length, 64).Complete();
         }
     }
 }

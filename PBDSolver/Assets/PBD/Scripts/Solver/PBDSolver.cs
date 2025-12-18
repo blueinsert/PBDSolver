@@ -258,14 +258,20 @@ namespace bluebean.Physics.PBD
             var end = (int)ConstrainType.Max;
             for (int i = start; i < end; i++)
             {
-                var constrain = m_constrains[i];
-                handle = constrain.Initialize(handle, substepTime);
+                if (m_constrains.ContainsKey(i))
+                {
+                    var constrain = m_constrains[i];
+                    handle = constrain.Initialize(handle, substepTime);
+                }
             }
             for (int i = start; i < end; i++)
             {
-                var constrain = m_constrains[i];
-                handle = constrain.Solve(handle, stepTime, substepTime, substeps);
-                handle = constrain.Apply(handle, substepTime);
+                if (m_constrains.ContainsKey(i))
+                {
+                    var constrain = m_constrains[i];
+                    handle = constrain.Solve(handle, stepTime, substepTime, substeps);
+                    handle = constrain.Apply(handle, substepTime);
+                }         
             }
             //3.更新速度
             var updateVel = new UpdateVelJob()
@@ -325,6 +331,7 @@ namespace bluebean.Physics.PBD
             m_constrains[(int)ConstrainType.ParticleCollide] = new ParticleCollideConstrainGroup(this);
             m_constrains[(int)ConstrainType.Stretch] = new StretchConstrainGroup(this);
             m_constrains[(int)ConstrainType.Volume] = new VolumeConstrainGroup(this);
+            //m_constrains[(int)ConstrainType.ShapeMatching] = new ShapeMatchingConstrainGroup(this);
         }
 
         private void OnParticleCountChange()
@@ -456,6 +463,21 @@ namespace bluebean.Physics.PBD
             var p3 = actor.m_particleIndicesInSolver[volumeConstrainData.m_tet.z];
             var p4 = actor.m_particleIndicesInSolver[volumeConstrainData.m_tet.w];
             constrainGroup.AddConstrain(new VectorInt4(p1, p2, p3, p4), volumeConstrainData.m_restVolume, 0);
+        }
+
+        public void PushShapeMatchingConstrain(ShapeMatchingConstrainData constrainData)
+        {
+            if (!m_constrains.ContainsKey((int)ConstrainType.ShapeMatching))
+            {
+                Debug.LogError("ConstrainType.ShapeMatching 没有该约束");
+                return;
+            }
+            var constrainGroup = m_constrains[(int)ConstrainType.ShapeMatching] as ShapeMatchingConstrainGroup;
+            var actorId = constrainData.m_actorId;
+            var actor = m_actorDic[actorId];
+            List<int> particles = new List<int>();
+            particles.AddRange(actor.m_particleIndicesInSolver);
+            constrainGroup.AddConstrain(particles);
         }
 
         public Vector3 GetParticlePosition(int particleIndex)

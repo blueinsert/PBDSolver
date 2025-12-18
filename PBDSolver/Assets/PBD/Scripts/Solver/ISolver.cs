@@ -44,6 +44,8 @@ namespace bluebean.Physics.PBD
 
         void PushVolumeConstrain(VolumeConstrainData volumeConstrainData);
 
+        void PushShapeMatchingConstrain(ShapeMatchingConstrainData constrainData);
+
         void ScheduleBatchedJobsIfNeeded();
     }
 }

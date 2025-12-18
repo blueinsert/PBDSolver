@@ -14,6 +14,18 @@ namespace bluebean.Physics.PBD
         {
         }
 
+        public void AddConstrain(List<int> particles)
+        {
+            if(m_batches.Count == 0)
+            {
+                CreateConstraintsBatch();
+                m_batches[0].enabled = true;
+            }
+            var batch = m_batches[0];
+            batch.AddConstrain(particles);
+            batch.CalculateRestShapeMatching();
+        }
+
         public ShapeMatchingContrainsBatch CreateConstraintsBatch()
         {
             var dataBatch = new ShapeMatchingContrainsBatch(this);

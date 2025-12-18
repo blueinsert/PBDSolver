@@ -1,4 +1,6 @@
 using bluebean.Physics.PBD.DataStruct;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace bluebean.Physics.PBD
 {
@@ -16,5 +18,10 @@ namespace bluebean.Physics.PBD
         public int m_actorId;
         public VectorInt4 m_tet;
         public float m_restVolume;
+    }
+
+    public struct ShapeMatchingConstrainData
+    {
+        public int m_actorId;
     }
 }

@@ -136,6 +136,7 @@
     <Compile Include="Assets\PBD\Scripts\DataStruct\Batcher\ContactBatcher.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Burst\BurstLocalOptimization.cs" />
     <Compile Include="Assets\PBD\Scripts\Job\ParticleCollide\GenerateParticleParticleContactsJob.cs" />
+    <Compile Include="Assets\PBD\Scripts\Actor\ShapeMatchingBasedSoftBodyActor.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Native\NativeList.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\SDF\ASDF.cs" />
     <Compile Include="Assets\PBD\Scripts\Job\ColliderCollide\GenerateContactsJob.cs" />
