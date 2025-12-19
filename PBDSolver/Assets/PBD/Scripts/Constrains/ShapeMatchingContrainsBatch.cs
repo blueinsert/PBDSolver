@@ -23,16 +23,16 @@ namespace bluebean.Physics.PBD
 
         protected bool m_Enabled = true;
 
-        private NativeIntList particleIndexList = new NativeIntList();
-        private NativeIntList firstIndexList = new NativeIntList();
-        private NativeIntList numIndexList = new NativeIntList();
-        private NativeFloatList shapeMaterialParameterList = new NativeFloatList();
-        private NativeVector4List restComList = new NativeVector4List();
-        private NativeVector4List comList = new NativeVector4List();
-        private NativeQuaternionList constraintOrientationList = new NativeQuaternionList();
-        private NativeMatrix4x4List aqqList = new NativeMatrix4x4List();
-        private NativeMatrix4x4List linearTransformList = new NativeMatrix4x4List();
-        private NativeMatrix4x4List plasticDeformationList = new NativeMatrix4x4List();
+        public NativeIntList particleIndexList = new NativeIntList();
+        public NativeIntList firstIndexList = new NativeIntList();
+        public NativeIntList numIndexList = new NativeIntList();
+        public NativeFloatList shapeMaterialParameterList = new NativeFloatList();
+        public NativeVector4List restComList = new NativeVector4List();
+        public NativeVector4List comList = new NativeVector4List();
+        public NativeQuaternionList constraintOrientationList = new NativeQuaternionList();
+        public NativeMatrix4x4List aqqList = new NativeMatrix4x4List();
+        public NativeMatrix4x4List linearTransformList = new NativeMatrix4x4List();
+        public NativeMatrix4x4List plasticDeformationList = new NativeMatrix4x4List();
 
         private int m_ConstraintCount = 0;
         private NativeArray<int> particleIndices;
@@ -56,11 +56,11 @@ namespace bluebean.Physics.PBD
             firstIndexList.Add(particleIndexList.count);
             particleIndexList.AddRange(particles);
             numIndexList.Add(particles.Count);
-            shapeMaterialParameterList.Add(1f);
-            shapeMaterialParameterList.Add(0);
-            shapeMaterialParameterList.Add(0);
-            shapeMaterialParameterList.Add(0);
-            shapeMaterialParameterList.Add(0);
+            shapeMaterialParameterList.Add(0.5f);
+            shapeMaterialParameterList.Add(0.1f);
+            shapeMaterialParameterList.Add(0.1f);
+            shapeMaterialParameterList.Add(0.4f);
+            shapeMaterialParameterList.Add(0.7f);
             restComList.Add(new Vector4(0,0,0,0));
             comList.Add(new Vector4(0, 0, 0, 0));
             constraintOrientationList.Add(Quaternion.identity);
@@ -121,8 +121,6 @@ namespace bluebean.Physics.PBD
 
         public JobHandle Apply(JobHandle inputDeps, float substepTime)
         {
-            //var parameters = solverAbstraction.GetConstraintParameters(m_ConstraintType);
-
             var applyConstraints = new ApplyShapeMatchingConstraintsBatchJob()
             {
                 particleIndices = particleIndices,
@@ -134,7 +132,7 @@ namespace bluebean.Physics.PBD
                 counts = m_owner.Solver.PositionConstraintCounts,
 
                 //sorFactor = parameters.SORFactor
-                sorFactor = 1.0f,
+                sorFactor = 0.5f,
             };
 
             return applyConstraints.Schedule(m_ConstraintCount, 8, inputDeps);
@@ -149,12 +147,12 @@ namespace bluebean.Physics.PBD
                 particleIndices = particleIndices,
                 firstIndex = firstIndex,
                 numIndices = numIndices,
-                restComs = restComs,
-                Aqq = Aqq,
                 deformation = plasticDeformations,
-
                 restPositions = m_owner.Solver.ParticleRestPositions,
                 invMasses = m_owner.Solver.InvMasses,
+
+                restComs = restComs,
+                Aqq = Aqq,
             };
 
             calculateRest.Schedule(numIndices.Length, 64).Complete();

@@ -4,6 +4,7 @@ using Unity.Collections;
 using Unity.Jobs;
 using Unity.Mathematics;
 using bluebean.Physics.PBD.DataStruct;
+using System.Diagnostics;
 
 namespace bluebean.Physics.PBD
 {
@@ -38,7 +39,7 @@ namespace bluebean.Physics.PBD
 
             coms[i] = float4.zero;
             float4x4 Apq = float4x4.zero;
-
+            float sumMass = 0;
             // calculate center of mass
             for (int j = 0; j < numIndices[i]; ++j)
             {
@@ -49,12 +50,13 @@ namespace bluebean.Physics.PBD
                     mass = 1.0f / invMasses[k];
 
                 coms[i] += positions[k] * mass;
+                sumMass += mass;
             }
 
-            if (restComs[i][3] < BurstMath.epsilon)
+            if (sumMass < BurstMath.epsilon)
                 return;
 
-            coms[i] /= restComs[i][3];
+            coms[i] /= sumMass;
 
             float4 restCom = restComs[i];
             restCom[3] = 0;
@@ -67,7 +69,6 @@ namespace bluebean.Physics.PBD
                 float mass = maximumMass;
                 if (invMasses[k] > 1.0f / maximumMass)
                     mass = 1.0f / invMasses[k];
-
 
                 float4 restPosition = restPositions[k];
                 restPosition[3] = 0;
@@ -95,7 +96,7 @@ namespace bluebean.Physics.PBD
             for (int j = 0; j < numIndices[i]; ++j)
             {
                 k = particleIndices[firstIndex[i] + j];
-                goal = coms[i] + math.mul(transform, restPositions[k] - restComs[i]);
+                goal = coms[i] + math.mul(transform, restPositions[k] - restCom);
                 deltas[k] += (goal - positions[k]) * shapeMaterialParameters[i * 5];
                 counts[k]++;
             }

@@ -183,6 +183,7 @@ namespace bluebean.Physics.PBD
 
         void OnPostStep()
         {
+           
             for (int i = 0; i < m_actors.Count; i++)
             {
                 m_actors[i].OnPostStep();
@@ -231,7 +232,7 @@ namespace bluebean.Physics.PBD
         }
 
         void OnPostSubStep()
-        {
+        { 
             for (int i = 0; i < m_actors.Count; i++)
             {
                 m_actors[i].OnPostSubStep(m_dtSubStep, m_damping_subStep);
