@@ -14,6 +14,7 @@ namespace bluebean.Physics.PBD
         #region 粒子数据获取接口
         NativeArray<float> ParticleRadius { get; }
         NativeArray<float4> ParticlePositions { get; }
+        NativeArray<float4> ParticleRestPositions { get; }
         NativeArray<float4> PrevParticlePositions { get; }
         NativeArray<float4> ParticleVels { get; }
         public NativeArray<BurstAabb> ParticleAabb { get; }

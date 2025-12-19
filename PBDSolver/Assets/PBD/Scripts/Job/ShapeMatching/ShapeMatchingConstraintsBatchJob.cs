@@ -14,17 +14,16 @@ namespace bluebean.Physics.PBD
         [ReadOnly] public NativeArray<int> firstIndex;
         [ReadOnly] public NativeArray<int> numIndices;
         [ReadOnly] public NativeArray<float> shapeMaterialParameters;
-        public NativeArray<float4> restComs;
+        [ReadOnly] public NativeArray<float4> restComs;
+       
+        [ReadOnly] public NativeArray<float4x4> Aqq;
         public NativeArray<float4> coms;
         public NativeArray<quaternion> constraintOrientations;
-
-        public NativeArray<float4x4> Aqq;
         public NativeArray<float4x4> linearTransforms;
         public NativeArray<float4x4> deformation;
 
         [ReadOnly] public NativeArray<float4> positions;
         [ReadOnly] public NativeArray<float4> restPositions;
-
         [ReadOnly] public NativeArray<float> invMasses;
 
         [NativeDisableContainerSafetyRestriction][NativeDisableParallelForRestriction] public NativeArray<float4> deltas;
@@ -40,7 +39,7 @@ namespace bluebean.Physics.PBD
             coms[i] = float4.zero;
             float4x4 Apq = float4x4.zero;
 
-            // calculate shape mass, center of mass, and moment matrix:
+            // calculate center of mass
             for (int j = 0; j < numIndices[i]; ++j)
             {
                 k = particleIndices[firstIndex[i] + j];
@@ -50,11 +49,6 @@ namespace bluebean.Physics.PBD
                     mass = 1.0f / invMasses[k];
 
                 coms[i] += positions[k] * mass;
-
-                float4 restPosition = restPositions[k];
-                restPosition[3] = 0;
-
-                Apq += mass * BurstMath.multrnsp4(positions[k], restPosition);
             }
 
             if (restComs[i][3] < BurstMath.epsilon)
@@ -62,11 +56,24 @@ namespace bluebean.Physics.PBD
 
             coms[i] /= restComs[i][3];
 
-            // subtract global shape moment:
             float4 restCom = restComs[i];
             restCom[3] = 0;
 
-            Apq -= restComs[i][3] * BurstMath.multrnsp4(coms[i], restCom);
+            // calculate Apq
+            for (int j = 0; j < numIndices[i]; ++j)
+            {
+                k = particleIndices[firstIndex[i] + j];
+
+                float mass = maximumMass;
+                if (invMasses[k] > 1.0f / maximumMass)
+                    mass = 1.0f / invMasses[k];
+
+
+                float4 restPosition = restPositions[k];
+                restPosition[3] = 0;
+
+                Apq += mass * BurstMath.multrnsp4(positions[k] - coms[i], restPosition - restCom);
+            }
 
             // calculate optimal transform including plastic deformation:
             float4x4 Apq_def = math.mul(Apq, math.transpose(deformation[i]));

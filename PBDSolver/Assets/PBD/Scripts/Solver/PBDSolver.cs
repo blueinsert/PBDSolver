@@ -56,6 +56,7 @@ namespace bluebean.Physics.PBD
         }
         public NativeFloatList InvMassList { get { return m_invMassList; } }
 
+        private NativeVector4List m_restPositionList = new NativeVector4List();
         private NativeVector4List m_positionList = new NativeVector4List();
         private NativeFloatList m_radiusList = new NativeFloatList();
         private NativeVector4List m_prevPositionList = new NativeVector4List();
@@ -71,6 +72,7 @@ namespace bluebean.Physics.PBD
         private NativeVector4List m_gradientList = new NativeVector4List();
         private NativeIntList m_positionConstraintCountList = new NativeIntList();
 
+        private NativeArray<float4> m_particleRestPositions;
         private NativeArray<float4> m_particlePositions;
         private NativeArray<float4> m_prevParticlePositions;
         private NativeArray<float4> m_particleVels;
@@ -86,6 +88,7 @@ namespace bluebean.Physics.PBD
         private NativeArray<int> m_positionConstraintCounts;
 
         public NativeArray<float4> ParticlePositions => m_particlePositions;
+        public NativeArray<float4> ParticleRestPositions => m_particleRestPositions;
         public NativeArray<float> InvMasses => m_invMasses;
         public NativeArray<float4> PositionDeltas => m_positionDeltas;
         public NativeArray<float4> Gradients => m_gradients;
@@ -331,13 +334,14 @@ namespace bluebean.Physics.PBD
             m_constrains[(int)ConstrainType.ParticleCollide] = new ParticleCollideConstrainGroup(this);
             m_constrains[(int)ConstrainType.Stretch] = new StretchConstrainGroup(this);
             m_constrains[(int)ConstrainType.Volume] = new VolumeConstrainGroup(this);
-            //m_constrains[(int)ConstrainType.ShapeMatching] = new ShapeMatchingConstrainGroup(this);
+            m_constrains[(int)ConstrainType.ShapeMatching] = new ShapeMatchingConstrainGroup(this);
         }
 
         private void OnParticleCountChange()
         {
             //重新从nativeList中获取nativeArray引用
             m_particlePositions = m_positionList.AsNativeArray<float4>();
+            m_particleRestPositions = m_restPositionList.AsNativeArray<float4>();
             m_particleVels = m_velList.AsNativeArray<float4>();
             m_externalForces = m_externalForceList.AsNativeArray<float4>();
             m_invMasses = m_invMassList.AsNativeArray<float>();
@@ -358,6 +362,7 @@ namespace bluebean.Physics.PBD
             if (count >= m_positionList.count)
             {
                 m_positionList.ResizeInitialized(count);
+                m_restPositionList.ResizeInitialized(count);
                 m_velList.ResizeInitialized(count);
                 m_externalForceList.ResizeInitialized(count);
                 m_invMassList.ResizeInitialized(count);
@@ -421,7 +426,8 @@ namespace bluebean.Physics.PBD
                 {
                     var index = actor.m_particleIndicesInSolver[i];//在求解器中的索引
                     var pos = actor.GetParticleInitPosition(i);
-                    this.m_positionList[index] = pos;
+                    this.m_positionList[index] = new Vector4(pos.x, pos.y, pos.z, 1);
+                    this.m_restPositionList[index] = new Vector4(pos.x, pos.y, pos.z, 1);
                     this.m_externalForceList[index] = Vector4.zero;
                     this.m_velList[index] = Vector4.zero;
                     this.m_invMassList[index] = actor.GetParticleInvMass(i);

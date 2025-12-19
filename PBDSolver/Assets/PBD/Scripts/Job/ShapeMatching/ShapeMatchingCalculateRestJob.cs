@@ -13,14 +13,12 @@ namespace bluebean.Physics.PBD
         [ReadOnly] public NativeArray<int> particleIndices;
         [ReadOnly] public NativeArray<int> firstIndex;
         [ReadOnly] public NativeArray<int> numIndices;
-        public NativeArray<float4> restComs;
-        [ReadOnly] public NativeArray<float4> coms;
-
-        public NativeArray<float4x4> Aqq;
         [ReadOnly] public NativeArray<float4x4> deformation;
-
         [ReadOnly] public NativeArray<float4> restPositions;
         [ReadOnly] public NativeArray<float> invMasses;
+
+        public NativeArray<float4> restComs;
+        public NativeArray<float4x4> Aqq;
 
         public void Execute(int i)
         {
@@ -55,33 +53,34 @@ namespace bluebean.Physics.PBD
             float4 restCom = float4.zero;
             float4x4 _Aqq = float4x4.zero;
 
-            // calculate rest center of mass, shape mass and Aqq matrix.
+            // calculate rest center of mass
             for (int j = 0; j < numIndices[i]; ++j)
             {
                 k = particleIndices[firstIndex[i] + j];
-
                 float mass = maximumMass;
                 if (invMasses[k] > 1.0f / maximumMass)
                     mass = 1.0f / invMasses[k];
-
                 restCom += restPositions[k] * mass;
-
-                float4 restPosition = restPositions[k];
-                restPosition[3] = 0;
-
-                _Aqq += mass * BurstMath.multrnsp4(restPosition, restPosition);
-
             }
-
 
             if (restCom[3] < BurstMath.epsilon)
                 return;
 
             restCom.xyz /= restCom[3];
             restComs[i] = restCom;
-
             restCom[3] = 0;
-            _Aqq -= restComs[i][3] * BurstMath.multrnsp4(restCom, restCom);
+
+            for (int j = 0; j < numIndices[i]; ++j)
+            {
+                k = particleIndices[firstIndex[i] + j];
+                float mass = maximumMass;
+                if (invMasses[k] > 1.0f / maximumMass)
+                    mass = 1.0f / invMasses[k];
+                var ri = restPositions[k] - restCom;
+                _Aqq += mass * BurstMath.multrnsp4(ri, ri);
+
+            }
+
             _Aqq[3][3] = 1; // so that the determinant is never 0 due to all-zeros row/column.
 
             Aqq[i] = math.inverse(math.mul(deformation[i], math.mul(_Aqq, math.transpose(deformation[i]))));

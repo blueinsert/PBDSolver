@@ -56,6 +56,7 @@ namespace bluebean.Physics.PBD
             firstIndexList.Add(particleIndexList.count);
             particleIndexList.AddRange(particles);
             numIndexList.Add(particles.Count);
+            shapeMaterialParameterList.Add(1f);
             shapeMaterialParameterList.Add(0);
             shapeMaterialParameterList.Add(0);
             shapeMaterialParameterList.Add(0);
@@ -106,7 +107,7 @@ namespace bluebean.Physics.PBD
                 deformation = plasticDeformations,
 
                 positions = m_owner.Solver.ParticlePositions,
-                restPositions = m_owner.Solver.ParticlePositions,//todo
+                restPositions = m_owner.Solver.ParticleRestPositions,
                 invMasses = m_owner.Solver.InvMasses,
 
                 deltas = m_owner.Solver.PositionDeltas,
@@ -149,15 +150,15 @@ namespace bluebean.Physics.PBD
                 firstIndex = firstIndex,
                 numIndices = numIndices,
                 restComs = restComs,
-                coms = coms,
                 Aqq = Aqq,
                 deformation = plasticDeformations,
 
-                restPositions = m_owner.Solver.ParticlePositions,
+                restPositions = m_owner.Solver.ParticleRestPositions,
                 invMasses = m_owner.Solver.InvMasses,
             };
 
             calculateRest.Schedule(numIndices.Length, 64).Complete();
+            Debug.Log($"CalculateRestShapeMatching com:{restComs[0]}");
         }
     }
 }
