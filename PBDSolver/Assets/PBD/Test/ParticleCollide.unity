@@ -667,8 +667,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 545e1480d65657646aa13d8bdedb64e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefabToSpawn: {fileID: 9154976019757273673, guid: 47a51e91e0e7576418703ea9cac8f977,
-    type: 3}
+  prefabToSpawn: {fileID: 1000521549}
   spawnOffset: {x: 0, y: 0, z: 0}
   useCurrentRotation: 1
   asChild: 1
@@ -762,8 +761,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 725602589}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.19489387, y: 0.24734153, z: -0.050863605, w: -0.94776136}
-  m_LocalPosition: {x: 1.6589351, y: 1.8599905, z: -3.3097782}
+  m_LocalRotation: {x: -0.09739352, y: -0.9000347, z: 0.33387917, w: -0.26263425}
+  m_LocalPosition: {x: -2.5192013, y: 2.2265122, z: 2.529786}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1316,7 +1315,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1000521550
 Transform:
   m_ObjectHideFlags: 0
@@ -13873,7 +13872,7 @@ PrefabInstance:
     - target: {fileID: 7697274286269921209, guid: 47a51e91e0e7576418703ea9cac8f977,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.089
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7697274286269921209, guid: 47a51e91e0e7576418703ea9cac8f977,
         type: 3}
@@ -13923,7 +13922,7 @@ PrefabInstance:
     - target: {fileID: 9154976019757273673, guid: 47a51e91e0e7576418703ea9cac8f977,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

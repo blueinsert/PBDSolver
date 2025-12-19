@@ -57,10 +57,10 @@ namespace bluebean.Physics.PBD
             particleIndexList.AddRange(particles);
             numIndexList.Add(particles.Count);
             shapeMaterialParameterList.Add(0.5f);
+            shapeMaterialParameterList.Add(0.5f);
             shapeMaterialParameterList.Add(0.1f);
             shapeMaterialParameterList.Add(0.1f);
-            shapeMaterialParameterList.Add(0.4f);
-            shapeMaterialParameterList.Add(0.7f);
+            shapeMaterialParameterList.Add(10f);
             restComList.Add(new Vector4(0,0,0,0));
             comList.Add(new Vector4(0, 0, 0, 0));
             constraintOrientationList.Add(Quaternion.identity);

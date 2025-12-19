@@ -80,6 +80,7 @@ public class GameObjectSpawner : MonoBehaviour
             spawnedObject.transform.SetParent(transform);
         }
 
+        spawnedObject.gameObject.SetActive(true);
         // 记录生成时间
         lastSpawnTime = Time.time;
 

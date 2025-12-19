@@ -15,9 +15,9 @@ namespace bluebean.Physics.PBD
         [ReadOnly] public NativeArray<int> firstIndex;
         [ReadOnly] public NativeArray<int> numIndices;
         [ReadOnly] public NativeArray<float> shapeMaterialParameters;
-        [ReadOnly] public NativeArray<float4> restComs;
-       
-        [ReadOnly] public NativeArray<float4x4> Aqq;
+
+        public NativeArray<float4> restComs;
+        public NativeArray<float4x4> Aqq;
         public NativeArray<float4> coms;
         public NativeArray<quaternion> constraintOrientations;
         public NativeArray<float4x4> linearTransforms;
