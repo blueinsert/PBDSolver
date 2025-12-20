@@ -87,7 +87,9 @@ public class ContactsDebugDraw : MonoBehaviour
             Gizmos.DrawSphere(pointA, radiusA);
             Gizmos.color = (distance <= 0) ? Color.red : Color.green;
             Gizmos.DrawSphere(pointB, radiusB);
-            Gizmos.DrawRay(pointB, normal.normalized * distance);
+            Gizmos.color = Color.red;
+            Gizmos.DrawLine(pointA, pointB); ;
+            //Gizmos.DrawRay(pointB, normal.normalized * distance);
         }
     }
 

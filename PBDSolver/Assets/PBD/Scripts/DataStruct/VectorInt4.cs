@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace bluebean.Physics.PBD.DataStruct
 {
@@ -61,6 +62,18 @@ namespace bluebean.Physics.PBD.DataStruct
                     case 3: w = value; break;
                 }
             }
+        }
+
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append("[");
+            sb.Append(x);sb.Append(",");
+            sb.Append(y);sb.Append(", ");
+            sb.Append(z);sb.Append(",");
+            sb.Append(w);
+            sb.Append("]");
+            return sb.ToString();
         }
     }
 }

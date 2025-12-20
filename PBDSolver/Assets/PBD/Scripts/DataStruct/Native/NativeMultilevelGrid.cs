@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
+using System.Text;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Mathematics;
@@ -85,6 +86,22 @@ namespace bluebean.Physics.PBD.DataStruct.Native
             public void Dispose()
             {
                 contents.Dispose();
+            }
+
+            public override string ToString()
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.Append("[");
+                sb.Append(Coords);
+                sb.Append("[");
+                for (int i = 0; i < this.contents.Length; i++)
+                {
+                    sb.Append(this.contents[i].ToString());
+                    sb.Append(",");
+                }
+                sb.Append("]");
+                sb.Append("]");
+                return sb.ToString();
             }
         }
 
@@ -291,6 +308,18 @@ namespace bluebean.Physics.PBD.DataStruct.Native
                 }
             }
 
+        }
+
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append("[");
+            for (int i = 0; i < this.usedCells.Length; i++)
+            {
+                sb.Append(this.usedCells[i].ToString());
+            }
+            sb.Append("]");
+            return sb.ToString();
         }
     }
 }

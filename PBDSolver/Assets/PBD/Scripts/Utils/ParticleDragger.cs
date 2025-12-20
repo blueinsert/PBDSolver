@@ -50,7 +50,9 @@ namespace bluebean.Physics.PBD
                     Vector4 position = solver.PositionList[pickArgs.particleIndex];
                     Vector4 velocity = solver.VelList[pickArgs.particleIndex];
                     var externalForces = solver.ExternalForces;
-                    externalForces[pickArgs.particleIndex] = ((targetPosition - position) * springStiffness - velocity * springDamping) / invMass;
+                    var force = ((targetPosition - position) * springStiffness - velocity * springDamping) / invMass;
+                    force.w = 0;
+                    externalForces[pickArgs.particleIndex] = force;
 
 
                     if (drawSpring)

@@ -135,7 +135,7 @@ namespace bluebean.Physics.PBD
             m_particleGrid.Update(this, deltaTime, inputDeps);
             var generateParticleInteractionsHandle = m_particleGrid.GenerateContacts(this, deltaTime);
             generateParticleInteractionsHandle.Complete();
-
+            Debug.Log($"paritcleAABB:{m_aabbList.ToString()} cellCords:{m_cellCoordsList} multiGrid:{m_particleGrid.m_grid} contacts:{m_particleGrid.m_particleContactQueue.Count}");
             // allocate arrays for interactions and batch data:
             m_particleContacts = new NativeArray<BurstContact>(m_particleGrid.m_particleContactQueue.Count, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
             m_particleBatchData = new NativeArray<BatchData>(MaxBatches, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);

@@ -31,8 +31,11 @@ struct PredictPositionsJob : IJobParallelFor
         float4 vel = m_velocities[i] + (m_inverseMasses[i] * m_externalForces[i] + m_gravity) * m_deltaTime;
         if (!PBDUtil.IsParticleFixed(property))
         {
+            vel.w = 0f;
             m_velocities[i] = vel;
-            m_positions[i] = m_positions[i] + m_velocities[i] * m_deltaTime;
+            var newPos = m_positions[i] + m_velocities[i] * m_deltaTime;
+            newPos.w = 0;
+            m_positions[i] = newPos;
         }
     }
 }

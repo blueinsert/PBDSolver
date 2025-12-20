@@ -1,3 +1,4 @@
+using System.Text;
 using UnityEngine;
 
 namespace bluebean.Physics.PBD.DataStruct
@@ -80,6 +81,17 @@ namespace bluebean.Physics.PBD.DataStruct
             corners[5] = p5;
             corners[6] = p6;
             corners[7] = p7;
+        }
+
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append("[");
+            sb.Append(min);
+            sb.Append(", ");
+            sb.Append(max);
+            sb.Append("]");
+            return sb.ToString();
         }
     }
 }
