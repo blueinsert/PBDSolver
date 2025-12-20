@@ -128,7 +128,6 @@
     <Compile Include="Assets\PBD\Scripts\Actor\PBDActor.cs" />
     <Compile Include="Assets\PBD\Scripts\Job\PredictPositionsJob.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Contact.cs" />
-    <Compile Include="Assets\PBD\Scenes\CompressTest\SimpleRotate.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Native\NativeTriangleList.cs" />
     <Compile Include="Assets\PBD\Scripts\Utils\ParticlePicker.cs" />
     <Compile Include="Assets\PBD\Scripts\Actor\TetMesh.cs" />
@@ -171,6 +170,7 @@
     <Compile Include="Assets\PBD\Scripts\Constrains\ParticleCollideConstrainGroup.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Burst\BurstTriangleMesh.cs" />
     <Compile Include="Assets\PBD\Scripts\Job\ColliderCollide\CollisionConstraintsJob.cs" />
+    <Compile Include="Assets\PBD\Test\CompressTest\SimpleRotate.cs" />
     <Compile Include="Assets\PBD\Scripts\Constrains\ParticleCollisionConstraintsBatch.cs" />
     <Compile Include="Assets\PBD\Scripts\Job\ColliderCollide\UpdateMultiGridByMovingCollidersJob.cs" />
     <Compile Include="Assets\PBD\Scripts\Job\ColliderCollide\IdentifyMovingCollidersJob.cs" />
