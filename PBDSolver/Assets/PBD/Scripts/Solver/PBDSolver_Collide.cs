@@ -148,10 +148,7 @@ namespace bluebean.Physics.PBD
                 InputQueue = m_particleGrid.m_particleContactQueue,
                 OutputArray = rawParticleContacts
             };
-            if (rawParticleContacts.Length > 0)
-            {
-                Debug.Log($"rawParticleContacts contacts count: {rawParticleContacts.Length}");
-            }
+
             var dequeueHandle = dequeueParticleContacts.Schedule();
             // Sort contacts for jitter-free gauss-seidel (sequential) solving:
             // 根据约束的第一个及第二个粒子编号，排序约束数组
