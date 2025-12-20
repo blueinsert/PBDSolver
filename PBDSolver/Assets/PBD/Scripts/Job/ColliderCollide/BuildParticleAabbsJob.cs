@@ -21,7 +21,7 @@ namespace bluebean.Physics.PBD
         [ReadOnly] public float dt;
 
         //输出
-        public NativeArray<BurstAabb> simplexBounds;
+        public NativeArray<BurstAabb> particleBounds;
 
         public void Execute(int i)
         {
@@ -36,7 +36,7 @@ namespace bluebean.Physics.PBD
                                             math.max(radii[p] + stickDistance, 0.0f) + collisionMargin);
             }
 
-            simplexBounds[i] = bounds;
+            particleBounds[i] = bounds;
         }
     }
 }

@@ -48,7 +48,7 @@ namespace bluebean.Physics.PBD
                 continuousCollisionDetection = 1,
                 dt = deltaTime,
                 //输出
-                simplexBounds = this.ParticleAabb,
+                particleBounds = this.ParticleAabb,
             };
             return buildAabbs.Schedule(this.ParticlePositions.Count(), 32);
         }
@@ -84,7 +84,7 @@ namespace bluebean.Physics.PBD
             dequeueColliderContacts.Schedule().Complete();
             if (m_colliderContacts.Length > 0)
             {
-                Debug.Log($"collider contacts count: {m_colliderContacts.Length}");
+                //Debug.Log($"collider contacts count: {m_colliderContacts.Length}");
             }
         }
 
@@ -148,6 +148,10 @@ namespace bluebean.Physics.PBD
                 InputQueue = m_particleGrid.m_particleContactQueue,
                 OutputArray = rawParticleContacts
             };
+            if (rawParticleContacts.Length > 0)
+            {
+                Debug.Log($"rawParticleContacts contacts count: {rawParticleContacts.Length}");
+            }
             var dequeueHandle = dequeueParticleContacts.Schedule();
             // Sort contacts for jitter-free gauss-seidel (sequential) solving:
             // 根据约束的第一个及第二个粒子编号，排序约束数组

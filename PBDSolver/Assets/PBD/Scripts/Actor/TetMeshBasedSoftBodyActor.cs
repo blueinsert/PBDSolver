@@ -191,5 +191,10 @@ namespace bluebean.Physics.PBD
         {
             return m_tetMesh.m_invMass[particleIndex];
         }
+
+        public override float GetParticleRadius(int particleIndex)
+        {
+            return 0.1f;
+        }
     }
 }

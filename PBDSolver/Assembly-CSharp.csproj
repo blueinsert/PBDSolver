@@ -67,6 +67,7 @@
     <Compile Include="Assets\PBD\Scripts\DataStruct\SurfacePoint.cs" />
     <Compile Include="Assets\PBD\Scripts\Collide\ParticleGrid.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\BVH\BIHNode.cs" />
+    <Compile Include="Assets\PBD\Scripts\Actor\SingleParticleActor.cs" />
     <Compile Include="Assets\PBD\Scripts\Actor\BunnyTetMeshImpl.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\SDF\DFNode.cs" />
     <Compile Include="Assets\PBD\Scripts\Constrains\ShapeMatchingContrainsBatch.cs" />

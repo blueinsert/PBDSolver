@@ -16,14 +16,12 @@ namespace bluebean.Physics.PBD
         [ReadOnly] public NativeArray<int> gridLevels;
 
         [ReadOnly] public NativeArray<float4> positions;
-        //[ReadOnly] public NativeArray<float4> restPositions;
         [ReadOnly] public NativeArray<float4> velocities;
         [ReadOnly] public NativeArray<float> invMasses;
         [ReadOnly] public NativeArray<float> radii;
         [ReadOnly] public NativeArray<int> groups;
-        //[ReadOnly] public NativeArray<float4> normals;
 
-        [ReadOnly] public NativeArray<BurstAabb> simplexBounds;
+        [ReadOnly] public NativeArray<BurstAabb> particleBounds;
 
         [ReadOnly] public float dt;
         [ReadOnly] public float collisionMargin;
@@ -137,9 +135,6 @@ namespace bluebean.Physics.PBD
         {
             if (A == B)
                 return;
-            // skip the pair if their bounds don't intersect:
-            if (!simplexBounds[A].IntersectsAabb(simplexBounds[B]))
-                return;
             int groupA = groups[A];
             int groupB = groups[B];
             // if all particles are in the same group:
@@ -147,11 +142,16 @@ namespace bluebean.Physics.PBD
             {
                 return;
             }
+            // skip the pair if their bounds don't intersect:
+            if (!particleBounds[A].IntersectsAabb(particleBounds[B]))
+                return;
             float rA = radii[A];
             float rB = radii[B];
             float4 pA = positions[A];
             float4 pB = positions[B];
-            float4 velocityA = float4.zero, velocityB = float4.zero, normalB = float4.zero;
+            float4 velocityA = float4.zero, velocityB = float4.zero;
+            velocityA = velocities[A];
+            velocityB = velocities[B];
             float4 normal = math.normalizesafe(pA - pB);
 
             float dAB = math.dot(pA - pB, normal);

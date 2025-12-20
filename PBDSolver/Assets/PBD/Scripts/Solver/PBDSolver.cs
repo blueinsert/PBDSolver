@@ -49,11 +49,6 @@ namespace bluebean.Physics.PBD
 
         public NativeVector4List PositionList { get { return m_positionList; } }
         public NativeVector4List VelList { get { return m_velList; } }
-        public NativeVector4List ExternalForceList
-        {
-            get { return m_externalForceList; }
-            set { m_externalForceList = value; }
-        }
         public NativeFloatList InvMassList { get { return m_invMassList; } }
 
         private NativeVector4List m_restPositionList = new NativeVector4List();
@@ -326,7 +321,6 @@ namespace bluebean.Physics.PBD
         private void ClearForce()
         {
             m_externalForceList.WipeToZero();
-           
         }
 
         private void InitConstrains()
@@ -435,8 +429,7 @@ namespace bluebean.Physics.PBD
                     this.m_positionDeltaList[index] = Vector4.zero;
                     this.m_gradientList[index] = Vector4.zero;
                     this.m_positionConstraintCountList[index] = 0;
-                    float radius = 0.1f;
-                    this.m_radiusList[index] = radius;
+                    this.m_radiusList[index] = actor.GetParticleRadius(i);
                     this.m_aabbList[index] = new Aabb();
                     this.m_groups[index] = actor.ActorId;
                 }

@@ -49,7 +49,8 @@ namespace bluebean.Physics.PBD
                     // Calculate and apply spring force:
                     Vector4 position = solver.PositionList[pickArgs.particleIndex];
                     Vector4 velocity = solver.VelList[pickArgs.particleIndex];
-                    solver.ExternalForceList[pickArgs.particleIndex] = ((targetPosition - position) * springStiffness - velocity * springDamping) / invMass;
+                    var externalForces = solver.ExternalForces;
+                    externalForces[pickArgs.particleIndex] = ((targetPosition - position) * springStiffness - velocity * springDamping) / invMass;
 
 
                     if (drawSpring)
@@ -74,6 +75,20 @@ namespace bluebean.Physics.PBD
 
         void Picker_OnParticleReleased(ParticlePicker.ParticlePickEventArgs e)
         {
+            //PBDSolver solver = picker.solver;
+
+            //if (solver != null && pickArgs != null)
+            //{
+            //    float invMass = solver.InvMassList[pickArgs.particleIndex];
+
+            //    if (invMass > 0)
+            //    {
+            //        var externalForces = solver.ExternalForces;
+            //        externalForces[pickArgs.particleIndex] = new Unity.Mathematics.float4(0,0,0,0);
+            //    }
+
+            //    Debug.Log($"pickArgs.particleIndex {pickArgs.particleIndex} released");
+            //}
             pickArgs = null;
             lineRenderer.positionCount = 0;
         }

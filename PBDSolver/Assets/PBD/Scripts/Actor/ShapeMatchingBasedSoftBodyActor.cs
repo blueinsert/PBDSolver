@@ -82,6 +82,11 @@ namespace bluebean.Physics.PBD
             return 1;
         }
 
+        public override float GetParticleRadius(int particleIndex)
+        {
+            return 0.1f;
+        }
+
         public override void OnPostStep()
         {
             SyncMesh();

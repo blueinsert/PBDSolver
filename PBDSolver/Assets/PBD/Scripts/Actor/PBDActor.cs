@@ -29,6 +29,11 @@ namespace bluebean.Physics.PBD
 
         public abstract float GetParticleInvMass(int particleIndex);
 
+        public virtual float GetParticleRadius(int particleIndex)
+        {
+            return 1;
+        }
+
         public virtual void Initialize()
         {
             m_solver = GetComponentInParent<ISolver>();

@@ -50,7 +50,7 @@ namespace bluebean.Physics.PBD
                 float lambda = contact.SolveAdhesion(posA, posB, 0, 0, substepTime);
 
                 // depenetration:
-                lambda += contact.SolvePenetration(posA, posB, 5.5f * substepTime);
+                lambda += contact.SolvePenetration(posA, posB, (radiusA+radiusB)/2.0f * substepTime);
 
                 // Apply normal impulse to both particles (w/ shock propagation):
                 if (math.abs(lambda) > BurstMath.epsilon)

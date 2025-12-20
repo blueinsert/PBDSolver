@@ -54,14 +54,11 @@ namespace bluebean.Physics.PBD
                 gridLevels = m_grid.populatedLevels.GetKeyArray(Allocator.TempJob),
 
                 positions = solver.ParticlePositions,
-                //restPositions = solver.res,//todo
                 velocities = solver.ParticleVels,
                 invMasses = solver.InvMasses,
                 radii = solver.ParticleRadius,
-                //normals = solver.nor,
                 groups = solver.Groups,
-                simplexBounds = solver.ParticleAabb,
-
+                particleBounds = solver.ParticleAabb,
 
                 contactsQueue = m_particleContactQueue.AsParallelWriter(),
                 dt = deltaTime,

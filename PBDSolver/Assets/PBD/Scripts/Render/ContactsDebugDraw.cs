@@ -73,11 +73,11 @@ public class ContactsDebugDraw : MonoBehaviour
             var contact = data.m_contacts.Data[i];
 
             int particleA = contact.bodyA;
-            var radiusA = solver.ParticleRadius[particleA];
+            var radiusA = 0.1f;// solver.ParticleRadius[particleA];
             var pointA = solver.GetParticlePosition(particleA);
 
             int particleB = contact.bodyB;
-            var radiusB = solver.ParticleRadius[particleB];
+            var radiusB = 0.1f;// solver.ParticleRadius[particleB];
             var pointB = solver.GetParticlePosition(particleB);
 
             var distance = contact.distance;
