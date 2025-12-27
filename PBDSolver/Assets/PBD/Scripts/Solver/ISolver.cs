@@ -22,6 +22,8 @@ namespace bluebean.Physics.PBD
         public NativeArray<int4> CellCoords { get; }
         public NativeArray<int> Groups { get; }
         NativeArray<float4> ParticleProperties { get; }
+        NativeArray<float> StaticFriction { get; }
+        NativeArray<float> DynamicFriction { get; }
         NativeArray<float4> ExternalForces { get; }
         NativeArray<float> InvMasses { get; }
         NativeArray<float4> PositionDeltas { get; }

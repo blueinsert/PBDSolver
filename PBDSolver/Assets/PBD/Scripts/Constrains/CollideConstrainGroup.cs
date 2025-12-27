@@ -10,6 +10,22 @@ namespace bluebean.Physics.PBD
 
         }
 
+        public override JobHandle Initialize(JobHandle inputDeps, float substepTime)
+        {
+            var job = new UpdateContactsJob()
+            {
+                prevPositions = this.Solver.PrevParticlePositions,
+                velocities = this.Solver.ParticleVels,
+                radii = this.Solver.ParticleRadius,
+                invMasses = this.Solver.InvMasses,
+                shapes = m_solver.ColliderWorld.m_colliderShapes.AsNativeArray<BurstColliderShape>(),
+                transforms = m_solver.ColliderWorld.m_colliderTransforms.AsNativeArray<BurstAffineTransform>(),
+
+                contacts = m_solver.ColliderContacts
+            }; 
+            return job.Schedule(m_solver.ColliderContacts.Length, 128, inputDeps);
+        }
+
         public override JobHandle Apply(JobHandle inputDeps, float substepTime)
         {
             var applyConstraints = new ApplyCollisionConstraintsJob()

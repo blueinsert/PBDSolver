@@ -57,6 +57,9 @@ namespace bluebean.Physics.PBD
         private NativeVector4List m_prevPositionList = new NativeVector4List();
         private NativeVector4List m_velList = new NativeVector4List();
         private NativeVector4List m_propertyList = new NativeVector4List();
+        private NativeFloatList m_staticFrictionList = new NativeFloatList();
+        private NativeFloatList m_dynamicFrictionList = new NativeFloatList();
+
         private NativeInt4List m_cellCoordsList = new NativeInt4List();
         private NativeAabbList m_aabbList = new NativeAabbList();
         private NativeIntList m_groupsList = new NativeIntList();
@@ -72,6 +75,8 @@ namespace bluebean.Physics.PBD
         private NativeArray<float4> m_prevParticlePositions;
         private NativeArray<float4> m_particleVels;
         private NativeArray<float4> m_particleProperties;
+        private NativeArray<float> m_staticFriction;
+        private NativeArray<float> m_dynamicFriction;
         private NativeArray<float> m_particleRadius;
         private NativeArray<BurstAabb> m_particleAabbs;
         public NativeArray<int4> m_cellCoords;
@@ -90,6 +95,8 @@ namespace bluebean.Physics.PBD
         public NativeArray<int> PositionConstraintCounts => m_positionConstraintCounts;
         public NativeArray<float4> ParticleVels => m_particleVels;
         public NativeArray<float4> ExternalForces => m_externalForces;
+        public NativeArray<float> StaticFriction => m_staticFriction;
+        public NativeArray<float> DynamicFriction => m_dynamicFriction;
         public NativeArray<float4> ParticleProperties => m_particleProperties;
 
         public NativeArray<float4> PrevParticlePositions => m_prevParticlePositions;
@@ -145,6 +152,8 @@ namespace bluebean.Physics.PBD
             m_positionList.Dispose();
             m_velList.Dispose();
             m_propertyList.Dispose();
+            m_staticFriction.Dispose();
+            m_dynamicFriction.Dispose();
             m_externalForceList.Dispose();
             m_freeList.Dispose();
             m_invMassList.Dispose();
@@ -272,6 +281,7 @@ namespace bluebean.Physics.PBD
                     handle = constrain.Apply(handle, substepTime);
                 }         
             }
+            
             //3.更新速度
             var updateVel = new UpdateVelJob()
             {
@@ -285,6 +295,11 @@ namespace bluebean.Physics.PBD
             handle = updateVel.Schedule(m_positionList.count, 32, handle);
 
             handle.Complete();
+            //if (this.ColliderContacts.Length > 0)
+            {
+                //var contact = this.ColliderContacts[0];
+                //Debug.Log($"{Time.frameCount} {substeps} {contact.ToString()}");
+            }
             Profiler.EndSample();
         }
 
@@ -327,6 +342,8 @@ namespace bluebean.Physics.PBD
         {
             m_constrains[(int)ConstrainType.Collide] = new CollideConstrainGroup(this);
             m_constrains[(int)ConstrainType.ParticleCollide] = new ParticleCollideConstrainGroup(this);
+            m_constrains[(int)ConstrainType.Friction] = new FrictionConstrainGroup(this);
+
             m_constrains[(int)ConstrainType.Stretch] = new StretchConstrainGroup(this);
             m_constrains[(int)ConstrainType.Volume] = new VolumeConstrainGroup(this);
             m_constrains[(int)ConstrainType.ShapeMatching] = new ShapeMatchingConstrainGroup(this);
@@ -344,6 +361,8 @@ namespace bluebean.Physics.PBD
             m_gradients = m_gradientList.AsNativeArray<float4>();
             m_positionConstraintCounts = m_positionConstraintCountList.AsNativeArray<int>();
             m_particleProperties = m_propertyList.AsNativeArray<float4>();
+            m_dynamicFriction = m_dynamicFrictionList.AsNativeArray<float>();
+            m_staticFriction = m_staticFrictionList.AsNativeArray <float>();
             m_prevParticlePositions = m_prevPositionList.AsNativeArray<float4>();
             m_particleRadius = m_radiusList.AsNativeArray<float>();
             m_particleAabbs = m_aabbList.AsNativeArray<BurstAabb>();
@@ -365,6 +384,8 @@ namespace bluebean.Physics.PBD
                 m_gradientList.ResizeInitialized(count);
                 m_positionConstraintCountList.ResizeInitialized(count);
                 m_propertyList.ResizeInitialized(count);
+                m_staticFrictionList.ResizeInitialized(count);
+                m_dynamicFrictionList.ResizeInitialized(count);
                 m_prevPositionList.ResizeInitialized(count);
                 m_aabbList.ResizeInitialized(count);
                 m_cellCoordsList.ResizeInitialized(count);
@@ -431,7 +452,10 @@ namespace bluebean.Physics.PBD
                     this.m_positionConstraintCountList[index] = 0;
                     this.m_radiusList[index] = actor.GetParticleRadius(i);
                     this.m_aabbList[index] = new Aabb();
-                    this.m_groups[index] = actor.ActorId;
+                    this.m_groupsList[index] = actor.ActorId;
+                    this.m_staticFrictionList[index] = actor.GetParticleStaticFriction(i);
+                    this.m_dynamicFrictionList[index] = actor.GetParticleDynamicFriction(i);
+
                 }
                 Debug.Log("AddActor Finish");
             }

@@ -33,17 +33,13 @@ namespace bluebean.Physics.PBD
 
                 float4 velocityA = float4.zero;
                 float4 prevPositionA = float4.zero;
-                quaternion prevOrientationA = new quaternion(0, 0, 0, 0);
                 float radiusA = 0;
                 float invMassA = 0;
-                float4 invInertiaA = float4.zero;
 
                 float4 velocityB = float4.zero;
                 float4 prevPositionB = float4.zero;
-                quaternion prevOrientationB = new quaternion(0, 0, 0, 0);
                 float radiusB = 0;
                 float invMassB = 0;
-                float4 invInertiaB = float4.zero;
 
                 velocityA = velocities[particleA];
                 prevPositionA = prevPositions[particleA];
@@ -67,9 +63,8 @@ namespace bluebean.Physics.PBD
                 contact.CalculateBasis(velocityA - velocityB);
 
                 // update contact masses:
-                bool rollingContacts = false; 
-                contact.CalculateContactMassesA(invMassA, invInertiaA, prevPositionA, prevOrientationA, contactPointA, rollingContacts);
-                contact.CalculateContactMassesB(invMassB, invInertiaB, prevPositionB, prevOrientationB, contactPointB, rollingContacts);
+                contact.CalculateContactMassesA(invMassA, prevPositionA, contactPointA);
+                contact.CalculateContactMassesB(invMassB, prevPositionB, contactPointB);
 
                 contacts[i] = contact;
             }

@@ -1,3 +1,5 @@
+using System.Diagnostics;
+using System.Text;
 using Unity.Mathematics;
 
 namespace bluebean.Physics.PBD.DataStruct
@@ -17,7 +19,6 @@ namespace bluebean.Physics.PBD.DataStruct
         float tangentLambda;
         float bitangentLambda;
         float stickLambda;
-        float rollingFrictionImpulse;
 
         public int bodyA;
         public int bodyB;
@@ -32,12 +33,35 @@ namespace bluebean.Physics.PBD.DataStruct
 
         public double pad0; // padding to ensure correct alignment to 128 bytes.
 
+
+        public float GetNormalLambda()
+        {
+            return normalLambda;
+        }
+
+        public float GetTangentLambda()
+        {
+            return tangentLambda;
+        }
+
         public int GetParticleCount() { return 2; }
         public int GetParticle(int index) { return index == 0 ? bodyA : bodyB; }
 
         public override string ToString()
         {
-            return bodyA + "," + bodyB;
+            StringBuilder sb = new StringBuilder();
+            sb.Append("{");
+            sb.Append("bodyA:").Append(bodyA).Append(",");
+            sb.Append("bodyB:").Append(bodyB).Append(",");
+            sb.Append("normal:").Append(normal).Append(",");
+            sb.Append("tangent:").Append(tangent).Append(",");
+            sb.Append("bitangent:").Append(bitangent).Append(",");
+            sb.Append("TotalTangentInvMass:").Append(TotalTangentInvMass).Append(",");
+            sb.Append("TotalBitangentInvMass:").Append(TotalBitangentInvMass).Append(",");
+            sb.Append("normalLambda:").Append(normalLambda).Append(",");
+            sb.Append("tangentLambda:").Append(tangentLambda);//.Append(",");
+            sb.Append("}");
+            return sb.ToString();
         }
 
         public int CompareTo(BurstContact other)
@@ -70,45 +94,19 @@ namespace bluebean.Physics.PBD.DataStruct
         }
 
         public void CalculateContactMassesA(float invMass,
-                                            float4 inverseInertiaTensor,
                                             float4 position,
-                                            quaternion orientation,
-                                            float4 contactPoint,
-                                            bool rollingContacts)
+                                            float4 contactPoint)
         {
             // initialize inverse linear masses:
             normalInvMassA = tangentInvMassA = bitangentInvMassA = invMass;
-
-            if (rollingContacts)
-            {
-                float4 rA = contactPoint - position;
-                float4x4 solverInertiaA = BurstMath.TransformInertiaTensor(inverseInertiaTensor, orientation);
-
-                normalInvMassA += BurstMath.RotationalInvMass(solverInertiaA, rA, normal);
-                tangentInvMassA += BurstMath.RotationalInvMass(solverInertiaA, rA, tangent);
-                bitangentInvMassA += BurstMath.RotationalInvMass(solverInertiaA, rA, bitangent);
-            }
         }
 
         public void CalculateContactMassesB(float invMass,
-                                            float4 inverseInertiaTensor,
                                             float4 position,
-                                            quaternion orientation,
-                                            float4 contactPoint,
-                                            bool rollingContacts)
+                                            float4 contactPoint)
         {
             // initialize inverse linear masses:
             normalInvMassB = tangentInvMassB = bitangentInvMassB = invMass;
-
-            if (rollingContacts)
-            {
-                float4 rB = contactPoint - position;
-                float4x4 solverInertiaB = BurstMath.TransformInertiaTensor(inverseInertiaTensor, orientation);
-
-                normalInvMassB += BurstMath.RotationalInvMass(solverInertiaB, rB, normal);
-                tangentInvMassB += BurstMath.RotationalInvMass(solverInertiaB, rB, tangent);
-                bitangentInvMassB += BurstMath.RotationalInvMass(solverInertiaB, rB, bitangent);
-            }
         }
 
 
@@ -123,6 +121,15 @@ namespace bluebean.Physics.PBD.DataStruct
             bitangentInvMassB += BurstMath.RotationalInvMass(rigidbody.inverseInertiaTensor, rB, bitangent);
         }
 
+        /// <summary>
+        /// 粘附力
+        /// </summary>
+        /// <param name="posA"></param>
+        /// <param name="posB"></param>
+        /// <param name="stickDistance"></param>
+        /// <param name="stickiness"></param>
+        /// <param name="dt"></param>
+        /// <returns></returns>
         public float SolveAdhesion(float4 posA, float4 posB, float stickDistance, float stickiness, float dt)
         {
 
@@ -152,99 +159,99 @@ namespace bluebean.Physics.PBD.DataStruct
         /// </summary>
         /// <param name="posA"></param>
         /// <param name="posB"></param>
-        /// <param name="maxDepenetrationDelta"></param>
+        /// <param name="maxDepenetrationDelta">stepTime时间内最大释放的穿越距离</param>
         /// <returns></returns>
         public float SolvePenetration(float4 posA, float4 posB, float maxDepenetrationDelta)
         {
-
             if (TotalNormalInvMass <= 0)
                 return 0;
             //穿越时为负值
             //project position delta to normal vector:
             distance = math.dot(posA - posB, normal);
-            //根据速度限制，这一帧结束时，穿透距离应该处于的值
-            // calculate max projection distance based on depenetration velocity:
+            if (distance >= 0) return 0;
+
             float maxProjection = math.max(-distance - maxDepenetrationDelta, 0);
-            //计算一帧内改变位置需要的冲量大小
-            // calculate lambda multiplier:
-            //TotalNormalInvMass是碰撞时两个物体分配冲量大小时的公共分母，
-            //质量大的位置变化小，质量小的变化大
             float dlambda = -(distance + maxProjection) / TotalNormalInvMass;
 
-            // accumulate lambda:
-            float newLambda = math.max(normalLambda + dlambda, 0);
-
-            // calculate lambda change and update accumulated lambda:
-            float lambdaChange = newLambda - normalLambda;
-            normalLambda = newLambda;
+            float lambdaChange = dlambda;
+            normalLambda = lambdaChange;
 
             return lambdaChange;
         }
+
+        //public float SolvePenetration(float4 posA, float4 posB, float maxDepenetrationDelta)
+        //{
+        //    if (TotalNormalInvMass <= 0)
+        //        return 0;
+        //    //穿越时为负值
+        //    //project position delta to normal vector:
+        //    distance = math.dot(posA - posB, normal);
+        //    //根据速度限制，这一帧结束时，穿透距离应该处于的值
+        //    // calculate max projection distance based on depenetration velocity:
+        //    float maxProjection = math.max(-distance - maxDepenetrationDelta, 0);
+        //    //计算一帧内改变位置需要的冲量大小
+        //    // calculate lambda multiplier:
+        //    //TotalNormalInvMass是碰撞时两个物体分配冲量大小时的公共分母，
+        //    float dlambda = -(distance + maxProjection) / TotalNormalInvMass;
+
+        //    float newLambda = math.max(normalLambda + dlambda, 0);
+
+        //    // calculate lambda change and update accumulated lambda:
+        //    float lambdaChange = newLambda - normalLambda;
+        //    normalLambda = newLambda;
+
+        //    normalLambda = lambdaChange;
+        //    return lambdaChange;
+        //}
 
         public float2 SolveFriction(float4 relativeVelocity, float staticFriction, float dynamicFriction, float dt)
         {
             float2 lambdaChange = float2.zero;
 
             if (TotalTangentInvMass <= 0 || TotalBitangentInvMass <= 0 ||
-                (dynamicFriction <= 0 && staticFriction <= 0) || (normalLambda <= 0 && stickLambda <= 0))
+                (dynamicFriction <= 0 && staticFriction <= 0)
+                || (normalLambda <= 0 && stickLambda <= 0)
+                )
+            {
+                //UnityEngine.Debug.Log("early return");
                 return lambdaChange;
+            }
 
             // calculate delta projection on both friction axis:
             float tangentPosDelta = math.dot(relativeVelocity, tangent);
             float bitangentPosDelta = math.dot(relativeVelocity, bitangent);
 
             // calculate friction pyramid limit:
+            //除以时间获得标准单位的冲量(m/s)
             float dynamicFrictionCone = normalLambda / dt * dynamicFriction;
             float staticFrictionCone = normalLambda / dt * staticFriction;
 
             // tangent impulse:
+            // 1/TotalTangentInvMass 即质量加权归一化系数 (1/(w1+w2))
             float tangentLambdaDelta = -tangentPosDelta / TotalTangentInvMass;
-            float newTangentLambda = tangentLambda + tangentLambdaDelta;
-
+            float newTangentLambda =tangentLambdaDelta;
+            //tangentLambdaDelta立即为摩擦力引起的冲量减小量，
+            //1.切向累计冲量小于静摩擦时，lambdaChange将移除切向位移，物体切向相对不动
+            //2.大于静摩擦时，动摩擦力使得物体切向位移减小,减小量dynamicFrictionCone
+            //这里的数学处理方法是由于碰撞contact求解可以跨越多个subStep逐渐将物体推开
+            //前面几个substep位移累计量小于静摩擦，然后加上后面的大于静摩擦
             if (math.abs(newTangentLambda) > staticFrictionCone)
                 newTangentLambda = math.clamp(newTangentLambda, -dynamicFrictionCone, dynamicFrictionCone);
 
-            lambdaChange[0] = newTangentLambda - tangentLambda;
-            tangentLambda = newTangentLambda;
+            lambdaChange[0] = newTangentLambda;
 
             // bitangent impulse:
             float bitangentLambdaDelta = -bitangentPosDelta / TotalBitangentInvMass;
-            float newBitangentLambda = bitangentLambda + bitangentLambdaDelta;
+            float newBitangentLambda = bitangentLambdaDelta;
 
             if (math.abs(newBitangentLambda) > staticFrictionCone)
                 newBitangentLambda = math.clamp(newBitangentLambda, -dynamicFrictionCone, dynamicFrictionCone);
 
-            lambdaChange[1] = newBitangentLambda - bitangentLambda;
-            bitangentLambda = newBitangentLambda;
+            lambdaChange[1] = newBitangentLambda;
+
+            tangentLambda = newTangentLambda + newBitangentLambda;
 
             return lambdaChange;
-        }
-
-
-        public float SolveRollingFriction(float4 angularVelocityA,
-                                          float4 angularVelocityB,
-                                          float rollingFriction,
-                                          float invMassA,
-                                          float invMassB,
-                                          ref float4 rolling_axis)
-        {
-            float totalInvMass = invMassA + invMassB;
-            if (totalInvMass <= 0)
-                return 0;
-
-            rolling_axis = math.normalizesafe(angularVelocityA - angularVelocityB);
-
-            float vel1 = math.dot(angularVelocityA, rolling_axis);
-            float vel2 = math.dot(angularVelocityB, rolling_axis);
-
-            float relativeVelocity = vel1 - vel2;
-
-            float maxImpulse = normalLambda * rollingFriction;
-            float newRollingImpulse = math.clamp(rollingFrictionImpulse - relativeVelocity / totalInvMass, -maxImpulse, maxImpulse);
-            float rolling_impulse_change = newRollingImpulse - rollingFrictionImpulse;
-            rollingFrictionImpulse = newRollingImpulse;
-
-            return rolling_impulse_change;
         }
     }
 }

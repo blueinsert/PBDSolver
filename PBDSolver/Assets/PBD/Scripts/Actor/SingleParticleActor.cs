@@ -8,11 +8,25 @@ namespace bluebean.Physics.PBD
     {
         public float m_radius = 0.2f;
         public Vector3 m_x = Vector3.zero;
+        [Range(0f,1f)]
+        public float m_staticFriction = 0.0f;
+        [Range(0f, 1f)]
+        public float m_dynamicFriction = 0.0f;
 
         private void Start()
         {
             this.transform.localScale = new Vector3(m_radius * 2, m_radius * 2, m_radius * 2);
             Initialize();
+        }
+
+        public override float GetParticleStaticFriction(int particleIndex)
+        {
+            return m_staticFriction;
+        }
+
+        public override float GetParticleDynamicFriction(int particleIndex)
+        {
+            return m_dynamicFriction;
         }
 
         public override void Initialize()

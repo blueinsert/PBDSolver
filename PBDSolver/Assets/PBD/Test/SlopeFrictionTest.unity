@@ -1319,7 +1319,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1326767703}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.085831694, y: -0.015134449, z: -0.17298746, w: 0.98106027}
+  m_LocalRotation: {x: 0, y: 0, z: -0.17364825, w: 0.9848078}
   m_LocalPosition: {x: 0, y: -0.79, z: -0.8}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1327,7 +1327,7 @@ Transform:
   - {fileID: 308782608}
   - {fileID: 1780642442}
   m_Father: {fileID: 9926467}
-  m_LocalEulerAnglesHint: {x: -10, y: 0, z: -20}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -20}
 --- !u!1 &1465183548
 GameObject:
   m_ObjectHideFlags: 0
@@ -1379,6 +1379,8 @@ MonoBehaviour:
   m_particleIndicesInSolver: 
   m_radius: 0.2
   m_x: {x: 0, y: 0, z: 0}
+  m_staticFriction: 0
+  m_dynamicFriction: 0
 --- !u!135 &1465183551
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -1501,6 +1503,8 @@ MonoBehaviour:
   m_particleIndicesInSolver: 
   m_radius: 0.2
   m_x: {x: 0, y: 0, z: 0}
+  m_staticFriction: 0
+  m_dynamicFriction: 0.2
 --- !u!135 &1489835882
 SphereCollider:
   m_ObjectHideFlags: 0

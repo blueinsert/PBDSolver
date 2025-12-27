@@ -6,6 +6,7 @@ namespace bluebean.Physics.PBD
         Start,
 
         Collide,
+        Friction,
         ParticleCollide,
         Volume,
         Stretch,

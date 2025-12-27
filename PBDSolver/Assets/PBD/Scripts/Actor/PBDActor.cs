@@ -34,6 +34,17 @@ namespace bluebean.Physics.PBD
             return 1;
         }
 
+        public virtual float GetParticleStaticFriction(int particleIndex)
+        {
+            return 0;
+        }
+
+        public virtual float GetParticleDynamicFriction(int particleIndex)
+        {
+            return 0.1f;
+        }
+
+
         public virtual void Initialize()
         {
             m_solver = GetComponentInParent<ISolver>();
