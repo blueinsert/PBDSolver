@@ -70,6 +70,7 @@
     <Compile Include="Assets\PBD\Scripts\DataStruct\BVH\BIHNode.cs" />
     <Compile Include="Assets\PBD\Scripts\Actor\BunnyTetMeshImpl.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\SDF\DFNode.cs" />
+    <Compile Include="Assets\PBD\Test\Scripts\StackGenerator.cs" />
     <Compile Include="Assets\PBD\Scripts\Constrains\ShapeMatchingContrainsBatch.cs" />
     <Compile Include="Assets\PBD\Scripts\Constrains\StretchConstrainGroup.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Native\NativeAffineTransformList.cs" />
@@ -80,10 +81,12 @@
     <Compile Include="Assets\PBD\Scripts\DataStruct\Native\NativeInt3List.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Triangle.cs" />
     <Compile Include="Assets\PBD\Scripts\Job\ParticleCollide\ParticleCollisionConstraintsBatchJob.cs" />
+    <Compile Include="Assets\PBD\Scripts\DataStruct\CustomList.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Native\NativeInt2List.cs" />
     <Compile Include="Assets\PBD\Scripts\Utils\ParticleDragger.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\IDistanceFunction.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Burst\BurstRigidbody.cs" />
+    <Compile Include="Assets\PBD\Scripts\Constrains\ParticleFrictionConstrainGroup.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\PriorityQueue.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Native\NativeAabbList.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Batcher\BatchData.cs" />
@@ -102,6 +105,7 @@
     <Compile Include="Assets\PBD\Scripts\Util\PhysicsUtil.cs" />
     <Compile Include="Assets\PBD\Scripts\Job\ParticleCollide\UpdateParticleGridJob.cs" />
     <Compile Include="Assets\PBD\Scripts\Constrains\VolumeConstrainGroup.cs" />
+    <Compile Include="Assets\PBD\Scripts\Job\ParticleFriction\ParticleFrictionConstraintsBatchJob.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Batcher\ContactProvider.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Burst\BurstCellSpan.cs" />
     <Compile Include="Assets\PBD\Scripts\Collide\ColliderWorld.cs" />
@@ -153,7 +157,6 @@
     <Compile Include="Assets\PBD\Scripts\Util\GeometryUtil.cs" />
     <Compile Include="Assets\PBD\Scripts\Job\ParticleCollide\CalculateCellCoordsJob.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Burst\GridHash.cs" />
-    <Compile Include="Assets\PBD\Scripts\DataStruct\ObiList.cs" />
     <Compile Include="Assets\PBD\Scripts\Job\Constrains\VolumeConstrainSolveJob.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Native\NativeMultilevelGrid.cs" />
     <Compile Include="Assets\PBD\Scripts\Job\ParticleCollide\SortSubArraysJob.cs" />
@@ -170,6 +173,7 @@
     <Compile Include="Assets\PBD\Scripts\DataStruct\Native\NativeCellSpanList.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\VectorInt4.cs" />
     <Compile Include="Assets\PBD\Scripts\Constrains\ParticleCollideConstrainGroup.cs" />
+    <Compile Include="Assets\PBD\Scripts\Constrains\ParticleFrictionConstraintsBatch.cs" />
     <Compile Include="Assets\PBD\Scripts\Job\ColliderFriction\FrictionConstraintsBatchJob.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Burst\BurstTriangleMesh.cs" />
     <Compile Include="Assets\PBD\Scripts\Job\ColliderCollide\CollisionConstraintsJob.cs" />

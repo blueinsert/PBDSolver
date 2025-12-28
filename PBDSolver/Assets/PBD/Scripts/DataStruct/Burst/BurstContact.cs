@@ -19,6 +19,7 @@ namespace bluebean.Physics.PBD.DataStruct
         float tangentLambda;
         float bitangentLambda;
         float stickLambda;
+        float rollingFrictionImpulse;
 
         public int bodyA;
         public int bodyB;

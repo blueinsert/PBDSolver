@@ -343,6 +343,7 @@ namespace bluebean.Physics.PBD
             m_constrains[(int)ConstrainType.Collide] = new CollideConstrainGroup(this);
             m_constrains[(int)ConstrainType.ParticleCollide] = new ParticleCollideConstrainGroup(this);
             m_constrains[(int)ConstrainType.Friction] = new FrictionConstrainGroup(this);
+            m_constrains[(int)ConstrainType.ParticleFriction] = new ParticleFrictionConstrainGroup(this);
 
             m_constrains[(int)ConstrainType.Stretch] = new StretchConstrainGroup(this);
             m_constrains[(int)ConstrainType.Volume] = new VolumeConstrainGroup(this);
@@ -506,6 +507,11 @@ namespace bluebean.Physics.PBD
 
         public Vector3 GetParticlePosition(int particleIndex)
         {
+            if(particleIndex<0 || particleIndex > m_positionList.count)
+            {
+                Debug.Log($"GetParticlePosition index invalid:{particleIndex}");
+                return Vector3.zero;
+            }
             var pos = m_positionList[particleIndex];
             return pos;
         }

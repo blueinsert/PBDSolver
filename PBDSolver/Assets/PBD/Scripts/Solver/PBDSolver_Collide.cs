@@ -13,7 +13,7 @@ namespace bluebean.Physics.PBD
 
         public class CollisionEventArgs : System.EventArgs
         {
-            public ObiList<Contact> m_contacts = new ObiList<Contact>();
+            public CustomList<Contact> m_contacts = new CustomList<Contact>();
         }
 
         public delegate void CollisionCallback(PBDSolver solver, CollisionEventArgs contacts);
@@ -169,8 +169,13 @@ namespace bluebean.Physics.PBD
             }
 
             var pc = m_constrains[(int)ConstrainType.ParticleCollide] as ParticleCollideConstrainGroup;
+            var pf = m_constrains[(int)ConstrainType.ParticleFriction] as ParticleFrictionConstrainGroup;
+
             for (int i = 0; i < pc.m_batches.Count; ++i)
                 pc.m_batches[i].enabled = false;
+            for (int i = 0; i < pf.m_batches.Count; ++i)
+                pf.m_batches[i].enabled = false;
+
             for (int i = 0; i < activeParticleBatchCount[0]; ++i)
             {
                 // create extra batches if not enough:
@@ -178,10 +183,15 @@ namespace bluebean.Physics.PBD
                 {
                     pc.CreateConstraintsBatch(); 
                 }
-
                 pc.m_batches[i].enabled = true;
-
                 (pc.m_batches[i]).SetBatchData(m_particleBatchData[i]);
+
+                if (i == pf.m_batches.Count)
+                {
+                    pf.CreateConstraintsBatch();
+                }
+                pf.m_batches[i].enabled = true;
+                (pf.m_batches[i]).SetBatchData(m_particleBatchData[i]);
             }
 
             rawParticleContacts.Dispose();

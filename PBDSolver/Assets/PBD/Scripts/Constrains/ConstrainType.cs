@@ -8,6 +8,7 @@ namespace bluebean.Physics.PBD
         Collide,
         Friction,
         ParticleCollide,
+        ParticleFriction,
         Volume,
         Stretch,
         ShapeMatching,

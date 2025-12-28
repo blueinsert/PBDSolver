@@ -9,7 +9,7 @@ namespace bluebean.Physics.PBD.DataStruct
 	 * includes some auxiliar methods that make it easier and faster to send data back and forth between C# and C++, as
      * well as deal with accesing the contents of the list directly without a copy.
 	 */
-    public class ObiList<T> : IList<T>
+    public class CustomList<T> : IList<T>
     {
         private T[] data = new T[16];
         private int count = 0;

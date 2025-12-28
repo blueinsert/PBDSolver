@@ -9,6 +9,9 @@ public class GameObjectSpawner : MonoBehaviour
 
     [Tooltip("生成位置的偏移量（相对于当前对象位置）")]
     public Vector3 spawnOffset = Vector3.zero;
+    public bool isRangeSpawn = false;
+    public Vector3 spawnRange = Vector3.zero;
+
 
     [Tooltip("是否使用当前对象的旋转")]
     public bool useCurrentRotation = true;
@@ -65,6 +68,13 @@ public class GameObjectSpawner : MonoBehaviour
     {
         // 计算生成位置和旋转
         Vector3 spawnPosition = transform.position + spawnOffset;
+        if (isRangeSpawn)
+        {
+            float xoffset = spawnRange.x * (Random.Range(1, 100) / 100f - 0.5f);
+            float yoffset = spawnRange.y * (Random.Range(1, 100) / 100f - 0.5f);
+            float zoffset = spawnRange.z * (Random.Range(1, 100) / 100f - 0.5f);
+            spawnPosition += new Vector3(xoffset, yoffset, zoffset);
+        }
         Quaternion spawnRotation = useCurrentRotation ? transform.rotation : prefabToSpawn.transform.rotation;
 
         // 实例化对象
