@@ -159,9 +159,10 @@ MonoBehaviour:
   m_damping_subStep: 0.98
   m_edgeCompliance: 0.00034
   m_volumeCompliance: 0
-  m_subStep: 34
+  m_subStep: 11
   m_collideCompliance: 0
   m_g: {x: 0, y: -9.8, z: 0}
+  m_showGUI: 1
   m_actors: []
 --- !u!4 &9926467
 Transform:
@@ -1387,8 +1388,8 @@ MonoBehaviour:
   m_particleIndicesInSolver: 
   m_radius: 0.2
   m_x: {x: 0, y: 0, z: 0}
-  m_staticFriction: 0.6
-  m_dynamicFriction: 0.2
+  m_staticFriction: 0.3
+  m_dynamicFriction: 0.15
 --- !u!135 &1489835882
 SphereCollider:
   m_ObjectHideFlags: 0
