@@ -6,10 +6,6 @@ namespace bluebean.Physics.PBD
     [RequireComponent(typeof(TetMesh))]
     public class TetMeshBasedSoftBodyActor : PBDActor
     {
-        const int CollideConstrainCountMax = 500;
-        //CollideConstrain[] m_collideConstrains = new CollideConstrain[CollideConstrainCountMax];
-        int m_collideConstrainCount = 0;
-
         private float m_scale = 1.0f;
 
         protected TetMesh m_tetMesh = null;
@@ -19,9 +15,17 @@ namespace bluebean.Physics.PBD
 
         Vector3[] m_x;
 
+        [Range(0f, 1f)]
+        public float m_staticFriction = 0.0f;
+        [Range(0f, 1f)]
+        public float m_dynamicFriction = 0.0f;
+
+        private Matrix4x4 m_initL2W = Matrix4x4.identity;
+
         // Start is called before the first frame update
         void Start()
         {
+            m_initL2W = this.transform.localToWorldMatrix;
             Initialize();
         }
 
@@ -36,7 +40,7 @@ namespace bluebean.Physics.PBD
             m_x = new Vector3[GetParticleCount()];
             for (int i = 0; i < m_x.Length; i++)
             {
-                m_x[i] = m_tetMesh.GetParticlePos(i);
+                m_x[i] = m_initL2W.MultiplyPoint3x4(m_tetMesh.GetParticlePos(i));
             }
             m_solver.AddActor(this);
             PushStretchConstrains2Solver();
@@ -46,34 +50,6 @@ namespace bluebean.Physics.PBD
         public override void OnPreSubStep(float dt, Vector3 g)
         {
 
-        }
-
-        void GenerateCollideConstrains()
-        {
-            m_collideConstrainCount = 0;
-
-            for (int i = 0; i < m_x.Length; i++)
-            {
-                var p = m_x[i];
-                float planeY = -5;
-                if (p.y < planeY && m_collideConstrainCount < CollideConstrainCountMax - 1)
-                {
-                    //m_collideConstrains[m_collideConstrainCount].m_actorId = this.ActorId;
-                    //m_collideConstrains[m_collideConstrainCount].m_index = i;
-                    //m_collideConstrains[m_collideConstrainCount].m_normal = new Vector3(0, 1, 0);
-                    //m_collideConstrains[m_collideConstrainCount].m_entryPosition = new Vector3(p.x, planeY, p.z);
-                    m_collideConstrainCount++;
-                }
-            }
-        }
-
-        void PushCollideConstrains2Solver()
-        {
-            for (int i = 0; i < m_collideConstrainCount; i++)
-            {
-                //var constrain = m_collideConstrains[i];
-                //m_solver.AddConstrain(constrain);
-            }
         }
 
         void PushStretchConstrains2Solver()
@@ -175,6 +151,9 @@ namespace bluebean.Physics.PBD
             }
             m_mesh.vertices = m_x;
             m_mesh.RecalculateNormals();
+            this.transform.localPosition = Vector3.zero;
+            this.transform.localRotation = Quaternion.identity;
+            this.transform.localScale = Vector3.one;
         }
 
         public override int GetParticleCount()
@@ -184,7 +163,7 @@ namespace bluebean.Physics.PBD
 
         public override Vector3 GetParticleInitPosition(int particleIndex)
         {
-            return m_tetMesh.GetParticlePos(particleIndex);
+            return m_initL2W.MultiplyPoint3x4(m_tetMesh.GetParticlePos(particleIndex));
         }
 
         public override float GetParticleInvMass(int particleIndex)
@@ -195,6 +174,16 @@ namespace bluebean.Physics.PBD
         public override float GetParticleRadius(int particleIndex)
         {
             return 0.1f;
+        }
+
+        public override float GetParticleDynamicFriction(int particleIndex)
+        {
+            return m_dynamicFriction;
+        }
+
+        public override float GetParticleStaticFriction(int particleIndex)
+        {
+            return m_staticFriction;
         }
     }
 }

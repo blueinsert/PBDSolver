@@ -40,6 +40,8 @@ namespace bluebean.Physics.PBD
         [Header("重力加速度")]
         public Vector3 m_g = new Vector3(0, -9.8f, 0);
 
+        public bool m_showGUI = true;
+
         public List<PBDActor> m_actors = new List<PBDActor>();
         private Dictionary<int, PBDActor> m_actorDic = new Dictionary<int, PBDActor>();
 
@@ -531,5 +533,15 @@ namespace bluebean.Physics.PBD
         }
 
         #endregion
+
+        void OnGUI()
+        {
+            if (!m_showGUI) return;
+            // 显示粒子数量
+            GUILayout.Label($"当前粒子数: {m_positionList.count}");
+            GUILayout.Label($"contact: {m_colliderContacts.Length}");
+            GUILayout.Label($"particle contact: {m_particleContacts.Length}");
+
+        }
     }
 }

@@ -206,7 +206,7 @@ public class StackGenerator : MonoBehaviour
         //        }
         //    }
         //}
-        //generatedParticles.Clear();
+        //generatedParticles.Clear(); 
     }
 
     void OnDrawGizmosSelected()

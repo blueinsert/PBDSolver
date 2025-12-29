@@ -163,11 +163,6 @@ namespace bluebean.Physics.PBD
             var particleBatchHandle = m_particleContactBatcher.BatchConstraints(ref contactProvider, particleCount, ref m_particleBatchData, ref activeParticleBatchCount, dequeueHandle);
             particleBatchHandle.Complete();
 
-            if (m_particleContacts.Length > 0)
-            {
-                Debug.Log($"particle contacts count: {m_particleContacts.Length}");
-            }
-
             var pc = m_constrains[(int)ConstrainType.ParticleCollide] as ParticleCollideConstrainGroup;
             var pf = m_constrains[(int)ConstrainType.ParticleFriction] as ParticleFrictionConstrainGroup;
 
