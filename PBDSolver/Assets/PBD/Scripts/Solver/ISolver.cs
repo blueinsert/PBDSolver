@@ -12,8 +12,8 @@ namespace bluebean.Physics.PBD
         float StretchConstrainCompliance { get; }
         float VolumeConstrainCompliance { get; }
 
-        NativeVector4List rigidbodyLinearDeltas { get; }
-        NativeVector4List rigidbodyAngularDeltas { get; }
+        NativeVector4List RigidbodyLinearDeltas { get; }
+        NativeVector4List RigidbodyAngularDeltas { get; }
         #region 粒子数据获取接口
         NativeArray<float> ParticleRadius { get; }
         NativeArray<float4> ParticlePositions { get; }

@@ -22,8 +22,8 @@ namespace bluebean.Physics.PBD
                 shapes = m_solver.ColliderWorld.m_colliderShapes.AsNativeArray<BurstColliderShape>(),
                 transforms = m_solver.ColliderWorld.m_colliderTransforms.AsNativeArray<BurstAffineTransform>(),
                 rigidbodies = m_solver.ColliderWorld.rigidbodies.AsNativeArray<BurstRigidbody>(),
-                rigidbodyAngularDeltas= m_solver.rigidbodyAngularDeltas.AsNativeArray<float4>(),
-                rigidbodyLinearDeltas = m_solver.rigidbodyLinearDeltas.AsNativeArray<float4>(),
+                rigidbodyAngularDeltas= m_solver.RigidbodyAngularDeltas.AsNativeArray<float4>(),
+                rigidbodyLinearDeltas = m_solver.RigidbodyLinearDeltas.AsNativeArray<float4>(),
                 contacts = m_solver.ColliderContacts
             }; 
             return job.Schedule(m_solver.ColliderContacts.Length, 128, inputDeps);
@@ -55,8 +55,8 @@ namespace bluebean.Physics.PBD
                 shapes = m_solver.ColliderWorld.m_colliderShapes.AsNativeArray<BurstColliderShape>(),
                 transforms = m_solver.ColliderWorld.m_colliderTransforms.AsNativeArray<BurstAffineTransform>(),
                 rigidbodies = m_solver.ColliderWorld.rigidbodies.AsNativeArray<BurstRigidbody>(),
-                rigidbodyLinearDeltas = m_solver.rigidbodyLinearDeltas.AsNativeArray<float4>(),
-                rigidbodyAngularDeltas = m_solver.rigidbodyAngularDeltas.AsNativeArray<float4>(),
+                rigidbodyLinearDeltas = m_solver.RigidbodyLinearDeltas.AsNativeArray<float4>(),
+                rigidbodyAngularDeltas = m_solver.RigidbodyAngularDeltas.AsNativeArray<float4>(),
 
                 deltas = m_solver.PositionDeltas,
                 counts = m_solver.PositionConstraintCounts,

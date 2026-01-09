@@ -85,7 +85,8 @@ namespace bluebean.Physics.PBD
 
                     if (rigidbodyIndex >= 0)
                     {
-                        BurstMath.ApplyImpulse(rigidbodyIndex, -lambda / stepTime * contact.normal, contact.pointB, rigidbodies, rigidbodyLinearDeltas, rigidbodyAngularDeltas, identity);
+                        //BurstMath.ApplyImpulse(rigidbodyIndex, -lambda / stepTime * contact.normal, contact.pointB, rigidbodies, rigidbodyLinearDeltas, rigidbodyAngularDeltas, identity);
+                        BurstMath.ApplyImpulse(rigidbodyIndex, -lambda / stepTime / substeps * contact.normal, contact.pointB, rigidbodies, rigidbodyLinearDeltas, rigidbodyAngularDeltas, identity);
                     }
                 }
 

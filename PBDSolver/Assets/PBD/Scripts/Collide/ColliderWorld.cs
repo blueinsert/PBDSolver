@@ -163,8 +163,8 @@ namespace bluebean.Physics.PBD
             if (solver != null)
             {
                 solver.EnsureRigidbodyArraysCapacity(rigidbodyHandles.Count);
-                solver.rigidbodyLinearDeltas.WipeToZero();
-                solver.rigidbodyAngularDeltas.WipeToZero();
+                solver.RigidbodyLinearDeltas.WipeToZero();
+                solver.RigidbodyAngularDeltas.WipeToZero();
             }
 
             for (int i = 0; i < rigidbodyHandles.Count; ++i)
@@ -254,7 +254,6 @@ namespace bluebean.Physics.PBD
 
         public void UpdateRigidbodyVelocities()
         {
-            // we want to average the deltas applied by all solvers, so calculate 1/solverCount.
             float rcpCount = 1.0f;
 
             for (int i = 0; i < rigidbodyHandles.Count; ++i)
@@ -262,8 +261,8 @@ namespace bluebean.Physics.PBD
                 Vector4 linearDelta = Vector4.zero;
                 Vector4 angularDelta = Vector4.zero;
 
-                linearDelta += this.Solver.rigidbodyLinearDeltas[i] * rcpCount;
-                angularDelta += this.Solver.rigidbodyAngularDeltas[i] * rcpCount;
+                linearDelta += this.Solver.RigidbodyLinearDeltas[i] * rcpCount;
+                angularDelta += this.Solver.RigidbodyAngularDeltas[i] * rcpCount;
 
                 // update rigidbody velocities
                 rigidbodyHandles[i].owner.UpdateVelocities(linearDelta, angularDelta);

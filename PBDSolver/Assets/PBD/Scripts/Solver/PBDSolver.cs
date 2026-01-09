@@ -71,8 +71,8 @@ namespace bluebean.Physics.PBD
         private NativeVector4List m_positionDeltaList = new NativeVector4List();
         private NativeVector4List m_gradientList = new NativeVector4List();
         private NativeIntList m_positionConstraintCountList = new NativeIntList();
-        NativeVector4List m_RigidbodyLinearVelocities;
-        NativeVector4List m_RigidbodyAngularVelocities;
+        private NativeVector4List m_rigidbodyLinearVelocities;
+        private NativeVector4List m_rigidbodyAngularVelocities;
 
         private NativeArray<float4> m_particleRestPositions;
         private NativeArray<float4> m_particlePositions;
@@ -123,27 +123,27 @@ namespace bluebean.Physics.PBD
 
         public Vector3 Gravity => m_g;
 
-        public NativeVector4List rigidbodyLinearDeltas
+        public NativeVector4List RigidbodyLinearDeltas
         {
             get
             {
-                if (m_RigidbodyLinearVelocities == null)
+                if (m_rigidbodyLinearVelocities == null)
                 {
-                    m_RigidbodyLinearVelocities = new NativeVector4List();
+                    m_rigidbodyLinearVelocities = new NativeVector4List();
                 }
-                return m_RigidbodyLinearVelocities;
+                return m_rigidbodyLinearVelocities;
             }
         }
 
-        public NativeVector4List rigidbodyAngularDeltas
+        public NativeVector4List RigidbodyAngularDeltas
         {
             get
             {
-                if (m_RigidbodyAngularVelocities == null)
+                if (m_rigidbodyAngularVelocities == null)
                 {
-                    m_RigidbodyAngularVelocities = new NativeVector4List();
+                    m_rigidbodyAngularVelocities = new NativeVector4List();
                 }
-                return m_RigidbodyAngularVelocities;
+                return m_rigidbodyAngularVelocities;
             }
         }
 
@@ -364,10 +364,10 @@ namespace bluebean.Physics.PBD
 
         public void EnsureRigidbodyArraysCapacity(int count)
         {
-            if (count >= rigidbodyLinearDeltas.count)
+            if (count >= RigidbodyLinearDeltas.count)
             {
-                rigidbodyLinearDeltas.ResizeInitialized(count);
-                rigidbodyAngularDeltas.ResizeInitialized(count);
+                RigidbodyLinearDeltas.ResizeInitialized(count);
+                RigidbodyAngularDeltas.ResizeInitialized(count);
             }
         }
 
