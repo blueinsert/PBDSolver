@@ -71,6 +71,8 @@ namespace bluebean.Physics.PBD
         private NativeVector4List m_positionDeltaList = new NativeVector4List();
         private NativeVector4List m_gradientList = new NativeVector4List();
         private NativeIntList m_positionConstraintCountList = new NativeIntList();
+        NativeVector4List m_RigidbodyLinearVelocities;
+        NativeVector4List m_RigidbodyAngularVelocities;
 
         private NativeArray<float4> m_particleRestPositions;
         private NativeArray<float4> m_particlePositions;
@@ -120,6 +122,31 @@ namespace bluebean.Physics.PBD
         public NativeArray<BurstContact> ParticleContacts => m_particleContacts;
 
         public Vector3 Gravity => m_g;
+
+        public NativeVector4List rigidbodyLinearDeltas
+        {
+            get
+            {
+                if (m_RigidbodyLinearVelocities == null)
+                {
+                    m_RigidbodyLinearVelocities = new NativeVector4List();
+                }
+                return m_RigidbodyLinearVelocities;
+            }
+        }
+
+        public NativeVector4List rigidbodyAngularDeltas
+        {
+            get
+            {
+                if (m_RigidbodyAngularVelocities == null)
+                {
+                    m_RigidbodyAngularVelocities = new NativeVector4List();
+                }
+                return m_RigidbodyAngularVelocities;
+            }
+        }
+
         #endregion
 
         private const int MaxBatches = 17;
@@ -189,7 +216,7 @@ namespace bluebean.Physics.PBD
 
         void OnPostStep()
         {
-           
+            m_colliderWorld.UpdateRigidbodyVelocities();
             for (int i = 0; i < m_actors.Count; i++)
             {
                 m_actors[i].OnPostStep();
@@ -334,6 +361,15 @@ namespace bluebean.Physics.PBD
         #endregion
 
         #region 内部方法
+
+        public void EnsureRigidbodyArraysCapacity(int count)
+        {
+            if (count >= rigidbodyLinearDeltas.count)
+            {
+                rigidbodyLinearDeltas.ResizeInitialized(count);
+                rigidbodyAngularDeltas.ResizeInitialized(count);
+            }
+        }
 
         private void ClearForce()
         {

@@ -39,8 +39,8 @@ namespace bluebean.Physics.PBD.DataStruct
         }
 
         public void Contacts(int colliderIndex,
-                              //int rigidbodyIndex,
-                              // NativeArray<BurstRigidbody> rigidbodies,
+                              int rigidbodyIndex,
+                              NativeArray<BurstRigidbody> rigidbodies,
                               NativeArray<float4> positions,
                               NativeArray<float4> velocities,
                               NativeArray<float> radii,
@@ -51,15 +51,14 @@ namespace bluebean.Physics.PBD.DataStruct
                               )
         {
 
-            BIHTraverse(colliderIndex, particleIndex,
+            BIHTraverse(colliderIndex, rigidbodyIndex, particleIndex, rigidbodies,
                         positions, velocities, radii, in particleBounds, 0, contacts);
-
         }
 
         private void BIHTraverse(int colliderIndex,
-                                 //int rigidbodyIndex,
+                                 int rigidbodyIndex,
                                  int particleIndex,
-                                 //NativeArray<BurstRigidbody> rigidbodies,
+                                 NativeArray<BurstRigidbody> rigidbodies,
                                  NativeArray<float4> positions,
                                  NativeArray<float4> velocities,
                                  NativeArray<float> radii,
@@ -74,13 +73,13 @@ namespace bluebean.Physics.PBD.DataStruct
             {
                 // visit min node:
                 if (particleBounds.min[node.axis] <= node.leftSplitPlane)
-                    BIHTraverse(colliderIndex, particleIndex,
+                    BIHTraverse(colliderIndex,rigidbodyIndex, particleIndex,rigidbodies,
                                 positions, velocities, radii, in particleBounds,
                                 node.firstChild, contacts);
 
                 // visit max node:
                 if (particleBounds.max[node.axis] >= node.rightSplitPlane)
-                    BIHTraverse(colliderIndex, particleIndex,
+                    BIHTraverse(colliderIndex, rigidbodyIndex, particleIndex, rigidbodies,
                                 positions, velocities, radii, in particleBounds,
                                 node.firstChild + 1, contacts);
             }
@@ -108,9 +107,10 @@ namespace bluebean.Physics.PBD.DataStruct
                         var nearestPoint = new SurfacePoint();
                         this.Evaluate(particlePoint, particleRadius, quaternion.identity, ref nearestPoint);
 
-                        float4 rbVelocity = float4.zero;  
-                        //if (rigidbodyIndex >= 0)
-                        //   rbVelocity = BurstMath.GetRigidbodyVelocityAtPoint(rigidbodyIndex, colliderPoint.point, rigidbodies, solverToWorld);
+                        var identity = new BurstAffineTransform(new float4(0, 0, 0, 0), quaternion.identity, new float4(1, 1, 1, 1));
+                        float4 rbVelocity = float4.zero;   
+                        if (rigidbodyIndex >= 0)
+                           rbVelocity = BurstMath.GetRigidbodyVelocityAtPoint(rigidbodyIndex, nearestPoint.point, rigidbodies, identity);
                         //计算粒子点距离表面最近点的相对距离和相对速度
                         float dAB = math.dot(particlePoint - nearestPoint.point, nearestPoint.normal);
                         float dVel = math.dot(particleVelocity - rbVelocity, nearestPoint.normal);

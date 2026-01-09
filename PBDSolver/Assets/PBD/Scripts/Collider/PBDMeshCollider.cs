@@ -19,10 +19,6 @@ namespace bluebean.Physics.PBD
             AddCollider();
         }
 
-        protected override void CreateTracker()
-        {
-            tracker = new MeshShapeTracker(this, m_unityMeshCollider);
-        }
 
         public override void UpdateIfNeeded()
         {
@@ -37,6 +33,7 @@ namespace bluebean.Physics.PBD
             var shape = new ColliderShape();
             shape.type = ColliderShapeType.TriangleMesh;
             shape.dataIndex = m_triMeshHandle.index;
+            shape.rigidbodyIndex = this.Rigidbody ? this.Rigidbody.handle.index : -1;
             var aabb = new Aabb();
             aabb.FromBounds(m_unityMeshCollider.bounds, 0);
             var trfm = new AffineTransform();

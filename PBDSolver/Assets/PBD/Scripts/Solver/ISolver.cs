@@ -1,4 +1,5 @@
 using bluebean.Physics.PBD.DataStruct;
+using bluebean.Physics.PBD.DataStruct.Native;
 using Unity.Collections;
 using Unity.Mathematics;
 using UnityEngine;
@@ -11,6 +12,8 @@ namespace bluebean.Physics.PBD
         float StretchConstrainCompliance { get; }
         float VolumeConstrainCompliance { get; }
 
+        NativeVector4List rigidbodyLinearDeltas { get; }
+        NativeVector4List rigidbodyAngularDeltas { get; }
         #region 粒子数据获取接口
         NativeArray<float> ParticleRadius { get; }
         NativeArray<float4> ParticlePositions { get; }

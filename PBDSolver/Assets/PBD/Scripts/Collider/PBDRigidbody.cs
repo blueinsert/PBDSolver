@@ -71,6 +71,7 @@ namespace bluebean.Physics.PBD
 
         public virtual void UpdateIfNeeded(float stepTime)
         {
+            //Debug.Log($"{this.gameObject.name} PBDRigidbody:UpdateIfNeeded");
             UpdateVelocities(stepTime);
             var solver = GetComponentInParent<PBDSolver>();
             if (solver != null)

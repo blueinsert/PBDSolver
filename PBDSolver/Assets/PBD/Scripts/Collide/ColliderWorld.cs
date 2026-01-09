@@ -157,6 +157,21 @@ namespace bluebean.Physics.PBD
                 m_colliderHandles[i].owner.UpdateIfNeeded();
         }
 
+        private void UpdateRigidbodies(float stepTime)
+        {
+            var solver = this.Solver as PBDSolver;
+            if (solver != null)
+            {
+                solver.EnsureRigidbodyArraysCapacity(rigidbodyHandles.Count);
+                solver.rigidbodyLinearDeltas.WipeToZero();
+                solver.rigidbodyAngularDeltas.WipeToZero();
+            }
+
+            for (int i = 0; i < rigidbodyHandles.Count; ++i)
+                rigidbodyHandles[i].owner.UpdateIfNeeded(stepTime);
+        }
+
+
         /// <summary>
         /// 使用多重网格，更新碰撞体的空间划分
         /// </summary>
@@ -169,7 +184,7 @@ namespace bluebean.Physics.PBD
             {
                 //输入
                 shapes = this.m_colliderShapes.AsNativeArray<BurstColliderShape>(m_colliderCellSpans.count),
-                //rigidbodies = world.rigidbodies.AsNativeArray<BurstRigidbody>(),
+                rigidbodies = this.rigidbodies.AsNativeArray<BurstRigidbody>(),
                 //collisionMaterials = world.collisionMaterials.AsNativeArray<BurstCollisionMaterial>(),
                 bounds = this.m_colliderAabbs.AsNativeArray<BurstAabb>(m_colliderCellSpans.count),
                 //colliderCount = m_colliderCount,
@@ -193,6 +208,7 @@ namespace bluebean.Physics.PBD
         {
             UpdateColliders();
             UpdateCollidersMultiGrid(deltaTime);
+            UpdateRigidbodies(deltaTime);
         }
 
         /// <summary>
@@ -218,13 +234,13 @@ namespace bluebean.Physics.PBD
 
                 colliderTransforms = this.m_colliderTransforms.AsNativeArray<BurstAffineTransform>(),
                 colliderShapes = this.m_colliderShapes.AsNativeArray<BurstColliderShape>(),
-                //rigidbodies = world.rigidbodies.AsNativeArray<BurstRigidbody>(),
+                rigidbodies = this.rigidbodies.AsNativeArray<BurstRigidbody>(),
                 colliderBounds = this.m_colliderAabbs.AsNativeArray<BurstAabb>(),
 
                 triangleMeshHeaders = this.m_triangleMeshContainer.headers.AsNativeArray<TriangleMeshHeader>(),
-                 triangleMesh_bihNodes = this.m_triangleMeshContainer.bihNodes.AsNativeArray<BIHNode>(),
-                 triangleMesh_triangles = this.m_triangleMeshContainer.triangles.AsNativeArray<Triangle>(),
-                 triangleMesh_vertices = this.m_triangleMeshContainer.vertices.AsNativeArray<float3>(),
+                triangleMesh_bihNodes = this.m_triangleMeshContainer.bihNodes.AsNativeArray<BIHNode>(),
+                triangleMesh_triangles = this.m_triangleMeshContainer.triangles.AsNativeArray<Triangle>(),
+                triangleMesh_vertices = this.m_triangleMeshContainer.vertices.AsNativeArray<float3>(),
 
                 deltaTime = deltaTime,
 
@@ -235,5 +251,25 @@ namespace bluebean.Physics.PBD
             return generateColliderContactsJob.Schedule(Solver.ParticlePositions.Count(), 16, inputDeps);
 
         }
+
+        public void UpdateRigidbodyVelocities()
+        {
+            // we want to average the deltas applied by all solvers, so calculate 1/solverCount.
+            float rcpCount = 1.0f;
+
+            for (int i = 0; i < rigidbodyHandles.Count; ++i)
+            {
+                Vector4 linearDelta = Vector4.zero;
+                Vector4 angularDelta = Vector4.zero;
+
+                linearDelta += this.Solver.rigidbodyLinearDeltas[i] * rcpCount;
+                angularDelta += this.Solver.rigidbodyAngularDeltas[i] * rcpCount;
+
+                // update rigidbody velocities
+                rigidbodyHandles[i].owner.UpdateVelocities(linearDelta, angularDelta);
+            }
+
+        }
+
     }
 }

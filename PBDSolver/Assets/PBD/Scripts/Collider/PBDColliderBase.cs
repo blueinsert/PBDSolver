@@ -7,7 +7,6 @@ namespace bluebean.Physics.PBD
     {
         private ISolver m_solver = null;
         protected ColliderHandle m_colliderHandle = null;
-        protected ShapeTracker tracker;                               /**< tracker object used to determine when to update the collider's shape*/
 
         public PBDRigidbody Rigidbody
         {
@@ -34,10 +33,6 @@ namespace bluebean.Physics.PBD
                 }
                 return m_solver;
             }
-        }
-
-        protected virtual void CreateTracker()
-        {
         }
 
         protected void CreateRigidbody()
@@ -69,9 +64,6 @@ namespace bluebean.Physics.PBD
                     m_colliderHandle = Solver.ColliderWorld.CreateCollider();
                     m_colliderHandle.owner = this;
 
-                    // Create shape tracker:
-                    CreateTracker();
-
                     // Create rigidbody if necessary, and link ourselves to it:
                     CreateRigidbody();
                 }
@@ -82,13 +74,6 @@ namespace bluebean.Physics.PBD
         protected void RemoveCollider()
         {
             //ObiColliderWorld.GetInstance().DestroyCollider(shapeHandle);
-
-            // Destroy shape tracker:
-            if (tracker != null)
-            {
-                tracker.Destroy();
-                tracker = null;
-            }
         }
 
         /// <summary>
@@ -96,8 +81,7 @@ namespace bluebean.Physics.PBD
         /// </summary>
         public virtual void UpdateIfNeeded()
         {
-            if (tracker != null)
-                tracker.UpdateIfNeeded();
+
         }
 
     }

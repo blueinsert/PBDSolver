@@ -1,4 +1,5 @@
 using bluebean.Physics.PBD.DataStruct;
+using System.CodeDom.Compiler;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
@@ -16,9 +17,10 @@ namespace bluebean.Physics.PBD
 
         [ReadOnly] public NativeArray<BurstColliderShape> shapes;
         [ReadOnly] public NativeArray<BurstAffineTransform> transforms;
-        //[ReadOnly] public NativeArray<BurstRigidbody> rigidbodies;
-        //public NativeArray<float4> rigidbodyLinearDeltas;
-        //public NativeArray<float4> rigidbodyAngularDeltas;
+        [ReadOnly] public NativeArray<BurstRigidbody> rigidbodies;
+
+        public NativeArray<float4> rigidbodyLinearDeltas;
+        public NativeArray<float4> rigidbodyAngularDeltas;
 
         [ReadOnly] public float stepTime;
         [ReadOnly] public float substepTime;
@@ -55,12 +57,15 @@ namespace bluebean.Physics.PBD
                 //粒子表面距离碰撞点的最近点
                 posA += -contact.normal * particleRadius;
 
+                var identity = new BurstAffineTransform(new float4(0, 0, 0, 0), quaternion.identity, new float4(1, 1, 1, 1));
+
                 //碰撞点，碰撞体表面上的点，世界坐标系
                 float4 posB = contact.pointB;
-
+                // Get the rigidbody index (might be < 0, in that case there's no rigidbody present)
+                int rigidbodyIndex = shapes[colliderIndex].rigidbodyIndex;
                 contact.normalInvMassA = contact.tangentInvMassA = contact.bitangentInvMassA = invMass;
-                //if (rigidbodyIndex >= 0)
-                //    posB += BurstMath.GetRigidbodyVelocityAtPoint(rigidbodyIndex, contact.pointB, rigidbodies, rigidbodyLinearDeltas, rigidbodyAngularDeltas, inertialFrame.frame) * stepTime;
+                if (rigidbodyIndex >= 0)
+                    posB += BurstMath.GetRigidbodyVelocityAtPoint(rigidbodyIndex, contact.pointB, rigidbodies, rigidbodyLinearDeltas, rigidbodyAngularDeltas, identity) * stepTime;
 
                 // adhesion:
                 //float lambda = contact.SolveAdhesion(posA, posB, material.stickDistance, material.stickiness, stepTime);
@@ -78,10 +83,10 @@ namespace bluebean.Physics.PBD
                     deltas[particleIndex] += delta * invMasses[particleIndex];
                     counts[particleIndex]++;
 
-                    //if (rigidbodyIndex >= 0)
-                    //{
-                    //    BurstMath.ApplyImpulse(rigidbodyIndex, -lambda / stepTime * contact.normal, contact.pointB, rigidbodies, rigidbodyLinearDeltas, rigidbodyAngularDeltas, inertialFrame.frame);
-                    //}
+                    if (rigidbodyIndex >= 0)
+                    {
+                        BurstMath.ApplyImpulse(rigidbodyIndex, -lambda / stepTime * contact.normal, contact.pointB, rigidbodies, rigidbodyLinearDeltas, rigidbodyAngularDeltas, identity);
+                    }
                 }
 
                 contacts[i] = contact;

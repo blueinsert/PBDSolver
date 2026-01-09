@@ -16,7 +16,7 @@ namespace bluebean.Physics.PBD
     {
         //输入
         [ReadOnly] public NativeArray<BurstColliderShape> shapes;
-        //[ReadOnly] public NativeArray<BurstRigidbody> rigidbodies;
+        [ReadOnly] public NativeArray<BurstRigidbody> rigidbodies;
         //[ReadOnly] public NativeArray<BurstCollisionMaterial> collisionMaterials;
         /// <summary>
         /// 碰撞体Aabb,世界坐标
@@ -41,12 +41,12 @@ namespace bluebean.Physics.PBD
         {
             BurstAabb velocityBounds = bounds[i];
 
-            //int rb = shapes[i].rigidbodyIndex;
+            int rb = shapes[i].rigidbodyIndex;
 
             // Expand bounds by rigidbody's linear velocity
             // (check against out of bounds rigidbody access, can happen when a destroyed collider references a rigidbody that has just been destroyed too)
-            //if (rb >= 0 && rb < rigidbodies.Length)
-            //    velocityBounds.Sweep(rigidbodies[rb].velocity * dt);
+            if (rb >= 0 && rb < rigidbodies.Length)
+                velocityBounds.Sweep(rigidbodies[rb].velocity * dt);
 
             // Expand bounds by collision material's stick distance:
             //if (shapes[i].materialIndex >= 0)

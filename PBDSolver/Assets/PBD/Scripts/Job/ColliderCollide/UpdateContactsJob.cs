@@ -19,9 +19,9 @@ namespace bluebean.Physics.PBD
 
         [ReadOnly] public NativeArray<BurstColliderShape> shapes;
         [ReadOnly] public NativeArray<BurstAffineTransform> transforms;
-        //[ReadOnly] public NativeArray<BurstRigidbody> rigidbodies;
-        //[ReadOnly] public NativeArray<float4> rigidbodyLinearDeltas;
-        //[ReadOnly] public NativeArray<float4> rigidbodyAngularDeltas;
+        [ReadOnly] public NativeArray<BurstRigidbody> rigidbodies;
+        [ReadOnly] public NativeArray<float4> rigidbodyLinearDeltas;
+        [ReadOnly] public NativeArray<float4> rigidbodyAngularDeltas;
 
         public NativeArray<BurstContact> contacts;
 
@@ -36,13 +36,14 @@ namespace bluebean.Physics.PBD
             float particleInvMass = invMasses[particleIndex];
             float particleRadius = radii[particleIndex];
 
+            var identity = new BurstAffineTransform(new float4(0, 0, 0, 0), quaternion.identity, new float4(1, 1, 1, 1));
 
             // if there's a rigidbody present, subtract its velocity from the relative velocity:
-            //int rigidbodyIndex = shapes[contact.bodyB].rigidbodyIndex;
-            //if (rigidbodyIndex >= 0)
-            //{
-            //    relativeVelocity -= BurstMath.GetRigidbodyVelocityAtPoint(rigidbodyIndex, contact.pointB, rigidbodies, rigidbodyLinearDeltas, rigidbodyAngularDeltas, inertialFrame.frame);
-            //}
+            int rigidbodyIndex = shapes[contact.bodyB].rigidbodyIndex;
+            if (rigidbodyIndex >= 0)
+            {
+                relativeVelocity -= BurstMath.GetRigidbodyVelocityAtPoint(rigidbodyIndex, contact.pointB, rigidbodies, rigidbodyLinearDeltas, rigidbodyAngularDeltas, identity);
+            }
 
             // update contact distance
             contact.distance = math.dot(particlePrevPosition - contact.pointB, contact.normal) - particleRadius;
@@ -57,8 +58,8 @@ namespace bluebean.Physics.PBD
             contact.CalculateContactMassesA(particleInvMass, particlePrevPosition, contactPoint);
 
             // calculate B's contact mass.
-            //if (rigidbodyIndex >= 0)
-            //    contact.CalculateContactMassesB(rigidbodies[rigidbodyIndex], inertialFrame.frame);
+            if (rigidbodyIndex >= 0)
+                contact.CalculateContactMassesB(rigidbodies[rigidbodyIndex], identity);
 
             contacts[i] = contact;
         }

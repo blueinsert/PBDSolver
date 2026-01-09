@@ -28,7 +28,7 @@ namespace bluebean.Physics.PBD
         // collider arrays:
         [ReadOnly] public NativeArray<BurstAffineTransform> colliderTransforms;
         [ReadOnly] public NativeArray<BurstColliderShape> colliderShapes;
-        //[ReadOnly] public NativeArray<BurstRigidbody> rigidbodies;
+        [ReadOnly] public NativeArray<BurstRigidbody> rigidbodies;
         [ReadOnly] public NativeArray<BurstAabb> colliderBounds;
 
         // triangle mesh data:
@@ -92,17 +92,16 @@ namespace bluebean.Physics.PBD
                     {
                         BurstColliderShape shape = colliderShapes[colliderId];
                         BurstAabb colliderBound = colliderBounds[colliderId];//world space
-                        //int rb = shape.rigidbodyIndex;
-
+                        int rb = shape.rigidbodyIndex;
                         // Expand bounds by rigidbody's linear velocity:
-                        //if (rb >= 0)
-                        //    colliderBoundsWS.Sweep(rigidbodies[rb].velocity * deltaTime);
+                        if (rb >= 0)
+                            colliderBound.Sweep(rigidbodies[rb].velocity * deltaTime);
 
                         if (particleBound.IntersectsAabb(in colliderBound))
                         {
                             //narrow phase, 更细致级别的碰撞检测
                             BurstAffineTransform colliderToWorldTransform = colliderTransforms[colliderId];
-                            GenerateContacts(in shape, in colliderToWorldTransform, colliderId, i, particleBound);
+                            GenerateContacts(in shape, in colliderToWorldTransform, colliderId, rb, i, particleBound);
                         }
                     }
                 }
@@ -120,7 +119,7 @@ namespace bluebean.Physics.PBD
         private void GenerateContacts(in BurstColliderShape colliderShape,
                                       in BurstAffineTransform colliderToWorldTransform,
                                       int colliderIndex,
-                                      //int rigidbodyIndex,
+                                      int rigidbodyIndex,
                                       int particleIndex,
                                       in BurstAabb particleBound)
         {
@@ -148,7 +147,7 @@ namespace bluebean.Physics.PBD
                         dt = deltaTime
                     };
 
-                    triangleMeshShape.Contacts(colliderIndex, positions, velocities, radii, in particleBoundCS,
+                    triangleMeshShape.Contacts(colliderIndex,rigidbodyIndex, rigidbodies, positions, velocities, radii, in particleBoundCS,
                         particleIndex, contactsQueue);
 
                     break;
