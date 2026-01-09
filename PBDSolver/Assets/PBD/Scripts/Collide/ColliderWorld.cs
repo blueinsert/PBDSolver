@@ -140,12 +140,12 @@ namespace bluebean.Physics.PBD
             m_triangleMeshContainer.DestroyTriangleMesh(meshHandle);
         }
 
-        //public void UpdateColliderData(int index, ColliderShape shape,Aabb aabb,AffineTransform transform)
-        //{
-        //    m_colliderShapes[index] = shape;
-        //    m_colliderAabbs[index] = aabb;
-        //    m_colliderTransforms[index] = transform;
-        //}
+        public void UpdateColliderData(int index, ColliderShape shape, Aabb aabb, AffineTransform transform)
+        {
+            m_colliderShapes[index] = shape;
+            m_colliderAabbs[index] = aabb;
+            m_colliderTransforms[index] = transform;
+        }
 
         /// <summary>
         /// 更新碰撞体数据
