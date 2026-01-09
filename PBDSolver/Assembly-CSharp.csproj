@@ -65,9 +65,12 @@
     <Compile Include="Assets\PBD\Scripts\Constrains\ConstrainData.cs" />
     <Compile Include="Assets\PBD\Scripts\Job\ParticleCollide\ApplyBatchedCollisionConstraintsBatchJob.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\SurfacePoint.cs" />
+    <Compile Include="Assets\PBD\Scripts\Collider\ShapeTracker.cs" />
     <Compile Include="Assets\PBD\Scripts\Actor\SingleParticleActor.cs" />
     <Compile Include="Assets\PBD\Scripts\Collide\ParticleGrid.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\BVH\BIHNode.cs" />
+    <Compile Include="Assets\PBD\Scripts\Collider\PBDRigidbody.cs" />
+    <Compile Include="Assets\PBD\Scripts\Collider\MeshShapeTracker.cs" />
     <Compile Include="Assets\PBD\Scripts\Actor\BunnyTetMeshImpl.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\SDF\DFNode.cs" />
     <Compile Include="Assets\PBD\Test\Scripts\StackGenerator.cs" />
@@ -87,14 +90,15 @@
     <Compile Include="Assets\PBD\Scripts\DataStruct\IDistanceFunction.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Burst\BurstRigidbody.cs" />
     <Compile Include="Assets\PBD\Scripts\Constrains\ParticleFrictionConstrainGroup.cs" />
+    <Compile Include="Assets\PBD\Scripts\DataStruct\Native\NativeRigidbodyList.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\PriorityQueue.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Native\NativeAabbList.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Batcher\BatchData.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Aabb.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Batcher\BatchLUT.cs" />
     <Compile Include="Assets\PBD\Scripts\Job\ParticleCollide\UpdateParticleContactsJob.cs" />
-    <Compile Include="Assets\PBD\Scripts\Collider\PBDMeshCollider.cs" />
     <Compile Include="Assets\PBD\Scripts\Constrains\FrictionConstrainGroup.cs" />
+    <Compile Include="Assets\PBD\Scripts\Collider\PBDMeshCollider.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Burst\BurstContact.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\ColliderShapeType.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Native\NativeTriangleMeshHeaderList.cs" />
@@ -102,10 +106,10 @@
     <Compile Include="Assets\PBD\Scripts\Job\DequeueIntoArrayJob.cs" />
     <Compile Include="Assets\PBD\Scripts\Solver\ISolver.cs" />
     <Compile Include="Assets\PBD\Scripts\Job\Constrains\StretchConstrainSolveJob.cs" />
+    <Compile Include="Assets\PBD\Scripts\Job\ParticleFriction\ParticleFrictionConstraintsBatchJob.cs" />
     <Compile Include="Assets\PBD\Scripts\Util\PhysicsUtil.cs" />
     <Compile Include="Assets\PBD\Scripts\Job\ParticleCollide\UpdateParticleGridJob.cs" />
     <Compile Include="Assets\PBD\Scripts\Constrains\VolumeConstrainGroup.cs" />
-    <Compile Include="Assets\PBD\Scripts\Job\ParticleFriction\ParticleFrictionConstraintsBatchJob.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Batcher\ContactProvider.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Burst\BurstCellSpan.cs" />
     <Compile Include="Assets\PBD\Scripts\Collide\ColliderWorld.cs" />
@@ -116,6 +120,7 @@
     <Compile Include="Assets\PBD\Scripts\DataStruct\VectorInt2.cs" />
     <Compile Include="Assets\PBD\Scripts\Job\ColliderCollide\BuildParticleAabbsJob.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\CellSpan.cs" />
+    <Compile Include="Assets\PBD\Scripts\Collider\PBDColliderBase.cs" />
     <Compile Include="Assets\PBD\Scripts\Actor\TetMeshBasedSoftBodyActor.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\BVH\BIH.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Native\NativeBIHNodeList.cs" />
@@ -129,7 +134,6 @@
     <Compile Include="Assets\PBD\Scripts\DataStruct\Native\NativeVector3List.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Burst\BurstAffineTransform.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\AffineTransform.cs" />
-    <Compile Include="Assets\PBD\Scripts\Collider\ColliderBase.cs" />
     <Compile Include="Assets\PBD\Scripts\Actor\PBDActor.cs" />
     <Compile Include="Assets\PBD\Scripts\Job\PredictPositionsJob.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Contact.cs" />
@@ -137,11 +141,12 @@
     <Compile Include="Assets\PBD\Scripts\Utils\ParticlePicker.cs" />
     <Compile Include="Assets\PBD\Scripts\Actor\TetMesh.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\VectorInt3.cs" />
+    <Compile Include="Assets\PBD\Scripts\DataStruct\ColliderRigidbody.cs" />
     <Compile Include="Assets\PBD\Scripts\Solver\PBDSolver.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Batcher\ContactBatcher.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Burst\BurstLocalOptimization.cs" />
-    <Compile Include="Assets\PBD\Scripts\Job\ParticleCollide\GenerateParticleParticleContactsJob.cs" />
     <Compile Include="Assets\PBD\Scripts\Job\ColliderCollide\UpdateContactsJob.cs" />
+    <Compile Include="Assets\PBD\Scripts\Job\ParticleCollide\GenerateParticleParticleContactsJob.cs" />
     <Compile Include="Assets\PBD\Scripts\Actor\ShapeMatchingBasedSoftBodyActor.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Native\NativeList.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\SDF\ASDF.cs" />
@@ -173,8 +178,8 @@
     <Compile Include="Assets\PBD\Scripts\DataStruct\Native\NativeCellSpanList.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\VectorInt4.cs" />
     <Compile Include="Assets\PBD\Scripts\Constrains\ParticleCollideConstrainGroup.cs" />
-    <Compile Include="Assets\PBD\Scripts\Constrains\ParticleFrictionConstraintsBatch.cs" />
     <Compile Include="Assets\PBD\Scripts\Job\ColliderFriction\FrictionConstraintsBatchJob.cs" />
+    <Compile Include="Assets\PBD\Scripts\Constrains\ParticleFrictionConstraintsBatch.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Burst\BurstTriangleMesh.cs" />
     <Compile Include="Assets\PBD\Scripts\Job\ColliderCollide\CollisionConstraintsJob.cs" />
     <Compile Include="Assets\PBD\Test\CompressTest\SimpleRotate.cs" />
@@ -1030,6 +1035,10 @@
       <HintPath>Library\ScriptAssemblies\Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Unity.Recorder.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.Recorder.Editor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.RenderPipelines.Core.Runtime">
       <HintPath>Library\ScriptAssemblies\Unity.RenderPipelines.Core.Runtime.dll</HintPath>
       <Private>False</Private>
@@ -1064,6 +1073,10 @@
     </Reference>
     <Reference Include="Unity.ShaderGraph.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.ShaderGraph.Editor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.Recorder.Base">
+      <HintPath>Library\ScriptAssemblies\Unity.Recorder.Base.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.VisualStudio.Editor">
@@ -1166,12 +1179,16 @@
       <HintPath>Library\ScriptAssemblies\Unity.TextMeshPro.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Unity.Searcher.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.Searcher.Editor.dll</HintPath>
+    <Reference Include="Unity.Recorder">
+      <HintPath>Library\ScriptAssemblies\Unity.Recorder.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.RenderPipelines.Universal.Shaders">
       <HintPath>Library\ScriptAssemblies\Unity.RenderPipelines.Universal.Shaders.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.Searcher.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.Searcher.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.ProBuilder.AssetIdRemapUtility">

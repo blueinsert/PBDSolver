@@ -41,8 +41,13 @@ namespace bluebean.Physics.PBD
         public TriangleMeshHandle(Mesh mesh, int index = -1) : base(index) { owner = mesh; }
     }
 
-    public class ColliderHandle : ResourceHandle<ColliderBase>
+    public class ColliderHandle : ResourceHandle<PBDColliderBase>
     {
         public ColliderHandle(int index = -1) : base(index) { }
+    }
+
+    public class RigidbodyHandle : ResourceHandle<PBDRigidbody>
+    {
+        public RigidbodyHandle(int index = -1) : base(index) { }
     }
 }

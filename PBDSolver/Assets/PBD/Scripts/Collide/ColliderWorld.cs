@@ -53,6 +53,9 @@ namespace bluebean.Physics.PBD
         [NonSerialized] public NativeCellSpanList m_colliderCellSpans;
 
         private int m_colliderCount = 0;
+
+        [NonSerialized] public List<RigidbodyHandle> rigidbodyHandles;         // list of rigidbody handles
+        [NonSerialized] public NativeRigidbodyList rigidbodies;                // list of rigidbodies.
         #endregion
 
         #region 碰撞体网格划分，空间优化
@@ -78,6 +81,8 @@ namespace bluebean.Physics.PBD
             m_colliderCellSpans = new NativeCellSpanList();
             m_triangleMeshContainer = new TriangleMeshContainer();
             m_colliderCount = 0;
+            rigidbodyHandles = new List<RigidbodyHandle>();
+            rigidbodies = new NativeRigidbodyList();
 
             m_movingColliders = new NativeQueue<MovingCollider>(Allocator.Persistent);
             m_grid = new NativeMultilevelGrid<int>(1000, Allocator.Persistent);
@@ -96,6 +101,8 @@ namespace bluebean.Physics.PBD
             m_movingColliders.Dispose();
             m_grid.Dispose();
             m_colliderContactQueue.Dispose();
+
+            rigidbodies.Dispose();
         }
 
         public ColliderHandle CreateCollider()
@@ -113,17 +120,32 @@ namespace bluebean.Physics.PBD
             return handle;
         }
 
+        public RigidbodyHandle CreateRigidbody()
+        {
+            var handle = new RigidbodyHandle(rigidbodyHandles.Count);
+            rigidbodyHandles.Add(handle);
+
+            rigidbodies.Add(new ColliderRigidbody());
+
+            return handle;
+        }
+
         public TriangleMeshHandle GetOrCreateTriangleMesh(Mesh mesh)
         {
             return m_triangleMeshContainer.GetOrCreateTriangleMesh(mesh);
         }
 
-        public void UpdateColliderData(int index, ColliderShape shape,Aabb aabb,AffineTransform transform)
+        public void DestroyTriangleMesh(TriangleMeshHandle meshHandle)
         {
-            m_colliderShapes[index] = shape;
-            m_colliderAabbs[index] = aabb;
-            m_colliderTransforms[index] = transform;
+            m_triangleMeshContainer.DestroyTriangleMesh(meshHandle);
         }
+
+        //public void UpdateColliderData(int index, ColliderShape shape,Aabb aabb,AffineTransform transform)
+        //{
+        //    m_colliderShapes[index] = shape;
+        //    m_colliderAabbs[index] = aabb;
+        //    m_colliderTransforms[index] = transform;
+        //}
 
         /// <summary>
         /// 更新碰撞体数据
