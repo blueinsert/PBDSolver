@@ -6,19 +6,18 @@ public class GameObjectSpawner : MonoBehaviour
     [Header("生成设置")]
     [Tooltip("将要实例化的Prefab")]
     public GameObject prefabToSpawn;
-
+    [Header("触发按钮")]
+    public KeyCode triggerKey;
     [Tooltip("生成位置的偏移量（相对于当前对象位置）")]
     public Vector3 spawnOffset = Vector3.zero;
     public bool isRangeSpawn = false;
     public Vector3 spawnRange = Vector3.zero;
-
-
-    [Tooltip("是否使用当前对象的旋转")]
-    public bool useCurrentRotation = true;
-
-    [Tooltip("生成的物体是否作为子对象")]
-    public bool asChild = true;
-
+    [Header("初始速度")]
+    public Vector3 initVel = Vector3.zero;
+    [Header("初始速度扰动")]
+    public Vector3 initVelPerturb = Vector3.zero;
+    [Header("生成物体父节点")]
+    public GameObject m_root = null;
     [Tooltip("每秒最大生成次数（防止连点）")]
     public float maxSpawnRate = 10f;
 
@@ -33,7 +32,7 @@ public class GameObjectSpawner : MonoBehaviour
     void Update()
     {
         // 检测空格键按下
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(this.triggerKey))
         {
             TrySpawnPrefab();
         }
@@ -75,7 +74,7 @@ public class GameObjectSpawner : MonoBehaviour
             float zoffset = spawnRange.z * (Random.Range(1, 100) / 100f - 0.5f);
             spawnPosition += new Vector3(xoffset, yoffset, zoffset);
         }
-        Quaternion spawnRotation = useCurrentRotation ? transform.rotation : prefabToSpawn.transform.rotation;
+        Quaternion spawnRotation = Quaternion.identity;
 
         // 实例化对象
         GameObject spawnedObject = Instantiate(prefabToSpawn, spawnPosition, spawnRotation);
@@ -83,12 +82,22 @@ public class GameObjectSpawner : MonoBehaviour
         if (actor != null)
         {
             actor.m_actorId = m_id++;
-        }
-        // 设置父对象
-        if (asChild)
+            actor.m_initVel = new Vector3(this.initVel.x + this.initVelPerturb.x*Random.Range(-1.0f,1.0f),
+                this.initVel.y + this.initVelPerturb.y * Random.Range(-1.0f, 1.0f),
+                this.initVel.z + this.initVelPerturb.z * Random.Range(-1.0f, 1.0f));
+        }else
         {
-            spawnedObject.transform.SetParent(transform);
+            var rigid = spawnedObject.GetComponent<Rigidbody>();
+            if(rigid != null)
+            {
+                rigid.velocity = new Vector3(this.initVel.x + this.initVelPerturb.x * Random.Range(-1.0f, 1.0f),
+                this.initVel.y + this.initVelPerturb.y * Random.Range(-1.0f, 1.0f),
+                this.initVel.z + this.initVelPerturb.z * Random.Range(-1.0f, 1.0f));
+            }
         }
+
+
+        spawnedObject.transform.SetParent(this.m_root.transform);
 
         spawnedObject.gameObject.SetActive(true);
         // 记录生成时间

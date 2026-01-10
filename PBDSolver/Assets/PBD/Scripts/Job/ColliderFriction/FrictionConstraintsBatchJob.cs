@@ -24,9 +24,9 @@ namespace bluebean.Physics.PBD
 
         [ReadOnly] public NativeArray<BurstColliderShape> shapes;
         [ReadOnly] public NativeArray<BurstAffineTransform> transforms;
-        //[ReadOnly] public NativeArray<BurstRigidbody> rigidbodies;
-        //public NativeArray<float4> rigidbodyLinearDeltas;
-        //public NativeArray<float4> rigidbodyAngularDeltas;
+        [ReadOnly] public NativeArray<BurstRigidbody> rigidbodies;
+        public NativeArray<float4> rigidbodyLinearDeltas;
+        public NativeArray<float4> rigidbodyAngularDeltas;
 
         [NativeDisableContainerSafetyRestriction][NativeDisableParallelForRestriction] public NativeArray<float4> deltas;
         [NativeDisableContainerSafetyRestriction][NativeDisableParallelForRestriction] public NativeArray<int> counts;
@@ -46,7 +46,7 @@ namespace bluebean.Physics.PBD
                 int particleIndex = contact.bodyA;
                 int colliderIndex = contact.bodyB;
 
-                //int rigidbodyIndex = shapes[colliderIndex].rigidbodyIndex;
+                int rigidbodyIndex = shapes[colliderIndex].rigidbodyIndex;
 
                 // Calculate relative velocity:
                 float4 rA = float4.zero, rB = float4.zero;
@@ -60,12 +60,11 @@ namespace bluebean.Physics.PBD
                 float staticFriction = staticFrictions[particleIndex];
                 float dynamicFriction = dynamicFrictions[particleIndex];
 
+                var identity = new BurstAffineTransform(new float4(0, 0, 0, 0), quaternion.identity, new float4(1, 1, 1, 1));
                 // Subtract rigidbody velocity:
-                //if (rigidbodyIndex >= 0)
+                if (rigidbodyIndex >= 0)
                 {
-                    // Note: unlike rA, that is expressed in solver space, rB is expressed in world space.
-                    //rB = inertialFrame.frame.TransformPoint(contact.pointB) - rigidbodies[rigidbodyIndex].com;
-                    //relativeVelocity -= BurstMath.GetRigidbodyVelocityAtPoint(rigidbodyIndex, contact.pointB, rigidbodies, rigidbodyLinearDeltas, rigidbodyAngularDeltas, inertialFrame.frame);
+                    relativeVelocity -= BurstMath.GetRigidbodyVelocityAtPoint(rigidbodyIndex, contact.pointB, rigidbodies, rigidbodyLinearDeltas, rigidbodyAngularDeltas, identity);
                 }
                 
                 // Determine impulse magnitude:

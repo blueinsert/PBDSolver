@@ -484,7 +484,8 @@ namespace bluebean.Physics.PBD
                     this.m_positionList[index] = new Vector4(pos.x, pos.y, pos.z, 1);
                     this.m_restPositionList[index] = new Vector4(pos.x, pos.y, pos.z, 1);
                     this.m_externalForceList[index] = Vector4.zero;
-                    this.m_velList[index] = Vector4.zero;
+                    var vel = actor.GetInitVel(i);
+                    this.m_velList[index] = new Vector4(vel.x,vel.y,vel.z,0);
                     this.m_invMassList[index] = actor.GetParticleInvMass(i);
                     this.m_positionDeltaList[index] = Vector4.zero;
                     this.m_gradientList[index] = Vector4.zero;
@@ -494,7 +495,6 @@ namespace bluebean.Physics.PBD
                     this.m_groupsList[index] = actor.ActorId;
                     this.m_staticFrictionList[index] = actor.GetParticleStaticFriction(i);
                     this.m_dynamicFrictionList[index] = actor.GetParticleDynamicFriction(i);
-
                 }
                 Debug.Log("AddActor Finish");
             }

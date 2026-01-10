@@ -21,7 +21,7 @@ namespace bluebean.Physics.PBD
                 invMasses = this.Solver.InvMasses,
                 shapes = m_solver.ColliderWorld.m_colliderShapes.AsNativeArray<BurstColliderShape>(),
                 transforms = m_solver.ColliderWorld.m_colliderTransforms.AsNativeArray<BurstAffineTransform>(),
-                rigidbodies = m_solver.ColliderWorld.rigidbodies.AsNativeArray<BurstRigidbody>(),
+                rigidbodies = m_solver.ColliderWorld.m_rigidbodies.AsNativeArray<BurstRigidbody>(),
                 rigidbodyAngularDeltas= m_solver.RigidbodyAngularDeltas.AsNativeArray<float4>(),
                 rigidbodyLinearDeltas = m_solver.RigidbodyLinearDeltas.AsNativeArray<float4>(),
                 contacts = m_solver.ColliderContacts
@@ -54,7 +54,7 @@ namespace bluebean.Physics.PBD
 
                 shapes = m_solver.ColliderWorld.m_colliderShapes.AsNativeArray<BurstColliderShape>(),
                 transforms = m_solver.ColliderWorld.m_colliderTransforms.AsNativeArray<BurstAffineTransform>(),
-                rigidbodies = m_solver.ColliderWorld.rigidbodies.AsNativeArray<BurstRigidbody>(),
+                rigidbodies = m_solver.ColliderWorld.m_rigidbodies.AsNativeArray<BurstRigidbody>(),
                 rigidbodyLinearDeltas = m_solver.RigidbodyLinearDeltas.AsNativeArray<float4>(),
                 rigidbodyAngularDeltas = m_solver.RigidbodyAngularDeltas.AsNativeArray<float4>(),
 

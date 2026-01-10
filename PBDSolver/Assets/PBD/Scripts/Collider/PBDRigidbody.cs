@@ -78,9 +78,9 @@ namespace bluebean.Physics.PBD
             {
                 var world = solver.ColliderWorld;
 
-                var rb = world.rigidbodies[handle.index];
+                var rb = world.m_rigidbodies[handle.index];
                 rb.FromRigidbody(this);
-                world.rigidbodies[handle.index] = rb;
+                world.m_rigidbodies[handle.index] = rb;
             }
            
         }

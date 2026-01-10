@@ -19,7 +19,6 @@ namespace bluebean.Physics.PBD
             AddCollider();
         }
 
-
         public override void UpdateIfNeeded()
         {
             var colliderWorld = Solver.ColliderWorld;

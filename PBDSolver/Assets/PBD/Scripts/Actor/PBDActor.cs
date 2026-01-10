@@ -8,6 +8,8 @@ namespace bluebean.Physics.PBD
         private static int m_idGenerater;
 
         public int m_actorId;
+        public Vector3 m_initVel = Vector3.zero;
+
         public int ActorId { get { return m_actorId; } }
 
         /// <summary>
@@ -42,6 +44,11 @@ namespace bluebean.Physics.PBD
         public virtual float GetParticleDynamicFriction(int particleIndex)
         {
             return 0.1f;
+        }
+
+        public virtual Vector3 GetInitVel(int particleIndex)
+        {
+            return m_initVel;
         }
 
 

@@ -1,5 +1,6 @@
 using bluebean.Physics.PBD.DataStruct;
 using Unity.Jobs;
+using Unity.Mathematics;
 
 namespace bluebean.Physics.PBD
 {
@@ -36,9 +37,9 @@ namespace bluebean.Physics.PBD
 
                  shapes = m_solver.ColliderWorld.m_colliderShapes.AsNativeArray<BurstColliderShape>(),
                  transforms = m_solver.ColliderWorld.m_colliderTransforms.AsNativeArray<BurstAffineTransform>(),
-                 //rigidbodies = ObiColliderWorld.GetInstance().rigidbodies.AsNativeArray<BurstRigidbody>(),
-                 //rigidbodyLinearDeltas = solverImplementation.abstraction.rigidbodyLinearDeltas.AsNativeArray<float4>(),
-                 //rigidbodyAngularDeltas = solverImplementation.abstraction.rigidbodyAngularDeltas.AsNativeArray<float4>(),
+                 rigidbodies = m_solver.ColliderWorld.m_rigidbodies.AsNativeArray<BurstRigidbody>(),
+                 rigidbodyLinearDeltas = m_solver.RigidbodyLinearDeltas.AsNativeArray<float4>(),
+                 rigidbodyAngularDeltas = m_solver.RigidbodyAngularDeltas.AsNativeArray<float4>(),
 
                  deltas = m_solver.PositionDeltas,
                  counts = m_solver.PositionConstraintCounts,
