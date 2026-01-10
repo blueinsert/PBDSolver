@@ -86,6 +86,8 @@ namespace bluebean.Physics.PBD
                     if (rigidbodyIndex >= 0)
                     {
                         //BurstMath.ApplyImpulse(rigidbodyIndex, -lambda / stepTime * contact.normal, contact.pointB, rigidbodies, rigidbodyLinearDeltas, rigidbodyAngularDeltas, identity);
+                        //这里分母中的时间应该是剩余substep的总时间，小于stepTime，
+                        //这种做法会损失能量，在效果上不会有问题
                         BurstMath.ApplyImpulse(rigidbodyIndex, -lambda / stepTime / substeps * contact.normal, contact.pointB, rigidbodies, rigidbodyLinearDeltas, rigidbodyAngularDeltas, identity);
                     }
                 }

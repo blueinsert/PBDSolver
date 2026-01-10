@@ -180,6 +180,7 @@
     <Compile Include="Assets\PBD\Scripts\Constrains\ParticleFrictionConstraintsBatch.cs" />
     <Compile Include="Assets\PBD\Scripts\DataStruct\Burst\BurstTriangleMesh.cs" />
     <Compile Include="Assets\PBD\Scripts\Job\ColliderCollide\CollisionConstraintsJob.cs" />
+    <Compile Include="Assets\PBD\Scripts\Utils\SolverDebugInfoGUI.cs" />
     <Compile Include="Assets\PBD\Test\CompressTest\SimpleRotate.cs" />
     <Compile Include="Assets\PBD\Scripts\Constrains\ParticleCollisionConstraintsBatch.cs" />
     <Compile Include="Assets\PBD\Scripts\Job\ColliderCollide\UpdateMultiGridByMovingCollidersJob.cs" />

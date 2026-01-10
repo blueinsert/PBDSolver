@@ -302,6 +302,7 @@ GameObject:
   - component: {fileID: 9926467}
   - component: {fileID: 9926466}
   - component: {fileID: 9926468}
+  - component: {fileID: 9926469}
   m_Layer: 0
   m_Name: Solver
   m_TagString: Untagged
@@ -349,6 +350,8 @@ Transform:
   - {fileID: 1326767704}
   - {fileID: 314092778}
   - {fileID: 936755830}
+  - {fileID: 62900978}
+  - {fileID: 1156988727}
   - {fileID: 1392421705}
   - {fileID: 1489835880}
   - {fileID: 1465183549}
@@ -373,6 +376,18 @@ MonoBehaviour:
   m_particleContactCount: 0
   m_listenColliderContact: 1
   m_listenParticleContact: 1
+--- !u!114 &9926469
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9926465}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5174cd152c9de374d8ced3aa532de08f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &28327390
 GameObject:
   m_ObjectHideFlags: 0
@@ -583,6 +598,60 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 41422040}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &62900977
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 62900978}
+  - component: {fileID: 62900979}
+  m_Layer: 0
+  m_Name: Spawner_Bunny (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &62900978
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 62900977}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -4.03, y: -0.48, z: -3.13}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 9926467}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &62900979
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 62900977}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 545e1480d65657646aa13d8bdedb64e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  prefabToSpawn: {fileID: 226979734}
+  triggerKey: 258
+  spawnOffset: {x: 0, y: 0, z: 0}
+  isRangeSpawn: 0
+  spawnRange: {x: 0, y: 0, z: 0}
+  initVel: {x: 0, y: 0, z: 15}
+  initVelPerturb: {x: 8, y: 8, z: 0}
+  m_root: {fileID: 9926465}
+  maxSpawnRate: 10
+  showDebugLog: 1
 --- !u!1 &67336451
 GameObject:
   m_ObjectHideFlags: 0
@@ -3765,8 +3834,8 @@ MonoBehaviour:
   spawnOffset: {x: 0, y: 0, z: 0}
   isRangeSpawn: 0
   spawnRange: {x: 0, y: 0, z: 0}
-  initVel: {x: 0, y: 0, z: 15}
-  initVelPerturb: {x: 5, y: 5, z: 0}
+  initVel: {x: 0, y: 0, z: 20}
+  initVelPerturb: {x: 8, y: 8, z: 0}
   m_root: {fileID: 9926465}
   maxSpawnRate: 10
   showDebugLog: 1
@@ -12594,12 +12663,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefabToSpawn: {fileID: 226979734}
-  triggerKey: 256
+  triggerKey: 257
   spawnOffset: {x: 0, y: 0, z: 0}
   isRangeSpawn: 0
   spawnRange: {x: 0, y: 0, z: 0}
   initVel: {x: 0, y: 0, z: 15}
-  initVelPerturb: {x: 5, y: 5, z: 0}
+  initVelPerturb: {x: 8, y: 8, z: 0}
   m_root: {fileID: 9926465}
   maxSpawnRate: 10
   showDebugLog: 1
@@ -13497,6 +13566,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 9926467}
     m_Modifications:
+    - target: {fileID: 5981054481952310355, guid: 47a51e91e0e7576418703ea9cac8f977,
+        type: 3}
+      propertyPath: m_IsTrigger
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7266170523524956446, guid: 47a51e91e0e7576418703ea9cac8f977,
         type: 3}
       propertyPath: m_Mesh
@@ -16365,6 +16439,60 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1150914214}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1156988726
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1156988727}
+  - component: {fileID: 1156988728}
+  m_Layer: 0
+  m_Name: Spawner_Bunny (2)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1156988727
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1156988726}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2.91, y: 0.35, z: -3.13}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 9926467}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1156988728
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1156988726}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 545e1480d65657646aa13d8bdedb64e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  prefabToSpawn: {fileID: 226979734}
+  triggerKey: 259
+  spawnOffset: {x: 0, y: 0, z: 0}
+  isRangeSpawn: 0
+  spawnRange: {x: 0, y: 0, z: 0}
+  initVel: {x: 0, y: 0, z: 15}
+  initVelPerturb: {x: 8, y: 8, z: 0}
+  m_root: {fileID: 9926465}
+  maxSpawnRate: 10
+  showDebugLog: 1
 --- !u!1 &1162440930
 GameObject:
   m_ObjectHideFlags: 0
@@ -21780,12 +21908,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefabToSpawn: {fileID: 1780642441}
-  triggerKey: 257
+  triggerKey: 256
   spawnOffset: {x: 0, y: 0, z: 0}
   isRangeSpawn: 0
   spawnRange: {x: 0, y: 0, z: 0}
   initVel: {x: 0, y: 0, z: 15}
-  initVelPerturb: {x: 5, y: 5, z: 0}
+  initVelPerturb: {x: 8, y: 8, z: 0}
   m_root: {fileID: 9926465}
   maxSpawnRate: 10
   showDebugLog: 1

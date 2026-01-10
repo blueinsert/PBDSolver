@@ -572,11 +572,7 @@ namespace bluebean.Physics.PBD
 
         void OnGUI()
         {
-            if (!m_showGUI) return;
-            // 显示粒子数量
-            GUILayout.Label($"当前粒子数: {m_positionList.count}");
-            GUILayout.Label($"contact: {m_colliderContacts.Length}");
-            GUILayout.Label($"particle contact: {m_particleContacts.Length}");
+           
 
         }
     }
